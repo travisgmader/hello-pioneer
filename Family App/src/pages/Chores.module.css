@@ -1,0 +1,250 @@
+.page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.addBtn {
+  padding: 10px 20px;
+  border-radius: 20px;
+  background: var(--lavender);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.addBtn:hover {
+  background: var(--lavender-dark);
+  box-shadow: var(--shadow);
+}
+
+.form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: white;
+  padding: 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.input {
+  flex: 1;
+  min-width: 140px;
+  padding: 9px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: var(--lavender);
+}
+
+.submitBtn {
+  padding: 9px 20px;
+  border-radius: var(--radius-sm);
+  background: var(--mint);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.submitBtn:hover {
+  background: var(--mint-dark);
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  background: white;
+  border: 1.5px solid var(--border);
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+
+.filterBtn:hover {
+  border-color: var(--lavender);
+  color: var(--lavender-dark);
+}
+
+.filterBtn.active {
+  background: var(--lavender);
+  border-color: var(--lavender);
+  color: white;
+}
+
+.stats {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.statCard {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1.5px solid;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.statEmoji { font-size: 16px; }
+.statName { color: var(--text); }
+.statCount { font-weight: 700; font-size: 14px; }
+
+.tableWrap {
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  overflow: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td {
+  background: var(--lavender-light);
+}
+
+.doneRow td {
+  opacity: 0.5;
+}
+
+.choreTitle {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.doneRow .choreTitle {
+  text-decoration: line-through;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.freqBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  background: var(--lavender-light);
+  color: var(--lavender-dark);
+  text-transform: capitalize;
+}
+
+.dateCell {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.checkbox {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: white;
+  transition: all 0.2s;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  opacity: 0;
+  transition: all 0.2s;
+}
+
+.table tr:hover .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  background: var(--pink-light);
+  color: var(--pink-dark);
+}
+
+.empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px;
+}
+
+@media (max-width: 768px) {
+  .page { padding: 16px; gap: 16px; }
+  .form { flex-direction: column; }
+  .input { min-width: unset; }
+  .stats { gap: 6px; }
+  .tableWrap { font-size: 13px; }
+  .table th, .table td { padding: 8px 10px; }
+  /* Hide frequency col on very small screens */
+  .table th:nth-child(4), .table td:nth-child(4) { display: none; }
+}

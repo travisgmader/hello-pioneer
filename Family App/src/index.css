@@ -1,0 +1,80 @@
+:root {
+  --lavender: #c9a8e0;
+  --lavender-light: #ecdff7;
+  --lavender-dark: #9b7bbf;
+  --mint: #8ecf8e;
+  --mint-light: #cbedcb;
+  --mint-dark: #5fa85f;
+  --yellow: #f5d87a;
+  --yellow-light: #fdf0b8;
+  --yellow-dark: #c9a830;
+  --pink: #f4a0b5;
+  --pink-light: #fad4e0;
+  --pink-dark: #d4607a;
+  --blue: #87c4e0;
+  --blue-light: #c5e4f0;
+  --blue-dark: #4a8fba;
+  --peach: #f5c09a;
+  --peach-light: #fde3ca;
+  --peach-dark: #d07a40;
+  --bg: #fdf6ff;
+  --card-bg: #ffffff;
+  --text: #3d2c4e;
+  --text-muted: #8a7898;
+  --border: #e8d5f5;
+  --shadow: 0 4px 20px rgba(180, 140, 220, 0.12);
+  --shadow-hover: 0 8px 30px rgba(180, 140, 220, 0.22);
+  --radius: 16px;
+  --radius-sm: 8px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: 14px;
+}
+
+h1, h2, h3, h4 {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ── Mobile globals ───────────────────────────────────── */
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+
+  /* Ensure tappable elements meet 44px minimum */
+  button { min-height: 36px; }
+
+  /* Safe area padding for iPhone notch / home bar */
+  #root {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
