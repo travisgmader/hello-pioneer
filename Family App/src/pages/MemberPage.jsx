@@ -1,5 +1,6 @@
 import { useApp } from '../context/AppContext';
 import { MEMBERS } from '../data/initialData';
+import { formatTimeRange } from '../lib/utils';
 import Calendar from '../components/Calendar';
 import styles from './MemberPage.module.css';
 
@@ -38,7 +39,7 @@ export default function MemberPage({ memberId }) {
   return (
     <div className={styles.page}>
       {/* Hero */}
-      <div className={styles.hero} style={{ background: `linear-gradient(135deg, ${col.bg}, white)`, borderColor: col.accent }}>
+      <div className={styles.hero} style={{ background: `linear-gradient(135deg, ${col.bg}, var(--card-bg))`, borderColor: col.accent }}>
         <div className={styles.heroEmoji}>{member.emoji}</div>
         <div className={styles.heroInfo}>
           <h1 className={styles.heroName} style={{ color: col.dark }}>{member.name}</h1>
@@ -71,7 +72,7 @@ export default function MemberPage({ memberId }) {
                   <div key={c.id} className={`${styles.choreItem} ${c.completed ? styles.choreDone : ''}`}>
                     <button
                       className={styles.checkbox}
-                      style={{ borderColor: col.accent, background: c.completed ? col.accent : 'white' }}
+                      style={{ borderColor: col.accent, background: c.completed ? col.accent : 'var(--card-bg)' }}
                       onClick={() => toggleChore(c.id)}
                     >
                       {c.completed && '✓'}
@@ -100,7 +101,7 @@ export default function MemberPage({ memberId }) {
                   <div key={e.id} className={styles.eventItem} style={{ borderLeftColor: col.accent, background: col.bg }}>
                     <span className={styles.evtDate} style={{ color: col.dark }}>{formatDate(e.date)}</span>
                     <span className={styles.evtTitle}>{e.title}</span>
-                    {e.time && <span className={styles.evtTime}>{e.time}</span>}
+                    {e.time && <span className={styles.evtTime}>{formatTimeRange(e.time, e.endTime)}</span>}
                   </div>
                 ))}
               </div>

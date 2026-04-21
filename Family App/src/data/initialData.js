@@ -2,7 +2,7 @@ export const MEMBERS = [
   { id: 'mom', name: 'Mom', color: 'pink', emoji: '👩' },
   { id: 'dad', name: 'Dad', color: 'blue', emoji: '👨' },
   { id: 'stella', name: 'Stella', color: 'lavender', emoji: '🌸' },
-  { id: 'roman', name: 'Roman', color: 'mint', emoji: '🌿' },
+  { id: 'roman', name: 'Roman', color: 'mint', emoji: '🦕' },
   { id: 'layla', name: 'Layla', color: 'yellow', emoji: '🌻' },
 ];
 

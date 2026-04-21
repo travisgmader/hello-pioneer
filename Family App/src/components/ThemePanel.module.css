@@ -1,0 +1,112 @@
+.wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.gearBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.35s ease, background 0.15s;
+  line-height: 1;
+}
+
+.gearBtn:hover { background: var(--lavender-light); }
+.gearOpen { transform: rotate(60deg); }
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 299;
+}
+
+.panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-hover);
+  min-width: 230px;
+  z-index: 300;
+  overflow: hidden;
+  animation: popIn 0.15s ease;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.panelHeader {
+  padding: 10px 14px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.themeBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-align: left;
+}
+
+.themeBtn:hover { background: var(--lavender-light); }
+.active { background: var(--lavender-light); }
+
+.swatches {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.swatch {
+  width: 12px;
+  height: 28px;
+  border-radius: 4px;
+  display: block;
+  border: 1px solid rgba(0,0,0,0.12);
+}
+
+.themeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.themeName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.themeDesc {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.check {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--lavender-dark);
+  flex-shrink: 0;
+}

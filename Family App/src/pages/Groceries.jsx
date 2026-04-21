@@ -127,7 +127,7 @@ export default function Groceries() {
                     <div key={g.id} className={`${styles.item} ${g.checked ? styles.itemChecked : ''}`}>
                       <button
                         className={styles.checkbox}
-                        style={{ borderColor: col.accent, background: g.checked ? col.accent : 'white' }}
+                        style={{ borderColor: col.accent, background: g.checked ? col.accent : 'var(--card-bg)' }}
                         onClick={() => toggleGrocery(g.id)}
                       >
                         {g.checked && '✓'}

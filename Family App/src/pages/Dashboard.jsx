@@ -33,36 +33,6 @@ export default function Dashboard({ setPage }) {
         <p className={styles.subtitle}>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
       </div>
 
-      {/* Member Cards */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>👨‍👩‍👧‍👦 Family Members</h2>
-        <div className={styles.memberGrid}>
-          {MEMBERS.map(m => {
-            const c = COLOR_VARS[m.color];
-            const memberChores = chores.filter(ch => ch.assignedTo === m.id);
-            const done = memberChores.filter(ch => ch.completed).length;
-            const pct = memberChores.length ? Math.round((done / memberChores.length) * 100) : 0;
-            return (
-              <button
-                key={m.id}
-                className={styles.memberCard}
-                style={{ background: c.bg, borderColor: c.accent }}
-                onClick={() => setPage(m.id)}
-              >
-                <div className={styles.memberEmoji}>{m.emoji}</div>
-                <div className={styles.memberName}>{m.name}</div>
-                <div className={styles.memberStats}>
-                  <div className={styles.progressBar}>
-                    <div className={styles.progressFill} style={{ width: `${pct}%`, background: c.accent }} />
-                  </div>
-                  <span className={styles.progressLabel}>{done}/{memberChores.length} chores</span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
       <div className={styles.columns}>
         {/* Today's Chores */}
         <section className={styles.section}>
@@ -78,7 +48,7 @@ export default function Dashboard({ setPage }) {
                   <div key={c.id} className={`${styles.choreItem} ${c.completed ? styles.done : ''}`}>
                     <button
                       className={styles.checkbox}
-                      style={{ borderColor: col.accent, background: c.completed ? col.accent : 'white' }}
+                      style={{ borderColor: col.accent, background: c.completed ? col.accent : 'var(--card-bg)' }}
                       onClick={() => toggleChore(c.id)}
                     >
                       {c.completed && '✓'}
@@ -125,6 +95,36 @@ export default function Dashboard({ setPage }) {
           )}
         </section>
       </div>
+
+      {/* Member Cards */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>👨‍👩‍👧‍👦 Family Members</h2>
+        <div className={styles.memberGrid}>
+          {MEMBERS.map(m => {
+            const c = COLOR_VARS[m.color];
+            const memberChores = chores.filter(ch => ch.assignedTo === m.id);
+            const done = memberChores.filter(ch => ch.completed).length;
+            const pct = memberChores.length ? Math.round((done / memberChores.length) * 100) : 0;
+            return (
+              <button
+                key={m.id}
+                className={styles.memberCard}
+                style={{ background: c.bg, borderColor: c.accent }}
+                onClick={() => setPage(m.id)}
+              >
+                <div className={styles.memberEmoji}>{m.emoji}</div>
+                <div className={styles.memberName}>{m.name}</div>
+                <div className={styles.memberStats}>
+                  <div className={styles.progressBar}>
+                    <div className={styles.progressFill} style={{ width: `${pct}%`, background: c.accent }} />
+                  </div>
+                  <span className={styles.progressLabel}>{done}/{memberChores.length} chores</span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 }

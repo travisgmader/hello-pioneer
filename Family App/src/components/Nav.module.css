@@ -3,7 +3,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  background: white;
+  background: var(--card-bg);
   border-bottom: 2px solid var(--border);
   box-shadow: var(--shadow);
   position: sticky;
@@ -119,7 +119,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--card-bg);
   border-bottom: 2px solid var(--border);
   box-shadow: 0 8px 24px rgba(180, 140, 220, 0.18);
   z-index: 199;
@@ -209,8 +209,9 @@
 .dropSignOut:hover { background: var(--pink-light); }
 
 @media (max-width: 768px) {
-  .links    { display: none; }
-  .signOut  { display: none; }
+  .links     { display: none; }
+  .signOut   { display: none; }
+  .themeWrap { display: none; }
   .mobileRight { display: flex; }
   .nav { position: relative; flex-wrap: nowrap; }
 }

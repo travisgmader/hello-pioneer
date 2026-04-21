@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { MEMBERS } from '../data/initialData';
 import { useApp } from '../context/AppContext';
 import { isConfigured } from '../lib/supabase';
+import ThemePanel from './ThemePanel';
 import styles from './Nav.module.css';
 
 const NAV_ITEMS = [
@@ -13,7 +14,7 @@ const NAV_ITEMS = [
   { id: 'notes',     label: '📝 Notes' },
 ];
 
-export default function Nav({ page, setPage }) {
+export default function Nav({ page, setPage, theme, setTheme }) {
   const [open, setOpen] = useState(false);
   const { user, signOut } = useApp();
 
@@ -24,7 +25,7 @@ export default function Nav({ page, setPage }) {
 
   return (
     <nav className={styles.nav}>
-      <div className={styles.logo}>🐣 Family Hub</div>
+      <div className={styles.logo}><img src="/fox-logo.png" alt="" style={{ width: 28, height: 28, objectFit: 'contain', verticalAlign: 'middle', marginRight: 8 }} />Family Hub</div>
 
       {/* Desktop links */}
       <div className={styles.links}>
@@ -45,15 +46,18 @@ export default function Nav({ page, setPage }) {
         ))}
       </div>
 
-      {/* Mobile: current page label + hamburger */}
+      {/* Mobile: current page label + gear + hamburger */}
       <div className={styles.mobileRight}>
         <span className={styles.mobilePageLabel}>{currentLabel}</span>
+        <ThemePanel theme={theme} setTheme={setTheme} />
         <button className={styles.hamburger} onClick={() => setOpen(o => !o)} aria-label="Menu">
           <span className={`${styles.bar} ${open ? styles.barTop : ''}`} />
           <span className={`${styles.bar} ${open ? styles.barMid : ''}`} />
           <span className={`${styles.bar} ${open ? styles.barBot : ''}`} />
         </button>
       </div>
+
+      <div className={styles.themeWrap}><ThemePanel theme={theme} setTheme={setTheme} /></div>
 
       {/* Desktop sign out */}
       {isConfigured && user && (

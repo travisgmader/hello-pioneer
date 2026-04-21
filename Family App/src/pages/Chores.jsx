@@ -134,7 +134,7 @@ export default function Chores() {
                     <td>
                       <button
                         className={styles.checkbox}
-                        style={{ borderColor: col.accent, background: c.completed ? col.accent : 'white' }}
+                        style={{ borderColor: col.accent, background: c.completed ? col.accent : 'var(--card-bg)' }}
                         onClick={() => toggleChore(c.id)}
                       >
                         {c.completed && '✓'}

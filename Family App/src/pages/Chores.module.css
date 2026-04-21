@@ -37,7 +37,7 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-  background: white;
+  background: var(--card-bg);
   padding: 20px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
@@ -86,7 +86,7 @@
   border-radius: 16px;
   font-size: 13px;
   font-weight: 500;
-  background: white;
+  background: var(--card-bg);
   border: 1.5px solid var(--border);
   color: var(--text-muted);
   transition: all 0.2s;
@@ -125,7 +125,7 @@
 .statCount { font-weight: 700; font-size: 14px; }
 
 .tableWrap {
-  background: white;
+  background: var(--card-bg);
   border-radius: var(--radius);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);

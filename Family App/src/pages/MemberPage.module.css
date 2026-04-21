@@ -93,7 +93,7 @@
 }
 
 .section {
-  background: white;
+  background: var(--card-bg);
   border-radius: var(--radius);
   border: 1px solid var(--border);
   border-top: 3px solid;

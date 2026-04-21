@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AppProvider } from './context/AppContext';
 import { useApp } from './context/AppContext';
-import { isConfigured } from './lib/supabase';
+import { isConfigured, supabase } from './lib/supabase';
+import { ALLOWED_EMAILS } from './lib/allowedEmails';
 import Nav from './components/Nav';
 import Dashboard from './pages/Dashboard';
 import Chores from './pages/Chores';
@@ -18,19 +19,40 @@ const MEMBER_IDS = ['mom', 'dad', 'stella', 'roman', 'layla'];
 function AppInner() {
   const { loading, authLoading, user } = useApp();
   const [page, setPage] = useState('dashboard');
+  const [theme, setTheme] = useState(() => localStorage.getItem('family-theme') || 'lavender');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('family-theme', theme);
+  }, [theme]);
 
   if (authLoading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: 16, color: 'var(--text-muted)' }}>
-      <div style={{ fontSize: 48 }}>🐣</div>
+      <img src="/fox-logo.png" alt="Family Hub" style={{ width: 72, height: 72, objectFit: 'contain' }} />
       <div style={{ fontSize: 16, fontWeight: 600 }}>Loading Family Hub…</div>
     </div>
   );
 
   if (isConfigured && !user) return <Login />;
 
+  if (isConfigured && user && ALLOWED_EMAILS.length > 0 && !ALLOWED_EMAILS.includes(user.email?.toLowerCase())) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: 16, color: 'var(--text-muted)', padding: 24, textAlign: 'center' }}>
+        <img src="/fox-logo.png" alt="Family Hub" style={{ width: 72, height: 72, objectFit: 'contain' }} />
+        <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>Access Denied</div>
+        <div style={{ fontSize: 14, maxWidth: 320 }}>
+          <strong>{user.email}</strong> is not authorized to access Family Hub.
+        </div>
+        <button onClick={() => supabase.auth.signOut()} style={{ marginTop: 8, padding: '8px 20px', borderRadius: 20, background: 'var(--lavender)', color: 'white', border: 'none', fontWeight: 600, cursor: 'pointer' }}>
+          Sign out
+        </button>
+      </div>
+    );
+  }
+
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: 16, color: 'var(--text-muted)' }}>
-      <div style={{ fontSize: 48 }}>🐣</div>
+      <img src="/fox-logo.png" alt="Family Hub" style={{ width: 72, height: 72, objectFit: 'contain' }} />
       <div style={{ fontSize: 16, fontWeight: 600 }}>Loading Family Hub…</div>
     </div>
   );
@@ -47,7 +69,7 @@ function AppInner() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Nav page={page} setPage={setPage} />
+      <Nav page={page} setPage={setPage} theme={theme} setTheme={setTheme} />
       <main style={{ flex: 1 }}>{content}</main>
       <footer style={{
         textAlign: 'center',
@@ -55,7 +77,7 @@ function AppInner() {
         color: 'var(--text-muted)',
         fontSize: '12px',
         borderTop: '1px solid var(--border)',
-        background: 'white',
+        background: 'var(--card-bg)',
       }}>
         🌷 Family Hub — Made with love
       </footer>

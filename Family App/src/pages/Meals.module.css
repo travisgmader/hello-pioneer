@@ -20,7 +20,7 @@
 }
 
 .weekBtn {
-  background: white;
+  background: var(--card-bg);
   border: 1.5px solid var(--border);
   border-radius: 50%;
   width: 34px;
@@ -65,7 +65,7 @@
 }
 
 .dayHeader {
-  background: white;
+  background: var(--card-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -118,7 +118,7 @@
 }
 
 .cell {
-  background: white;
+  background: var(--card-bg);
   min-height: 72px;
   transition: background 0.15s;
 }
@@ -177,7 +177,7 @@
   border-radius: 6px;
   font-size: 12px;
   outline: none;
-  background: white;
+  background: var(--card-bg);
 }
 
 .editActions {
@@ -207,7 +207,7 @@
 
 /* Recommendations section */
 .recSection {
-  background: white;
+  background: var(--card-bg);
   border-radius: var(--radius);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
@@ -256,7 +256,7 @@
   border-radius: var(--radius-sm);
   font-size: 14px;
   outline: none;
-  background: white;
+  background: var(--card-bg);
   color: var(--text);
 }
 .recInput:focus { border-color: var(--lavender); }
@@ -283,7 +283,7 @@
   border-radius: 14px;
   font-size: 13px;
   font-weight: 500;
-  background: white;
+  background: var(--card-bg);
   border: 1.5px solid var(--border);
   color: var(--text-muted);
   cursor: pointer;
@@ -369,7 +369,7 @@
   border-radius: 50%;
   border: 1.5px solid;
   font-size: 13px;
-  background: white;
+  background: var(--card-bg);
   cursor: pointer;
   display: flex;
   align-items: center;

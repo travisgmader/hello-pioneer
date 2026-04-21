@@ -28,6 +28,157 @@
   --radius-sm: 8px;
 }
 
+/* ── Electric Lemonade theme ──────────────────────────── */
+[data-theme="electric"] {
+  /* Stella + primary UI chrome → vivid violet */
+  --lavender: #7c3aed;
+  --lavender-light: #ede9fe;
+  --lavender-dark: #4c1d95;
+  /* Roman → electric green */
+  --mint: #16a34a;
+  --mint-light: #dcfce7;
+  --mint-dark: #14532d;
+  /* Layla → vivid orange (yellow bg = can't use yellow) */
+  --yellow: #ea580c;
+  --yellow-light: #ffedd5;
+  --yellow-dark: #9a3412;
+  /* Mom → hot pink */
+  --pink: #ec4899;
+  --pink-light: #fce7f3;
+  --pink-dark: #9d174d;
+  /* Dad → electric blue */
+  --blue: #2563eb;
+  --blue-light: #dbeafe;
+  --blue-dark: #1e3a8a;
+  /* Unassigned/shared events → amber */
+  --peach: #f59e0b;
+  --peach-light: #fef3c7;
+  --peach-dark: #92400e;
+  --bg: #ffff00;
+  --card-bg: #ffffff;
+  --text: #1c1b1b;
+  --text-muted: #484831;
+  --border: #581c87;
+  --shadow: 4px 4px 0 0 #581c87;
+  --shadow-hover: 6px 6px 0 0 #581c87;
+  --radius: 16px;
+  --radius-sm: 8px;
+}
+
+[data-theme="electric"] body {
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+}
+
+[data-theme="electric"] h1,
+[data-theme="electric"] h2,
+[data-theme="electric"] h3,
+[data-theme="electric"] h4 {
+  font-family: 'Epilogue', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+/* ── Midnight Monolith theme ──────────────────────────── */
+[data-theme="midnight"] {
+  /* Stella + primary UI chrome → warm gold */
+  --lavender: #e9c176;
+  --lavender-light: #221c0d;
+  --lavender-dark: #f0d490;
+  /* Roman → emerald green */
+  --mint: #10b981;
+  --mint-light: #041a10;
+  --mint-dark: #6ee7b7;
+  /* Layla → vivid orange (distinct from gold) */
+  --yellow: #f97316;
+  --yellow-light: #1e0d03;
+  --yellow-dark: #fdba74;
+  /* Mom → rose pink */
+  --pink: #e879a0;
+  --pink-light: #1e0815;
+  --pink-dark: #f9a8d4;
+  /* Dad → sky blue */
+  --blue: #60a5fa;
+  --blue-light: #060f1e;
+  --blue-dark: #93c5fd;
+  /* Unassigned/shared events → soft violet */
+  --peach: #a78bfa;
+  --peach-light: #110e20;
+  --peach-dark: #c4b5fd;
+  /* Surfaces */
+  --bg: #0c0b0f;
+  --card-bg: #16141f;
+  /* Text — warm off-white, never pure white */
+  --text: #e5e2e1;
+  --text-muted: #8b8680;
+  /* Ghost gold border */
+  --border: rgba(233, 193, 118, 0.12);
+  /* Diffuse depth shadow + subtle gold top rim on every card */
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(233, 193, 118, 0.12);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(233, 193, 118, 0.22), 0 0 24px rgba(233, 193, 118, 0.08);
+  /* Sharp, architectural corners */
+  --radius: 4px;
+  --radius-sm: 2px;
+}
+
+[data-theme="midnight"] body {
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  background-color: #0c0b0f;
+  /* Architectural crosshatch texture — fine gold grid */
+  background-image:
+    linear-gradient(rgba(233, 193, 118, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(233, 193, 118, 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-attachment: fixed;
+}
+
+[data-theme="midnight"] h1,
+[data-theme="midnight"] h2,
+[data-theme="midnight"] h3,
+[data-theme="midnight"] h4 {
+  font-family: 'Noto Serif', Georgia, serif;
+  letter-spacing: -0.02em;
+}
+
+/* Frosted obsidian nav */
+[data-theme="midnight"] nav {
+  background: rgba(22, 20, 31, 0.82) !important;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom-color: rgba(233, 193, 118, 0.1) !important;
+}
+
+/* Dark footer */
+[data-theme="midnight"] footer {
+  background: var(--card-bg) !important;
+  color: var(--text-muted);
+  border-top-color: rgba(233, 193, 118, 0.08) !important;
+}
+
+/* Card-surface texture — diagonal micro-lines on every card/section */
+[data-theme="midnight"] main {
+  background: transparent;
+}
+
+[data-theme="midnight"] input,
+[data-theme="midnight"] textarea,
+[data-theme="midnight"] select {
+  background: var(--card-bg);
+  color: var(--text);
+  border-color: rgba(233, 193, 118, 0.2);
+}
+
+[data-theme="midnight"] input::placeholder,
+[data-theme="midnight"] textarea::placeholder {
+  color: var(--text-muted);
+}
+
+[data-theme="midnight"] input:focus,
+[data-theme="midnight"] textarea:focus,
+[data-theme="midnight"] select:focus {
+  outline-color: var(--lavender);
+  border-color: var(--lavender);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

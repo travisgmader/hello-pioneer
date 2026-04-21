@@ -1,5 +1,5 @@
 .cal {
-  background: white;
+  background: var(--card-bg);
   border-radius: var(--radius);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
@@ -107,7 +107,7 @@
 }
 
 .cell {
-  background: white;
+  background: var(--card-bg);
   padding: 4px 5px;
   min-height: 110px;
   cursor: pointer;
@@ -205,7 +205,7 @@
   padding: 1px 3px;
   border-radius: 4px;
   border: 1.5px solid var(--border);
-  background: white;
+  background: var(--card-bg);
   cursor: pointer;
   line-height: 1;
   transition: all 0.15s;
@@ -224,10 +224,73 @@
   box-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
 
-/* ── Detail Panel ─────────────────────────────────────── */
-.detail {
-  border-top: 1px solid var(--border);
+/* ── Dialog / Modal ───────────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.dialog {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+  width: 100%;
+  max-width: 520px;
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dialogHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   padding: 16px 20px;
+  background: var(--lavender-light);
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.dialogHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.dialogClose {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--lavender-dark);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+  line-height: 1;
+}
+
+.dialogClose:hover {
+  background: var(--lavender);
+  color: white;
+}
+
+.dialogBody {
+  padding: 16px 20px;
+  overflow-y: auto;
+  flex: 1;
   background: var(--bg);
 }
 
@@ -283,7 +346,7 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  background: white;
+  background: var(--card-bg);
   transition: all 0.2s;
 }
 
@@ -316,7 +379,7 @@
   flex-wrap: wrap;
   margin-bottom: 12px;
   padding: 12px;
-  background: white;
+  background: var(--card-bg);
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
 }
@@ -334,6 +397,25 @@
 }
 
 .evtInput:focus { border-color: var(--lavender); }
+
+.repeatRow {
+  flex: 0 0 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+.repeatLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
 
 .evtSubmit {
   padding: 7px 16px;
@@ -460,7 +542,7 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  background: white;
+  background: var(--card-bg);
   transition: all 0.2s;
 }
 
@@ -475,6 +557,25 @@
 .evtActions {
   display: flex;
   justify-content: flex-end;
+  gap: 4px;
+}
+
+.evtEdit {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0.4;
+  transition: all 0.15s;
+}
+
+.evtEdit:hover {
+  opacity: 1;
+  background: var(--lavender-light);
+  color: var(--lavender-dark);
 }
 
 .evtDel {
@@ -495,6 +596,32 @@
   color: var(--pink-dark);
 }
 
+.evtEditForm {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.evtEditActions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.evtSave {
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--mint);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.evtSave:hover { background: var(--mint-dark); }
+
 @media (max-width: 768px) {
   .legendNote { display: none; }
 
@@ -511,11 +638,21 @@
 
   .custodyIcon { font-size: 9px; padding: 1px 2px; }
 
-  .detail { padding: 14px 14px; }
+  .overlay { padding: 12px; align-items: flex-end; }
+
+  .dialog {
+    max-height: 88vh;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .dialogBody { padding: 14px; }
 
   .evtForm { flex-direction: column; }
   .evtInput { min-width: unset; }
 
   .transportRow { padding-left: 0; }
-  .detailHeader { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .dialogHeader { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+  .dialogHeaderActions { align-self: flex-end; }
 }

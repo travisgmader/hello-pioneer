@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styles from './Calendar.module.css';
+import { formatTimeRange } from '../lib/utils';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -39,7 +40,9 @@ export default function Calendar({
   const [month, setMonth] = useState(now.getMonth());
   const [selected, setSelected] = useState(null);
   const [showEventForm, setShowEventForm] = useState(false);
-  const [newEvent, setNewEvent] = useState({ title: '', memberId: '', time: '09:00', color: 'peach' });
+  const [newEvent, setNewEvent] = useState({ title: '', memberId: '', time: '09:00', color: 'peach', repeat: 'none', repeatUntil: '' });
+  const [editingId, setEditingId] = useState(null);
+  const [editFields, setEditFields] = useState({});
 
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -47,6 +50,20 @@ export default function Calendar({
 
   const prevMonth = () => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); };
   const nextMonth = () => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); };
+  const closeDialog = () => { setSelected(null); setShowEventForm(false); setEditingId(null); };
+
+  const startEdit = (ev) => {
+    setEditingId(ev.id);
+    setEditFields({ title: ev.title, time: ev.time || '', memberId: ev.memberId || '', color: ev.color || 'peach' });
+  };
+
+  const handleSaveEdit = (evId) => {
+    const color = editFields.memberId
+      ? (members.find(m => m.id === editFields.memberId)?.color || 'lavender')
+      : 'peach';
+    onUpdateEvent?.(evId, { ...editFields, color });
+    setEditingId(null);
+  };
 
   const fmt = (d) => {
     const dd = String(d).padStart(2, '0');
@@ -71,11 +88,32 @@ export default function Calendar({
   const selectedDateStr = selected ? fmt(selected) : null;
   const selectedEvents = selected ? dayEvents(selected) : [];
 
+  const generateRepeatDates = (startDate, repeat, until) => {
+    if (repeat === 'none') return [startDate];
+    const dates = [];
+    const end = new Date(until + 'T00:00:00');
+    let cur = new Date(startDate + 'T00:00:00');
+    let guard = 500;
+    while (cur <= end && guard-- > 0) {
+      const dow = cur.getDay();
+      if (repeat !== 'weekdays' || (dow >= 1 && dow <= 5)) {
+        dates.push(cur.toISOString().split('T')[0]);
+      }
+      if (repeat === 'daily' || repeat === 'weekdays') cur.setDate(cur.getDate() + 1);
+      else if (repeat === 'weekly') cur.setDate(cur.getDate() + 7);
+      else if (repeat === 'monthly') cur.setMonth(cur.getMonth() + 1);
+    }
+    return dates;
+  };
+
   const handleAddEvent = (e) => {
     e.preventDefault();
     if (!newEvent.title.trim() || !selected) return;
-    onAddEvent?.({ ...newEvent, date: fmt(selected) });
-    setNewEvent({ title: '', memberId: '', time: '09:00', color: 'peach' });
+    const startDate = fmt(selected);
+    const { repeat, repeatUntil, ...eventBase } = newEvent;
+    const until = repeat !== 'none' && repeatUntil ? repeatUntil : startDate;
+    generateRepeatDates(startDate, repeat, until).forEach(date => onAddEvent?.({ ...eventBase, date }));
+    setNewEvent({ title: '', memberId: '', time: '09:00', color: 'peach', repeat: 'none', repeatUntil: '' });
     setShowEventForm(false);
   };
 
@@ -200,40 +238,44 @@ export default function Calendar({
       </div></div>
 
       {selected && (
-        <div className={styles.detail}>
-          <div className={styles.detailHeader}>
-            <div className={styles.detailLeft}>
-              <h4 className={styles.detailTitle}>
-                {MONTHS[month]} {selected}
-                {fmt(selected) === todayStr && <span className={styles.todayBadge}>Today</span>}
-              </h4>
-              {/* Show custody assignment for selected day */}
-              {onCustodyChange && (
-                <div className={styles.detailCustody}>
-                  <span className={styles.custodyLabel}>Kids at:</span>
-                  {PARENTS.map(p => {
-                    const isActive = (custody[selectedDateStr] === p.id);
-                    const col = parentColor(p.id);
-                    return (
-                      <button
-                        key={p.id}
-                        className={`${styles.custodyPill} ${isActive ? styles.custodyPillActive : ''}`}
-                        style={isActive ? { background: col.accent, color: 'white', borderColor: col.accent } : { borderColor: col.accent, color: col.dark }}
-                        onClick={() => onCustodyChange(selectedDateStr, p.id)}
-                      >
-                        {p.emoji} {p.label}'s
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+        <div className={styles.overlay} onClick={closeDialog}>
+          <div className={styles.dialog} onClick={e => e.stopPropagation()}>
+            <div className={styles.dialogHeader}>
+              <div className={styles.detailLeft}>
+                <h4 className={styles.detailTitle}>
+                  {MONTHS[month]} {selected}
+                  {fmt(selected) === todayStr && <span className={styles.todayBadge}>Today</span>}
+                </h4>
+                {onCustodyChange && (
+                  <div className={styles.detailCustody}>
+                    <span className={styles.custodyLabel}>Kids at:</span>
+                    {PARENTS.map(p => {
+                      const isActive = (custody[selectedDateStr] === p.id);
+                      const col = parentColor(p.id);
+                      return (
+                        <button
+                          key={p.id}
+                          className={`${styles.custodyPill} ${isActive ? styles.custodyPillActive : ''}`}
+                          style={isActive ? { background: col.accent, color: 'white', borderColor: col.accent } : { borderColor: col.accent, color: col.dark }}
+                          onClick={() => onCustodyChange(selectedDateStr, p.id)}
+                        >
+                          {p.emoji} {p.label}'s
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+              <div className={styles.dialogHeaderActions}>
+                {onAddEvent && (
+                  <button className={styles.addEvtBtn} onClick={() => setShowEventForm(s => !s)}>
+                    {showEventForm ? '✕' : '+ Event'}
+                  </button>
+                )}
+                <button className={styles.dialogClose} onClick={closeDialog}>✕</button>
+              </div>
             </div>
-            {onAddEvent && (
-              <button className={styles.addEvtBtn} onClick={() => setShowEventForm(s => !s)}>
-                {showEventForm ? '✕' : '+ Event'}
-              </button>
-            )}
-          </div>
+          <div className={styles.dialogBody}>
 
           {showEventForm && onAddEvent && (
             <form className={styles.evtForm} onSubmit={handleAddEvent}>
@@ -253,6 +295,40 @@ export default function Calendar({
                   {members.map(m => <option key={m.id} value={m.id}>{m.emoji} {m.name}</option>)}
                 </select>
               )}
+              <div className={styles.repeatRow}>
+                <span className={styles.repeatLabel}>Repeats</span>
+                <select
+                  className={styles.evtInput}
+                  style={{ flex: 'none', minWidth: 0 }}
+                  value={newEvent.repeat}
+                  onChange={e => {
+                    const repeat = e.target.value;
+                    const d = new Date(fmt(selected) + 'T00:00:00');
+                    d.setDate(d.getDate() + (repeat === 'daily' || repeat === 'weekdays' ? 14 : repeat === 'weekly' ? 28 : 90));
+                    setNewEvent(f => ({ ...f, repeat, repeatUntil: repeat !== 'none' ? d.toISOString().split('T')[0] : '' }));
+                  }}
+                >
+                  <option value="none">Never</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekdays">Weekdays</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+                {newEvent.repeat !== 'none' && (
+                  <>
+                    <span className={styles.repeatLabel}>until</span>
+                    <input
+                      type="date"
+                      className={styles.evtInput}
+                      style={{ flex: 'none', minWidth: 0 }}
+                      value={newEvent.repeatUntil}
+                      min={fmt(selected)}
+                      onChange={e => setNewEvent(f => ({ ...f, repeatUntil: e.target.value }))}
+                      required
+                    />
+                  </>
+                )}
+              </div>
               <button type="submit" className={styles.evtSubmit}>Add</button>
             </form>
           )}
@@ -290,57 +366,99 @@ export default function Calendar({
                   ? { borderLeftColor: col.accent, borderLeftWidth: '5px', background: `${col.accent}18` }
                   : { borderLeftColor: col.accent, background: col.bg };
 
+                const isEditing = editingId === ev.id;
+
                 return (
                   <div key={ev.id}
                     className={`${styles.evtItem} ${ev.isChore && ev.completed ? styles.evtDone : ''}`}
                     style={itemStyle}
                   >
-                    <div className={styles.evtItemMain}>
-                      <span className={styles.evtDot} style={{ background: col.accent }} />
-                      <span className={styles.evtName}>
-                        {ev.isChore ? '✅ ' : isTransport ? '🚗 ' : ''}{ev.title}
-                        {ev.time && !ev.isChore && <span className={styles.evtTime}>{ev.time}</span>}
-                      </span>
-                      {member && <span className={styles.evtMember}>{member.emoji}</span>}
-                    </div>
+                    {isEditing ? (
+                      <form className={styles.evtEditForm} onSubmit={e => { e.preventDefault(); handleSaveEdit(ev.id); }}>
+                        <input
+                          className={styles.evtInput}
+                          value={editFields.title}
+                          onChange={e => setEditFields(f => ({ ...f, title: e.target.value }))}
+                          required
+                          autoFocus
+                        />
+                        <input
+                          type="time"
+                          className={styles.evtInput}
+                          value={editFields.time}
+                          onChange={e => setEditFields(f => ({ ...f, time: e.target.value }))}
+                        />
+                        {members.length > 0 && (
+                          <select
+                            className={styles.evtInput}
+                            value={editFields.memberId}
+                            onChange={e => setEditFields(f => ({ ...f, memberId: e.target.value }))}
+                          >
+                            <option value="">Everyone</option>
+                            {members.map(m => <option key={m.id} value={m.id}>{m.emoji} {m.name}</option>)}
+                          </select>
+                        )}
+                        <div className={styles.evtEditActions}>
+                          <button type="submit" className={styles.evtSave}>Save</button>
+                          <button type="button" className={styles.evtDel} onClick={() => setEditingId(null)}>Cancel</button>
+                        </div>
+                      </form>
+                    ) : (
+                      <>
+                        <div className={styles.evtItemMain}>
+                          <span className={styles.evtDot} style={{ background: col.accent }} />
+                          <span className={styles.evtName}>
+                            {ev.isChore ? '✅ ' : isTransport ? '🚗 ' : ''}{ev.title}
+                            {ev.time && !ev.isChore && (
+                              <span className={styles.evtTime}>{formatTimeRange(ev.time, ev.endTime)}</span>
+                            )}
+                          </span>
+                          {member && <span className={styles.evtMember}>{member.emoji}</span>}
+                        </div>
 
-                    {/* Parent pickup/dropoff selector for child events */}
-                    {isChildEvent && onUpdateEvent && (
-                      <div className={styles.transportRow}>
-                        <span className={styles.transportLabel}>🚗 Pickup/Dropoff:</span>
-                        {PARENTS.map(p => {
-                          const isActive = ev.transportParent === p.id;
-                          const pcol = parentColor(p.id);
-                          return (
-                            <button
-                              key={p.id}
-                              className={`${styles.transportBtn} ${isActive ? styles.transportActive : ''}`}
-                              style={isActive
-                                ? { background: pcol.accent, color: 'white', borderColor: pcol.accent }
-                                : { borderColor: pcol.accent, color: pcol.dark }}
-                              onClick={() => onUpdateEvent(ev.id, {
-                                transportParent: ev.transportParent === p.id ? null : p.id,
-                                // Override event color to match parent when assigned
-                                color: ev.transportParent === p.id ? ev._origColor || ev.color : ev.color,
-                              })}
-                            >
-                              {p.emoji} {p.label}
-                            </button>
-                          );
-                        })}
-                      </div>
+                        {/* Parent pickup/dropoff selector for child events */}
+                        {isChildEvent && onUpdateEvent && (
+                          <div className={styles.transportRow}>
+                            <span className={styles.transportLabel}>🚗 Pickup/Dropoff:</span>
+                            {PARENTS.map(p => {
+                              const isActive = ev.transportParent === p.id;
+                              const pcol = parentColor(p.id);
+                              return (
+                                <button
+                                  key={p.id}
+                                  className={`${styles.transportBtn} ${isActive ? styles.transportActive : ''}`}
+                                  style={isActive
+                                    ? { background: pcol.accent, color: 'white', borderColor: pcol.accent }
+                                    : { borderColor: pcol.accent, color: pcol.dark }}
+                                  onClick={() => onUpdateEvent(ev.id, {
+                                    transportParent: ev.transportParent === p.id ? null : p.id,
+                                    color: ev.transportParent === p.id ? ev._origColor || ev.color : ev.color,
+                                  })}
+                                >
+                                  {p.emoji} {p.label}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        <div className={styles.evtActions}>
+                          {onUpdateEvent && !ev.isChore && (
+                            <button className={styles.evtEdit} onClick={() => startEdit(ev)}>✎</button>
+                          )}
+                          {onDeleteEvent && !ev.isChore && (
+                            <button className={styles.evtDel} onClick={() => onDeleteEvent(ev.id)}>✕</button>
+                          )}
+                        </div>
+                      </>
                     )}
-
-                    <div className={styles.evtActions}>
-                      {onDeleteEvent && !ev.isChore && (
-                        <button className={styles.evtDel} onClick={() => onDeleteEvent(ev.id)}>✕</button>
-                      )}
-                    </div>
                   </div>
                 );
               })}
             </div>
           )}
+          </div>
+        </div>
         </div>
       )}
     </div>

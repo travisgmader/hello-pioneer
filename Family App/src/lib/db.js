@@ -13,11 +13,11 @@ const choreToRow = (c) => ({
 
 const eventFromRow = (r) => ({
   id: r.id, title: r.title, memberId: r.member_id,
-  date: r.date, time: r.time, color: r.color, transportParent: r.transport_parent,
+  date: r.date, time: r.time, endTime: r.end_time, color: r.color, transportParent: r.transport_parent,
 });
 const eventToRow = (e) => ({
   id: e.id, title: e.title, member_id: e.memberId,
-  date: e.date, time: e.time, color: e.color, transport_parent: e.transportParent,
+  date: e.date, time: e.time, end_time: e.endTime, color: e.color, transport_parent: e.transportParent,
 });
 
 const recFromRow = (r) => ({
