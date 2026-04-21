@@ -12,7 +12,9 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.104.0",
     "react": "^19.2.5",
-    "react-dom": "^19.2.5"
+    "react-dom": "^19.2.5",
+    "resend": "^6.12.2",
+    "svix": "^1.91.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
