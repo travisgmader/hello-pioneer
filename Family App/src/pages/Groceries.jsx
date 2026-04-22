@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { MEMBERS } from '../data/initialData';
+import { PARENT_EMAILS } from '../lib/allowedEmails';
 import styles from './Groceries.module.css';
 
 const MEMBER_MAP = Object.fromEntries(MEMBERS.map(m => [m.id, m]));
@@ -18,7 +19,8 @@ const CATEGORIES = ['Produce', 'Dairy', 'Meat', 'Bakery', 'Pantry', 'Frozen', 'S
 const EMPTY_ITEM = { name: '', qty: '', category: 'Produce', addedBy: 'mom' };
 
 export default function Groceries() {
-  const { groceries, groceryRequests, addGrocery, toggleGrocery, deleteGrocery, addGroceryRequest, approveRequest, deleteGroceryRequest } = useApp();
+  const { groceries, groceryRequests, addGrocery, toggleGrocery, deleteGrocery, addGroceryRequest, approveRequest, deleteGroceryRequest, user } = useApp();
+  const isParent = PARENT_EMAILS.includes(user?.email?.toLowerCase());
 
   const [itemForm, setItemForm] = useState(EMPTY_ITEM);
   const [showItemForm, setShowItemForm] = useState(false);
@@ -191,14 +193,16 @@ export default function Groceries() {
                   <div className={styles.reqTop}>
                     <span className={styles.reqName}>{r.name}</span>
                     <div className={styles.reqActions}>
-                      <button
-                        className={styles.approveBtn}
-                        onClick={() => approveRequest(r.id)}
-                        title="Approve & add to list"
-                      >
-                        ✓ Add to List
-                      </button>
-                      <button className={styles.deleteBtn} onClick={() => deleteGroceryRequest(r.id)}>✕</button>
+                      {isParent && (
+                        <button
+                          className={styles.approveBtn}
+                          onClick={() => approveRequest(r.id)}
+                          title="Approve & add to list"
+                        >
+                          ✓ Add to List
+                        </button>
+                      )}
+                      {isParent && <button className={styles.deleteBtn} onClick={() => deleteGroceryRequest(r.id)}>✕</button>}
                     </div>
                   </div>
                   {r.notes && <span className={styles.reqNotes}>"{r.notes}"</span>}

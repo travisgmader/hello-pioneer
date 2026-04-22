@@ -203,7 +203,7 @@ export default function Calendar({
                       className={`${styles.evtChip} ${ev.isChore && ev.completed ? styles.evtChipDone : ''}`}
                       style={chipStyle}
                     >
-                      {isTransport ? '🚗 ' : (mem ? `${mem.emoji} ` : '')}{ev.isChore ? '✅ ' : ''}{ev.title}
+                      {mem ? `${mem.emoji} ` : (isTransport ? '👥 ' : '')}{ev.isChore ? '✅ ' : ''}{ev.title}
                     </span>
                   );
                 })}
@@ -408,7 +408,7 @@ export default function Calendar({
                         <div className={styles.evtItemMain}>
                           <span className={styles.evtDot} style={{ background: col.accent }} />
                           <span className={styles.evtName}>
-                            {ev.isChore ? '✅ ' : isTransport ? '🚗 ' : ''}{ev.title}
+                            {ev.isChore ? '✅ ' : isTransport && member ? `${member.emoji} ` : ''}{ev.title}
                             {ev.time && !ev.isChore && (
                               <span className={styles.evtTime}>{formatTimeRange(ev.time, ev.endTime)}</span>
                             )}
@@ -419,7 +419,7 @@ export default function Calendar({
                         {/* Parent pickup/dropoff selector for child events */}
                         {isChildEvent && onUpdateEvent && (
                           <div className={styles.transportRow}>
-                            <span className={styles.transportLabel}>🚗 Pickup/Dropoff:</span>
+                            <span className={styles.transportLabel}>👥 Pickup/Dropoff:</span>
                             {PARENTS.map(p => {
                               const isActive = ev.transportParent === p.id;
                               const pcol = parentColor(p.id);

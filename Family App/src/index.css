@@ -54,10 +54,11 @@
   --peach: #f59e0b;
   --peach-light: #fef3c7;
   --peach-dark: #92400e;
-  --bg: #ffff00;
-  --card-bg: #ffffff;
+  /* Pale amber bg; light lime cards instead of white */
+  --bg: #fef9c3;
+  --card-bg: #f0fdf4;
   --text: #1c1b1b;
-  --text-muted: #484831;
+  --text-muted: #5a5227;
   --border: #581c87;
   --shadow: 4px 4px 0 0 #581c87;
   --shadow-hover: 6px 6px 0 0 #581c87;
@@ -67,6 +68,16 @@
 
 [data-theme="electric"] body {
   font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+  background-color: #fef9c3;
+  /* Diamond texture — two crossing diagonals at 45° */
+  background-image:
+    linear-gradient(45deg, rgba(88, 28, 135, 0.07) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(88, 28, 135, 0.07) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(88, 28, 135, 0.07) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(88, 28, 135, 0.07) 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  background-attachment: fixed;
 }
 
 [data-theme="electric"] h1,
@@ -76,6 +87,31 @@
   font-family: 'Epilogue', sans-serif;
   text-transform: uppercase;
   letter-spacing: -0.01em;
+}
+
+/* Forest green nav bar with yellow accent text */
+[data-theme="electric"] nav {
+  background: #14532d !important;
+  border-bottom-color: #16a34a !important;
+  box-shadow: 0 4px 0 0 #14532d !important;
+}
+
+[data-theme="electric"] nav .logo,
+[data-theme="electric"] nav button,
+[data-theme="electric"] nav span {
+  color: #fef9c3 !important;
+}
+
+[data-theme="electric"] nav button:hover {
+  background: rgba(254, 249, 195, 0.15) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="electric"] nav .active,
+[data-theme="electric"] nav [class*="active"] {
+  background: #fef9c3 !important;
+  color: #14532d !important;
+  box-shadow: none !important;
 }
 
 /* ── Midnight Monolith theme ──────────────────────────── */

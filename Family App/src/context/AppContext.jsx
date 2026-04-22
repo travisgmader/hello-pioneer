@@ -19,6 +19,7 @@ export function AppProvider({ children }) {
   const [user, setUser]                     = useState(null);
   const [authLoading, setAuthLoading]       = useState(isConfigured);
   const [loading, setLoading]               = useState(isConfigured);
+  const [dbError, setDbError]               = useState(null);
   const [chores, setChores]                 = useState(() => lsLoad('family_chores', INITIAL_CHORES));
   const [events, setEvents]                 = useState(() => lsLoad('family_events', INITIAL_EVENTS));
   const [custody, setCustody]               = useState(() => lsLoad('family_custody', {}));
@@ -40,9 +41,10 @@ export function AppProvider({ children }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // ── Load from Supabase on mount ──────────────────────
+  // ── Load from Supabase once auth is confirmed ─────────
   useEffect(() => {
-    if (!isConfigured) return;
+    if (!isConfigured || authLoading) return;
+    if (!user) { setLoading(false); return; }
     db.loadAll().then((data) => {
       setChores(data.chores);
       setEvents(data.events);
@@ -52,7 +54,7 @@ export function AppProvider({ children }) {
       setGroceries(data.groceries);
       setGroceryRequests(data.groceryRequests);
     }).catch(console.error).finally(() => setLoading(false));
-  }, []);
+  }, [authLoading, user]);
 
   // ── localStorage sync (only when Supabase is NOT configured) ──
   useEffect(() => { if (!isConfigured) lsSave('family_chores', chores); }, [chores]);
@@ -63,25 +65,21 @@ export function AppProvider({ children }) {
   useEffect(() => { if (!isConfigured) lsSave('family_groceries', groceries); }, [groceries]);
   useEffect(() => { if (!isConfigured) lsSave('family_grocery_requests', groceryRequests); }, [groceryRequests]);
 
-  // ── Optimistic helper: update state + fire DB call ───
-  const sync = (setter, dbCall) => (optimisticVal) => {
-    setter(optimisticVal);
-    if (isConfigured) dbCall().catch(console.error);
-  };
+  const dbErr = (e) => { console.error('DB write error:', e); setDbError(e?.message || String(e)); };
 
   // ── Chores ────────────────────────────────────────────
   const addChore = (chore) => {
     const c = { ...chore, id: 'c' + Date.now(), completed: false };
     setChores(prev => [...prev, c]);
-    if (isConfigured) db.dbAddChore(c).catch(console.error);
+    if (isConfigured) db.dbAddChore(c).catch(dbErr);
   };
   const updateChore = (id, updates) => {
     setChores(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
-    if (isConfigured) db.dbUpdateChore(id, updates).catch(console.error);
+    if (isConfigured) db.dbUpdateChore(id, updates).catch(dbErr);
   };
   const deleteChore = (id) => {
     setChores(prev => prev.filter(c => c.id !== id));
-    if (isConfigured) db.dbDeleteChore(id).catch(console.error);
+    if (isConfigured) db.dbDeleteChore(id).catch(dbErr);
   };
   const toggleChore = (id) => {
     const chore = chores.find(c => c.id === id);
@@ -92,37 +90,37 @@ export function AppProvider({ children }) {
   const addEvent = (event) => {
     const e = { ...event, id: 'e' + Date.now() };
     setEvents(prev => [...prev, e]);
-    if (isConfigured) db.dbAddEvent(e).catch(console.error);
+    if (isConfigured) db.dbAddEvent(e).catch(dbErr);
   };
   const updateEvent = (id, updates) => {
     setEvents(prev => prev.map(e => e.id === id ? { ...e, ...updates } : e));
-    if (isConfigured) db.dbUpdateEvent(id, updates).catch(console.error);
+    if (isConfigured) db.dbUpdateEvent(id, updates).catch(dbErr);
   };
   const deleteEvent = (id) => {
     setEvents(prev => prev.filter(e => e.id !== id));
-    if (isConfigured) db.dbDeleteEvent(id).catch(console.error);
+    if (isConfigured) db.dbDeleteEvent(id).catch(dbErr);
   };
 
   // ── Custody ───────────────────────────────────────────
   const setCustodyDay = (dateStr, parent) => {
     const next = custody[dateStr] === parent ? null : parent;
     setCustody(prev => ({ ...prev, [dateStr]: next }));
-    if (isConfigured) db.dbSetCustody(dateStr, next).catch(console.error);
+    if (isConfigured) db.dbSetCustody(dateStr, next).catch(dbErr);
   };
 
   // ── Meals ─────────────────────────────────────────────
   const setMeal = (dateStr, slot, value) => {
     setMealPlan(prev => ({ ...prev, [dateStr]: { ...prev[dateStr], [slot]: value } }));
-    if (isConfigured) db.dbSetMeal(dateStr, slot, value).catch(console.error);
+    if (isConfigured) db.dbSetMeal(dateStr, slot, value).catch(dbErr);
   };
   const addMealRec = (rec) => {
     const r = { ...rec, id: 'mr' + Date.now(), votes: [] };
     setMealRecs(prev => [...prev, r]);
-    if (isConfigured) db.dbAddMealRec(r).catch(console.error);
+    if (isConfigured) db.dbAddMealRec(r).catch(dbErr);
   };
   const deleteMealRec = (id) => {
     setMealRecs(prev => prev.filter(r => r.id !== id));
-    if (isConfigured) db.dbDeleteMealRec(id).catch(console.error);
+    if (isConfigured) db.dbDeleteMealRec(id).catch(dbErr);
   };
   const voteMealRec = (id, memberId) => {
     let nextVotes;
@@ -132,42 +130,42 @@ export function AppProvider({ children }) {
       nextVotes = hasVoted ? r.votes.filter(v => v !== memberId) : [...r.votes, memberId];
       return { ...r, votes: nextVotes };
     }));
-    if (isConfigured) db.dbVoteMealRec(id, nextVotes).catch(console.error);
+    if (isConfigured) db.dbVoteMealRec(id, nextVotes).catch(dbErr);
   };
 
   // ── Groceries ─────────────────────────────────────────
   const addGrocery = (item) => {
     const g = { ...item, id: 'g' + Date.now(), checked: false };
     setGroceries(prev => [...prev, g]);
-    if (isConfigured) db.dbAddGrocery(g).catch(console.error);
+    if (isConfigured) db.dbAddGrocery(g).catch(dbErr);
   };
   const toggleGrocery = (id) => {
     const item = groceries.find(g => g.id === id);
     if (!item) return;
     setGroceries(prev => prev.map(g => g.id === id ? { ...g, checked: !g.checked } : g));
-    if (isConfigured) db.dbToggleGrocery(id, !item.checked).catch(console.error);
+    if (isConfigured) db.dbToggleGrocery(id, !item.checked).catch(dbErr);
   };
   const deleteGrocery = (id) => {
     setGroceries(prev => prev.filter(g => g.id !== id));
-    if (isConfigured) db.dbDeleteGrocery(id).catch(console.error);
+    if (isConfigured) db.dbDeleteGrocery(id).catch(dbErr);
   };
 
   // ── Grocery requests ──────────────────────────────────
   const addGroceryRequest = (req) => {
     const r = { ...req, id: 'gr' + Date.now(), status: 'pending' };
     setGroceryRequests(prev => [...prev, r]);
-    if (isConfigured) db.dbAddGroceryReq(r).catch(console.error);
+    if (isConfigured) db.dbAddGroceryReq(r).catch(dbErr);
   };
   const approveRequest = (id) => {
     const req = groceryRequests.find(r => r.id === id);
     if (!req) return;
     addGrocery({ name: req.name, qty: '', category: 'Requested', addedBy: req.requestedBy });
     setGroceryRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'approved' } : r));
-    if (isConfigured) db.dbUpdateGroceryReq(id, { ...req, status: 'approved' }).catch(console.error);
+    if (isConfigured) db.dbUpdateGroceryReq(id, { ...req, status: 'approved' }).catch(dbErr);
   };
   const deleteGroceryRequest = (id) => {
     setGroceryRequests(prev => prev.filter(r => r.id !== id));
-    if (isConfigured) db.dbDeleteGroceryReq(id).catch(console.error);
+    if (isConfigured) db.dbDeleteGroceryReq(id).catch(dbErr);
   };
 
   const signOut = () => isConfigured ? supabase.auth.signOut() : null;
@@ -184,6 +182,12 @@ export function AppProvider({ children }) {
       addGrocery, toggleGrocery, deleteGrocery,
       addGroceryRequest, approveRequest, deleteGroceryRequest,
     }}>
+      {dbError && (
+        <div style={{ position: 'fixed', bottom: 16, left: '50%', transform: 'translateX(-50%)', background: '#dc2626', color: 'white', padding: '10px 18px', borderRadius: 8, zIndex: 9999, fontSize: 13, maxWidth: 480, boxShadow: '0 4px 12px rgba(0,0,0,0.3)', display: 'flex', gap: 12, alignItems: 'center' }}>
+          <span>Save failed: {dbError}</span>
+          <button onClick={() => setDbError(null)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>✕</button>
+        </div>
+      )}
       {children}
     </AppContext.Provider>
   );

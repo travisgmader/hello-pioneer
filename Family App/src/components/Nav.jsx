@@ -25,7 +25,7 @@ export default function Nav({ page, setPage, theme, setTheme }) {
 
   return (
     <nav className={styles.nav}>
-      <div className={styles.logo}><img src="/fox-logo.png" alt="" style={{ width: 28, height: 28, objectFit: 'contain', verticalAlign: 'middle', marginRight: 8 }} />Family Hub</div>
+      <div className={styles.logo}><img src="/fox-logo.png" alt="" style={{ width: 28, height: 28, objectFit: 'contain', verticalAlign: 'middle', marginRight: 8 }} />Family Plan</div>
 
       {/* Desktop links */}
       <div className={styles.links}>

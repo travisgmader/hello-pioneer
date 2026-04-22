@@ -19,8 +19,8 @@ export default function Login() {
   return (
     <div className={styles.wrapper}>
       <div className={styles.card}>
-        <div className={styles.icon}><img src="/fox-logo.png" alt="Family Hub" style={{ width: 80, height: 80, objectFit: 'contain' }} /></div>
-        <h1 className={styles.title}>Family Hub</h1>
+        <div className={styles.icon}><img src="/fox-logo.png" alt="Family Plan" style={{ width: 80, height: 80, objectFit: 'contain' }} /></div>
+        <h1 className={styles.title}>Family Plan</h1>
         <p className={styles.subtitle}>Sign in to access your family's dashboard</p>
         {error && <p className={styles.error}>{error}</p>}
         <button className={styles.googleBtn} onClick={handleGoogle} disabled={loading}>

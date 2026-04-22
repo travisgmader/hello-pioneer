@@ -28,8 +28,8 @@ function AppInner() {
 
   if (authLoading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: 16, color: 'var(--text-muted)' }}>
-      <img src="/fox-logo.png" alt="Family Hub" style={{ width: 72, height: 72, objectFit: 'contain' }} />
-      <div style={{ fontSize: 16, fontWeight: 600 }}>Loading Family Hub…</div>
+      <img src="/fox-logo.png" alt="Family Plan" style={{ width: 72, height: 72, objectFit: 'contain' }} />
+      <div style={{ fontSize: 16, fontWeight: 600 }}>Loading Family Plan…</div>
     </div>
   );
 
@@ -38,10 +38,10 @@ function AppInner() {
   if (isConfigured && user && ALLOWED_EMAILS.length > 0 && !ALLOWED_EMAILS.includes(user.email?.toLowerCase())) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: 16, color: 'var(--text-muted)', padding: 24, textAlign: 'center' }}>
-        <img src="/fox-logo.png" alt="Family Hub" style={{ width: 72, height: 72, objectFit: 'contain' }} />
+        <img src="/fox-logo.png" alt="Family Plan" style={{ width: 72, height: 72, objectFit: 'contain' }} />
         <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>Access Denied</div>
         <div style={{ fontSize: 14, maxWidth: 320 }}>
-          <strong>{user.email}</strong> is not authorized to access Family Hub.
+          <strong>{user.email}</strong> is not authorized to access Family Plan.
         </div>
         <button onClick={() => supabase.auth.signOut()} style={{ marginTop: 8, padding: '8px 20px', borderRadius: 20, background: 'var(--lavender)', color: 'white', border: 'none', fontWeight: 600, cursor: 'pointer' }}>
           Sign out
@@ -52,8 +52,8 @@ function AppInner() {
 
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: 16, color: 'var(--text-muted)' }}>
-      <img src="/fox-logo.png" alt="Family Hub" style={{ width: 72, height: 72, objectFit: 'contain' }} />
-      <div style={{ fontSize: 16, fontWeight: 600 }}>Loading Family Hub…</div>
+      <img src="/fox-logo.png" alt="Family Plan" style={{ width: 72, height: 72, objectFit: 'contain' }} />
+      <div style={{ fontSize: 16, fontWeight: 600 }}>Loading Family Plan…</div>
     </div>
   );
 
@@ -79,7 +79,7 @@ function AppInner() {
         borderTop: '1px solid var(--border)',
         background: 'var(--card-bg)',
       }}>
-        🌷 Family Hub — Made with love
+        Family Plan — Made with love
       </footer>
     </div>
   );

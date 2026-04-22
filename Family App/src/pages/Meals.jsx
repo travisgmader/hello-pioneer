@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { MEMBERS, MEAL_SLOTS } from '../data/initialData';
+import { PARENT_EMAILS } from '../lib/allowedEmails';
 import styles from './Meals.module.css';
 
 const MEMBER_MAP = Object.fromEntries(MEMBERS.map(m => [m.id, m]));
@@ -36,7 +37,8 @@ function fmtShort(d) {
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export default function Meals() {
-  const { mealPlan, mealRecs, setMeal, addMealRec, deleteMealRec, voteMealRec } = useApp();
+  const { mealPlan, mealRecs, setMeal, addMealRec, deleteMealRec, voteMealRec, user } = useApp();
+  const isParent = PARENT_EMAILS.includes(user?.email?.toLowerCase());
 
   const [weekStart, setWeekStart] = useState(() => getMondayOf(new Date()));
   const [editing, setEditing] = useState(null); // { dateStr, slot }
@@ -144,7 +146,7 @@ export default function Meals() {
                           <button className={styles.editCancel} onClick={() => setEditing(null)}>✕</button>
                         </div>
                       </div>
-                    ) : (
+                    ) : isParent ? (
                       <button className={styles.cellBtn} onClick={() => startEdit(dateStr, slot, value)}>
                         {value ? (
                           <span className={styles.mealName}>{value}</span>
@@ -152,6 +154,10 @@ export default function Meals() {
                           <span className={styles.addMeal}>+ Add</span>
                         )}
                       </button>
+                    ) : (
+                      <div className={styles.cellBtn}>
+                        {value ? <span className={styles.mealName}>{value}</span> : <span className={styles.addMeal} style={{ opacity: 0.3 }}>—</span>}
+                      </div>
                     )}
                   </div>
                 );
@@ -239,22 +245,24 @@ export default function Meals() {
                   <span className={styles.voteCount}>{rec.votes.length} 👍</span>
                 </div>
 
-                {/* Assign to a day */}
-                <div className={styles.assignRow}>
-                  <span className={styles.assignLabel}>Add to week:</span>
-                  <div className={styles.assignDays}>
-                    {weekDays.map((d, i) => (
-                      <button
-                        key={i}
-                        className={styles.assignDay}
-                        title={`${DAYS_OF_WEEK[i]} ${rec.category}`}
-                        onClick={() => assignRec(rec, fmtDate(d), rec.category)}
-                      >
-                        {DAYS_OF_WEEK[i]}
-                      </button>
-                    ))}
+                {/* Assign to a day — parents only */}
+                {isParent && (
+                  <div className={styles.assignRow}>
+                    <span className={styles.assignLabel}>Add to week:</span>
+                    <div className={styles.assignDays}>
+                      {weekDays.map((d, i) => (
+                        <button
+                          key={i}
+                          className={styles.assignDay}
+                          title={`${DAYS_OF_WEEK[i]} ${rec.category}`}
+                          onClick={() => assignRec(rec, fmtDate(d), rec.category)}
+                        >
+                          {DAYS_OF_WEEK[i]}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             );
           })}

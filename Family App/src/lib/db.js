@@ -1,5 +1,9 @@
 import { supabase } from './supabase';
 
+// Throw on Supabase errors so .catch() handlers actually fire
+const check = (res) => { if (res.error) throw res.error; return res; };
+const checked = (q) => q.then(check);
+
 // ── Row ↔ App-state transforms ─────────────────────────
 
 const choreFromRow = (r) => ({
@@ -82,45 +86,45 @@ export async function loadAll() {
 
 // ── Chores ─────────────────────────────────────────────
 
-export const dbAddChore    = (c) => supabase.from('chores').insert(choreToRow(c));
-export const dbUpdateChore = (id, u) => supabase.from('chores').update(choreToRow({ id, ...u })).eq('id', id);
-export const dbDeleteChore = (id) => supabase.from('chores').delete().eq('id', id);
+export const dbAddChore    = (c) => checked(supabase.from('chores').insert(choreToRow(c)));
+export const dbUpdateChore = (id, u) => checked(supabase.from('chores').update(choreToRow({ id, ...u })).eq('id', id));
+export const dbDeleteChore = (id) => checked(supabase.from('chores').delete().eq('id', id));
 
 // ── Events ─────────────────────────────────────────────
 
-export const dbAddEvent    = (e) => supabase.from('events').insert(eventToRow(e));
-export const dbUpdateEvent = (id, u) => supabase.from('events').update(eventToRow({ id, ...u })).eq('id', id);
-export const dbDeleteEvent = (id) => supabase.from('events').delete().eq('id', id);
+export const dbAddEvent    = (e) => checked(supabase.from('events').insert(eventToRow(e)));
+export const dbUpdateEvent = (id, u) => checked(supabase.from('events').update(eventToRow({ id, ...u })).eq('id', id));
+export const dbDeleteEvent = (id) => checked(supabase.from('events').delete().eq('id', id));
 
 // ── Custody ────────────────────────────────────────────
 
 export const dbSetCustody = (date, parent) =>
   parent
-    ? supabase.from('custody').upsert({ date, parent })
-    : supabase.from('custody').delete().eq('date', date);
+    ? checked(supabase.from('custody').upsert({ date, parent }))
+    : checked(supabase.from('custody').delete().eq('date', date));
 
 // ── Meal plan ──────────────────────────────────────────
 
 export const dbSetMeal = (date, slot, meal) =>
   meal
-    ? supabase.from('meal_plan').upsert({ date, slot, meal })
-    : supabase.from('meal_plan').delete().eq('date', date).eq('slot', slot);
+    ? checked(supabase.from('meal_plan').upsert({ date, slot, meal }))
+    : checked(supabase.from('meal_plan').delete().eq('date', date).eq('slot', slot));
 
 // ── Meal recommendations ───────────────────────────────
 
-export const dbAddMealRec    = (r) => supabase.from('meal_recommendations').insert(recToRow(r));
-export const dbDeleteMealRec = (id) => supabase.from('meal_recommendations').delete().eq('id', id);
+export const dbAddMealRec    = (r) => checked(supabase.from('meal_recommendations').insert(recToRow(r)));
+export const dbDeleteMealRec = (id) => checked(supabase.from('meal_recommendations').delete().eq('id', id));
 export const dbVoteMealRec   = (id, votes) =>
-  supabase.from('meal_recommendations').update({ votes }).eq('id', id);
+  checked(supabase.from('meal_recommendations').update({ votes }).eq('id', id));
 
 // ── Groceries ──────────────────────────────────────────
 
-export const dbAddGrocery    = (g) => supabase.from('groceries').insert(groceryToRow(g));
-export const dbToggleGrocery = (id, checked) => supabase.from('groceries').update({ checked }).eq('id', id);
-export const dbDeleteGrocery = (id) => supabase.from('groceries').delete().eq('id', id);
+export const dbAddGrocery    = (g) => checked(supabase.from('groceries').insert(groceryToRow(g)));
+export const dbToggleGrocery = (id, chk) => checked(supabase.from('groceries').update({ checked: chk }).eq('id', id));
+export const dbDeleteGrocery = (id) => checked(supabase.from('groceries').delete().eq('id', id));
 
 // ── Grocery requests ───────────────────────────────────
 
-export const dbAddGroceryReq    = (r) => supabase.from('grocery_requests').insert(reqToRow(r));
-export const dbUpdateGroceryReq = (id, u) => supabase.from('grocery_requests').update(reqToRow({ id, ...u })).eq('id', id);
-export const dbDeleteGroceryReq = (id) => supabase.from('grocery_requests').delete().eq('id', id);
+export const dbAddGroceryReq    = (r) => checked(supabase.from('grocery_requests').insert(reqToRow(r)));
+export const dbUpdateGroceryReq = (id, u) => checked(supabase.from('grocery_requests').update(reqToRow({ id, ...u })).eq('id', id));
+export const dbDeleteGroceryReq = (id) => checked(supabase.from('grocery_requests').delete().eq('id', id));

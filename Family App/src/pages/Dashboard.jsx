@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { MEMBERS } from '../data/initialData';
+import { formatTimeRange } from '../lib/utils';
 import styles from './Dashboard.module.css';
 
 const COLOR_VARS = {
@@ -8,17 +10,19 @@ const COLOR_VARS = {
   lavender: { bg: 'var(--lavender-light)', accent: 'var(--lavender)', dark: 'var(--lavender-dark)' },
   mint: { bg: 'var(--mint-light)', accent: 'var(--mint)', dark: 'var(--mint-dark)' },
   yellow: { bg: 'var(--yellow-light)', accent: 'var(--yellow)', dark: 'var(--yellow-dark)' },
+  peach: { bg: 'var(--peach-light)', accent: 'var(--peach)', dark: 'var(--peach-dark)' },
 };
 
 function today() { return new Date().toISOString().split('T')[0]; }
 
 function formatDate(d) {
-  return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 }
 
 export default function Dashboard({ setPage }) {
   const { chores, events, toggleChore } = useApp();
   const todayStr = today();
+  const [activeEvent, setActiveEvent] = useState(null);
 
   const todayChores = chores.filter(c => c.dueDate === todayStr);
   const upcomingEvents = events
@@ -29,7 +33,7 @@ export default function Dashboard({ setPage }) {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.title}>🌷 Family Hub</h1>
+        <h1 className={styles.title}>Family Plan</h1>
         <p className={styles.subtitle}>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
       </div>
 
@@ -79,7 +83,7 @@ export default function Dashboard({ setPage }) {
                 const member = MEMBERS.find(m => m.id === e.memberId);
                 const col = COLOR_VARS[e.color] || COLOR_VARS.lavender;
                 return (
-                  <div key={e.id} className={styles.eventItem} style={{ borderLeftColor: col.accent }}>
+                  <div key={e.id} className={styles.eventItem} style={{ borderLeftColor: col.accent }} onClick={() => setActiveEvent(e)}>
                     <div className={styles.eventDate} style={{ color: col.dark }}>{formatDate(e.date)}</div>
                     <div className={styles.eventTitle}>{e.title}</div>
                     {member && (
@@ -125,6 +129,48 @@ export default function Dashboard({ setPage }) {
           })}
         </div>
       </section>
+      {/* Event detail modal */}
+      {activeEvent && (() => {
+        const e = activeEvent;
+        const member = MEMBERS.find(m => m.id === e.memberId);
+        const col = COLOR_VARS[e.color] || COLOR_VARS.lavender;
+        return (
+          <div className={styles.overlay} onClick={() => setActiveEvent(null)}>
+            <div className={styles.modal} onClick={ev => ev.stopPropagation()}>
+              <div className={styles.modalHeader} style={{ borderLeftColor: col.accent, background: col.bg }}>
+                <div className={styles.modalTitle} style={{ color: col.dark }}>{e.title}</div>
+                <button className={styles.modalClose} onClick={() => setActiveEvent(null)}>✕</button>
+              </div>
+              <div className={styles.modalBody}>
+                <div className={styles.modalRow}>
+                  <span className={styles.modalLabel}>📅 Date</span>
+                  <span>{formatDate(e.date)}</span>
+                </div>
+                {e.time && (
+                  <div className={styles.modalRow}>
+                    <span className={styles.modalLabel}>🕐 Time</span>
+                    <span>{formatTimeRange(e.time, e.endTime)}</span>
+                  </div>
+                )}
+                {member && (
+                  <div className={styles.modalRow}>
+                    <span className={styles.modalLabel}>👤 Who</span>
+                    <span className={styles.eventMember} style={{ background: col.bg, color: col.dark }}>
+                      {member.emoji} {member.name}
+                    </span>
+                  </div>
+                )}
+                {!e.memberId && (
+                  <div className={styles.modalRow}>
+                    <span className={styles.modalLabel}>👤 Who</span>
+                    <span className={styles.eventMember} style={{ background: 'var(--peach-light)', color: 'var(--peach-dark)' }}>👨‍👩‍👧‍👦 Everyone</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
