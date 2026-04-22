@@ -259,9 +259,13 @@ h1, h2, h3, h4 {
   /* Ensure tappable elements meet 44px minimum */
   button { min-height: 36px; }
 
-  /* Safe area padding for iPhone notch / home bar */
-  #root {
-    padding-bottom: env(safe-area-inset-bottom);
+  /* Space for fixed bottom tab bar */
+  main {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+
+  footer {
+    margin-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
   }
 }
 

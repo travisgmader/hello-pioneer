@@ -14,6 +14,14 @@ const NAV_ITEMS = [
   { id: 'notes',     label: '📝 Notes' },
 ];
 
+const BOTTOM_BAR_ITEMS = [
+  { id: 'dashboard', emoji: '🏠' },
+  { id: 'chores',    emoji: '✅' },
+  { id: 'calendar',  emoji: '📅' },
+  { id: 'meals',     emoji: '🍽️' },
+  { id: 'groceries', emoji: '🛒' },
+];
+
 export default function Nav({ page, setPage, theme, setTheme }) {
   const [open, setOpen] = useState(false);
   const { user, signOut } = useApp();
@@ -25,7 +33,7 @@ export default function Nav({ page, setPage, theme, setTheme }) {
 
   return (
     <nav className={styles.nav}>
-      <div className={styles.logo}><img src="/fox-logo.png" alt="" style={{ width: 28, height: 28, objectFit: 'contain', verticalAlign: 'middle', marginRight: 8 }} />Family Plan</div>
+      <button className={styles.logo} onClick={() => navigate('dashboard')}><img src="/fox-logo.png" alt="" style={{ width: 28, height: 28, objectFit: 'contain', verticalAlign: 'middle', marginRight: 8 }} />Family Plan</button>
 
       {/* Desktop links */}
       <div className={styles.links}>
@@ -65,6 +73,19 @@ export default function Nav({ page, setPage, theme, setTheme }) {
           Sign out
         </button>
       )}
+
+      {/* Mobile bottom tab bar */}
+      <div className={styles.bottomBar}>
+        {BOTTOM_BAR_ITEMS.map(item => (
+          <button
+            key={item.id}
+            className={`${styles.bottomTab} ${page === item.id ? styles.bottomTabActive : ''}`}
+            onClick={() => navigate(item.id)}
+          >
+            {item.emoji}
+          </button>
+        ))}
+      </div>
 
       {/* Mobile dropdown */}
       {open && (

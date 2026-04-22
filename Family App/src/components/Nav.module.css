@@ -18,7 +18,16 @@
   color: var(--lavender-dark);
   white-space: nowrap;
   flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.15s;
 }
+
+.logo:hover { opacity: 0.75; }
 
 /* ── Desktop links ────────────────────────────────────── */
 .links {
@@ -208,10 +217,49 @@
 
 .dropSignOut:hover { background: var(--pink-light); }
 
+/* ── Mobile bottom tab bar ────────────────────────────── */
+.bottomBar {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .links     { display: none; }
   .signOut   { display: none; }
   .themeWrap { display: none; }
   .mobileRight { display: flex; }
   .nav { position: relative; flex-wrap: nowrap; }
+
+  .bottomBar {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 300;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .bottomTab {
+    flex: 1;
+    background: none;
+    border: none;
+    font-size: 24px;
+    padding: 10px 0;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+    border-radius: 0;
+    line-height: 1;
+  }
+
+  .bottomTab:hover {
+    background: var(--lavender-light);
+  }
+
+  .bottomTabActive {
+    background: var(--lavender-light);
+    transform: translateY(-2px);
+  }
 }

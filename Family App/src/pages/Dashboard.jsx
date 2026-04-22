@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { MEMBERS } from '../data/initialData';
+import { MEMBERS, MEAL_SLOTS } from '../data/initialData';
 import { formatTimeRange } from '../lib/utils';
 import styles from './Dashboard.module.css';
 
@@ -19,12 +19,16 @@ function formatDate(d) {
   return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 }
 
+const MEAL_ICONS = { Breakfast: '🌅', Lunch: '☀️', Dinner: '🌙' };
+
 export default function Dashboard({ setPage }) {
-  const { chores, events, toggleChore } = useApp();
+  const { chores, events, mealPlan, groceries, toggleChore } = useApp();
   const todayStr = today();
   const [activeEvent, setActiveEvent] = useState(null);
 
   const todayChores = chores.filter(c => c.dueDate === todayStr);
+  const todayMeals = MEAL_SLOTS.map(slot => ({ slot, meal: mealPlan[todayStr]?.[slot] || '' }));
+  const pendingGroceries = groceries.filter(g => !g.checked).slice(0, 8);
   const upcomingEvents = events
     .filter(e => e.date >= todayStr)
     .sort((a, b) => a.date.localeCompare(b.date))
@@ -40,7 +44,10 @@ export default function Dashboard({ setPage }) {
       <div className={styles.columns}>
         {/* Today's Chores */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>✅ Today's Chores</h2>
+          <h2 className={styles.sectionTitle}>
+            <button className={styles.titleLink} onClick={() => setPage('chores')}>✅</button>
+            {' '}Today's Chores
+          </h2>
           {todayChores.length === 0 ? (
             <div className={styles.empty}>No chores due today! 🎉</div>
           ) : (
@@ -74,7 +81,10 @@ export default function Dashboard({ setPage }) {
 
         {/* Upcoming Events */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>📅 Upcoming Events</h2>
+          <h2 className={styles.sectionTitle}>
+            <button className={styles.titleLink} onClick={() => setPage('calendar')}>📅</button>
+            {' '}Upcoming Events
+          </h2>
           {upcomingEvents.length === 0 ? (
             <div className={styles.empty}>No upcoming events.</div>
           ) : (
@@ -95,6 +105,54 @@ export default function Dashboard({ setPage }) {
                   </div>
                 );
               })}
+            </div>
+          )}
+        </section>
+      </div>
+
+      <div className={styles.columns}>
+        {/* Today's Meals */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>
+            <button className={styles.titleLink} onClick={() => setPage('meals')}>🍽️</button>
+            {' '}Today's Meals
+          </h2>
+          <div className={styles.mealList}>
+            {todayMeals.map(({ slot, meal }) => (
+              <div key={slot} className={styles.mealRow}>
+                <span className={styles.mealIcon}>{MEAL_ICONS[slot]}</span>
+                <span className={styles.mealSlot}>{slot}</span>
+                {meal
+                  ? <span className={styles.mealName}>{meal}</span>
+                  : <span className={styles.mealEmpty}>Not planned</span>
+                }
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Groceries */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>
+            <button className={styles.titleLink} onClick={() => setPage('groceries')}>🛒</button>
+            {' '}Groceries
+          </h2>
+          {pendingGroceries.length === 0 ? (
+            <div className={styles.empty}>All done! 🎉</div>
+          ) : (
+            <div className={styles.groceryList}>
+              {pendingGroceries.map(g => (
+                <div key={g.id} className={styles.groceryItem}>
+                  <span className={styles.groceryDot} />
+                  <span className={styles.groceryName}>{g.name}</span>
+                  {g.qty && <span className={styles.groceryQty}>{g.qty}</span>}
+                </div>
+              ))}
+              {groceries.filter(g => !g.checked).length > 8 && (
+                <button className={styles.viewAll} onClick={() => setPage('groceries')}>
+                  +{groceries.filter(g => !g.checked).length - 8} more items
+                </button>
+              )}
             </div>
           )}
         </section>
