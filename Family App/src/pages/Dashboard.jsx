@@ -4,6 +4,16 @@ import { MEMBERS, MEAL_SLOTS } from '../data/initialData';
 import { formatTimeRange } from '../lib/utils';
 import styles from './Dashboard.module.css';
 
+const PARENTS = [
+  { id: 'mom', emoji: '👩', label: 'Mom' },
+  { id: 'dad', emoji: '👨', label: 'Dad' },
+];
+const CHILD_IDS = ['stella', 'roman', 'layla'];
+const PARENT_COLORS = {
+  mom: { accent: 'var(--pink)', dark: 'var(--pink-dark)', bg: 'var(--pink-light)' },
+  dad: { accent: 'var(--blue)', dark: 'var(--blue-dark)', bg: 'var(--blue-light)' },
+};
+
 const COLOR_VARS = {
   pink: { bg: 'var(--pink-light)', accent: 'var(--pink)', dark: 'var(--pink-dark)' },
   blue: { bg: 'var(--blue-light)', accent: 'var(--blue)', dark: 'var(--blue-dark)' },
@@ -22,9 +32,32 @@ function formatDate(d) {
 const MEAL_ICONS = { Breakfast: '🌅', Lunch: '☀️', Dinner: '🌙' };
 
 export default function Dashboard({ setPage }) {
-  const { chores, events, mealPlan, groceries, toggleChore } = useApp();
+  const { chores, events, mealPlan, groceries, toggleChore, updateEvent, deleteEvent } = useApp();
   const todayStr = today();
   const [activeEvent, setActiveEvent] = useState(null);
+  const [editing, setEditing] = useState(false);
+  const [editFields, setEditFields] = useState({});
+
+  const openModal = (e) => { setActiveEvent(e); setEditing(false); setEditFields({}); };
+  const closeModal = () => { setActiveEvent(null); setEditing(false); };
+
+  const startEdit = (e) => {
+    setEditing(true);
+    setEditFields({ title: e.title, time: e.time || '', memberId: e.memberId || '' });
+  };
+
+  const saveEdit = () => {
+    updateEvent(activeEvent.id, {
+      title: editFields.title,
+      time: editFields.time || null,
+      memberId: editFields.memberId || null,
+      color: MEMBERS.find(m => m.id === editFields.memberId)?.color || activeEvent.color,
+    });
+    setActiveEvent(ev => ({ ...ev, ...editFields }));
+    setEditing(false);
+  };
+
+  const handleDelete = (id) => { deleteEvent(id); closeModal(); };
 
   const todayChores = chores.filter(c => c.dueDate === todayStr);
   const todayMeals = MEAL_SLOTS.map(slot => ({ slot, meal: mealPlan[todayStr]?.[slot] || '' }));
@@ -93,7 +126,7 @@ export default function Dashboard({ setPage }) {
                 const member = MEMBERS.find(m => m.id === e.memberId);
                 const col = COLOR_VARS[e.color] || COLOR_VARS.lavender;
                 return (
-                  <div key={e.id} className={styles.eventItem} style={{ borderLeftColor: col.accent }} onClick={() => setActiveEvent(e)}>
+                  <div key={e.id} className={styles.eventItem} style={{ borderLeftColor: col.accent }} onClick={() => openModal(e)}>
                     <div className={styles.eventDate} style={{ color: col.dark }}>{formatDate(e.date)}</div>
                     <div className={styles.eventTitle}>{e.title}</div>
                     {member && (
@@ -192,37 +225,103 @@ export default function Dashboard({ setPage }) {
         const e = activeEvent;
         const member = MEMBERS.find(m => m.id === e.memberId);
         const col = COLOR_VARS[e.color] || COLOR_VARS.lavender;
+        const isChildEvent = CHILD_IDS.includes(e.memberId);
         return (
-          <div className={styles.overlay} onClick={() => setActiveEvent(null)}>
+          <div className={styles.overlay} onClick={closeModal}>
             <div className={styles.modal} onClick={ev => ev.stopPropagation()}>
               <div className={styles.modalHeader} style={{ borderLeftColor: col.accent, background: col.bg }}>
                 <div className={styles.modalTitle} style={{ color: col.dark }}>{e.title}</div>
-                <button className={styles.modalClose} onClick={() => setActiveEvent(null)}>✕</button>
+                <div className={styles.modalHeaderActions}>
+                  {!editing && (
+                    <>
+                      <button className={styles.modalEdit} onClick={() => startEdit(e)} title="Edit">✎</button>
+                      <button className={styles.modalDelete} onClick={() => handleDelete(e.id)} title="Delete">🗑</button>
+                    </>
+                  )}
+                  <button className={styles.modalClose} onClick={closeModal}>✕</button>
+                </div>
               </div>
               <div className={styles.modalBody}>
-                <div className={styles.modalRow}>
-                  <span className={styles.modalLabel}>📅 Date</span>
-                  <span>{formatDate(e.date)}</span>
-                </div>
-                {e.time && (
-                  <div className={styles.modalRow}>
-                    <span className={styles.modalLabel}>🕐 Time</span>
-                    <span>{formatTimeRange(e.time, e.endTime)}</span>
-                  </div>
-                )}
-                {member && (
-                  <div className={styles.modalRow}>
-                    <span className={styles.modalLabel}>👤 Who</span>
-                    <span className={styles.eventMember} style={{ background: col.bg, color: col.dark }}>
-                      {member.emoji} {member.name}
-                    </span>
-                  </div>
-                )}
-                {!e.memberId && (
-                  <div className={styles.modalRow}>
-                    <span className={styles.modalLabel}>👤 Who</span>
-                    <span className={styles.eventMember} style={{ background: 'var(--peach-light)', color: 'var(--peach-dark)' }}>👨‍👩‍👧‍👦 Everyone</span>
-                  </div>
+                {editing ? (
+                  <form onSubmit={ev => { ev.preventDefault(); saveEdit(); }} className={styles.editForm}>
+                    <label className={styles.editLabel}>Title</label>
+                    <input
+                      className={styles.editInput}
+                      value={editFields.title}
+                      onChange={e => setEditFields(f => ({ ...f, title: e.target.value }))}
+                      required
+                      autoFocus
+                    />
+                    <label className={styles.editLabel}>Time</label>
+                    <input
+                      type="time"
+                      className={styles.editInput}
+                      value={editFields.time}
+                      onChange={e => setEditFields(f => ({ ...f, time: e.target.value }))}
+                    />
+                    <label className={styles.editLabel}>Who</label>
+                    <select
+                      className={styles.editInput}
+                      value={editFields.memberId}
+                      onChange={e => setEditFields(f => ({ ...f, memberId: e.target.value }))}
+                    >
+                      <option value="">Everyone</option>
+                      {MEMBERS.map(m => <option key={m.id} value={m.id}>{m.emoji} {m.name}</option>)}
+                    </select>
+                    <div className={styles.editActions}>
+                      <button type="submit" className={styles.editSave}>Save</button>
+                      <button type="button" className={styles.editCancel} onClick={() => setEditing(false)}>Cancel</button>
+                    </div>
+                  </form>
+                ) : (
+                  <>
+                    <div className={styles.modalRow}>
+                      <span className={styles.modalLabel}>📅 Date</span>
+                      <span>{formatDate(e.date)}</span>
+                    </div>
+                    {e.time && (
+                      <div className={styles.modalRow}>
+                        <span className={styles.modalLabel}>🕐 Time</span>
+                        <span>{formatTimeRange(e.time, e.endTime)}</span>
+                      </div>
+                    )}
+                    <div className={styles.modalRow}>
+                      <span className={styles.modalLabel}>👤 Who</span>
+                      {member
+                        ? <span className={styles.eventMember} style={{ background: col.bg, color: col.dark }}>{member.emoji} {member.name}</span>
+                        : <span className={styles.eventMember} style={{ background: 'var(--peach-light)', color: 'var(--peach-dark)' }}>👨‍👩‍👧‍👦 Everyone</span>
+                      }
+                    </div>
+                    {isChildEvent && (
+                      <div className={styles.modalRow} style={{ flexWrap: 'wrap', gap: 8 }}>
+                        <span className={styles.modalLabel}>👥 Pickup</span>
+                        <div className={styles.transportBtns}>
+                          {PARENTS.map(p => {
+                            const isActive = e.transportParent === p.id;
+                            const pcol = PARENT_COLORS[p.id];
+                            return (
+                              <button
+                                key={p.id}
+                                className={`${styles.transportBtn} ${isActive ? styles.transportActive : ''}`}
+                                style={isActive
+                                  ? { background: pcol.accent, color: 'white', borderColor: pcol.accent }
+                                  : { borderColor: pcol.accent, color: pcol.dark }}
+                                onClick={() => {
+                                  const updated = {
+                                    transportParent: e.transportParent === p.id ? null : p.id,
+                                  };
+                                  updateEvent(e.id, updated);
+                                  setActiveEvent(ev => ({ ...ev, ...updated }));
+                                }}
+                              >
+                                {p.emoji} {p.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
