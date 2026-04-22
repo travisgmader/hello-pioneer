@@ -291,6 +291,7 @@
   padding: 16px 20px;
   overflow-y: auto;
   flex: 1;
+  min-height: 0;
   background: var(--bg);
 }
 
@@ -472,9 +473,6 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  overflow-y: auto;
-  max-height: 45vh;
-  padding-right: 2px;
 }
 
 .evtItem {
