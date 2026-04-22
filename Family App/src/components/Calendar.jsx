@@ -54,7 +54,7 @@ export default function Calendar({
 
   const startEdit = (ev) => {
     setEditingId(ev.id);
-    setEditFields({ title: ev.title, time: ev.time || '', memberId: ev.memberId || '', color: ev.color || 'peach' });
+    setEditFields({ title: ev.title, time: ev.time || '', endTime: ev.endTime || '', memberId: ev.memberId || '', color: ev.color || 'peach' });
   };
 
   const handleSaveEdit = (evId) => {
@@ -381,13 +381,28 @@ export default function Calendar({
                           onChange={e => setEditFields(f => ({ ...f, title: e.target.value }))}
                           required
                           autoFocus
+                          placeholder="Event title"
                         />
-                        <input
-                          type="time"
-                          className={styles.evtInput}
-                          value={editFields.time}
-                          onChange={e => setEditFields(f => ({ ...f, time: e.target.value }))}
-                        />
+                        <div className={styles.timeRow}>
+                          <label className={styles.timeLabel}>
+                            Start
+                            <input
+                              type="time"
+                              className={styles.evtInput}
+                              value={editFields.time}
+                              onChange={e => setEditFields(f => ({ ...f, time: e.target.value }))}
+                            />
+                          </label>
+                          <label className={styles.timeLabel}>
+                            End
+                            <input
+                              type="time"
+                              className={styles.evtInput}
+                              value={editFields.endTime}
+                              onChange={e => setEditFields(f => ({ ...f, endTime: e.target.value }))}
+                            />
+                          </label>
+                        </div>
                         {members.length > 0 && (
                           <select
                             className={styles.evtInput}

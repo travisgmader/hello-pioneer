@@ -615,6 +615,23 @@
   color: white;
 }
 
+.timeRow {
+  display: flex;
+  gap: 8px;
+}
+
+.timeLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+  flex: 1;
+}
+
 .evtEditForm {
   display: flex;
   flex-direction: column;
