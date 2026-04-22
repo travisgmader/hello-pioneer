@@ -15,9 +15,11 @@ const choreToRow = (c) => ({
   frequency: c.frequency, completed: c.completed, due_date: c.dueDate,
 });
 
+const trimTime = (t) => t ? t.slice(0, 5) : t;
+
 const eventFromRow = (r) => ({
   id: r.id, title: r.title, memberId: r.member_id,
-  date: r.date, time: r.time, endTime: r.end_time, color: r.color, transportParent: r.transport_parent,
+  date: r.date, time: trimTime(r.time), endTime: trimTime(r.end_time), color: r.color, transportParent: r.transport_parent,
 });
 const eventToRow = (e) => ({
   id: e.id, title: e.title, member_id: e.memberId,

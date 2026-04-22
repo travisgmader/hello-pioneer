@@ -43,13 +43,14 @@ export default function Dashboard({ setPage }) {
 
   const startEdit = (e) => {
     setEditing(true);
-    setEditFields({ title: e.title, time: e.time || '', memberId: e.memberId || '' });
+    setEditFields({ title: e.title, time: e.time || '', endTime: e.endTime || '', memberId: e.memberId || '' });
   };
 
   const saveEdit = () => {
     updateEvent(activeEvent.id, {
       title: editFields.title,
       time: editFields.time || null,
+      endTime: editFields.endTime || null,
       memberId: editFields.memberId || null,
       color: MEMBERS.find(m => m.id === editFields.memberId)?.color || activeEvent.color,
     });
@@ -252,13 +253,26 @@ export default function Dashboard({ setPage }) {
                       required
                       autoFocus
                     />
-                    <label className={styles.editLabel}>Time</label>
-                    <input
-                      type="time"
-                      className={styles.editInput}
-                      value={editFields.time}
-                      onChange={e => setEditFields(f => ({ ...f, time: e.target.value }))}
-                    />
+                    <div className={styles.timeRow}>
+                      <label className={styles.timeLabel}>
+                        Start
+                        <input
+                          type="time"
+                          className={styles.editInput}
+                          value={editFields.time}
+                          onChange={e => setEditFields(f => ({ ...f, time: e.target.value }))}
+                        />
+                      </label>
+                      <label className={styles.timeLabel}>
+                        End
+                        <input
+                          type="time"
+                          className={styles.editInput}
+                          value={editFields.endTime}
+                          onChange={e => setEditFields(f => ({ ...f, endTime: e.target.value }))}
+                        />
+                      </label>
+                    </div>
                     <label className={styles.editLabel}>Who</label>
                     <select
                       className={styles.editInput}
