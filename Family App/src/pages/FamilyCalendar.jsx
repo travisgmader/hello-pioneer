@@ -4,7 +4,7 @@ import Calendar from '../components/Calendar';
 import styles from './FamilyCalendar.module.css';
 
 export default function FamilyCalendar() {
-  const { events, chores, custody, mealPlan, addEvent, updateEvent, deleteEvent, setCustodyDay } = useApp();
+  const { events, chores, custody, mealPlan, addEvent, updateEvent, deleteEvent, setCustodyDay, toggleChore } = useApp();
 
   return (
     <div className={styles.page}>
@@ -36,6 +36,7 @@ export default function FamilyCalendar() {
         onAddEvent={addEvent}
         onUpdateEvent={updateEvent}
         onDeleteEvent={deleteEvent}
+        onToggleChore={toggleChore}
       />
     </div>
   );

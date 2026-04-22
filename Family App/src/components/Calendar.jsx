@@ -33,7 +33,7 @@ export default function Calendar({
   events = [], chores = [], members = [],
   custody = {}, onCustodyChange,
   mealPlan = {},
-  onAddEvent, onDeleteEvent, onUpdateEvent,
+  onAddEvent, onDeleteEvent, onUpdateEvent, onToggleChore,
 }) {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
@@ -406,9 +406,24 @@ export default function Calendar({
                     ) : (
                       <>
                         <div className={styles.evtItemMain}>
-                          <span className={styles.evtDot} style={{ background: col.accent }} />
+                          {ev.isChore && onToggleChore ? (
+                            <button
+                              className={styles.choreCheck}
+                              style={{
+                                borderColor: col.accent,
+                                background: ev.completed ? col.accent : 'var(--card-bg)',
+                                color: 'white',
+                              }}
+                              onClick={() => onToggleChore(ev.id)}
+                              title={ev.completed ? 'Mark incomplete' : 'Mark complete'}
+                            >
+                              {ev.completed ? '✓' : ''}
+                            </button>
+                          ) : (
+                            <span className={styles.evtDot} style={{ background: col.accent }} />
+                          )}
                           <span className={styles.evtName}>
-                            {ev.isChore ? '✅ ' : isTransport && member ? `${member.emoji} ` : ''}{ev.title}
+                            {!ev.isChore && isTransport && member ? `${member.emoji} ` : ''}{ev.title}
                             {ev.time && !ev.isChore && (
                               <span className={styles.evtTime}>{formatTimeRange(ev.time, ev.endTime)}</span>
                             )}
