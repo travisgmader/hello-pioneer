@@ -583,39 +583,36 @@
 }
 
 .evtEdit {
-  background: none;
+  background: var(--lavender-light);
   border: none;
-  color: var(--text-muted);
-  font-size: 13px;
+  color: var(--lavender-dark);
+  font-size: 14px;
   cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 4px;
-  opacity: 0.4;
+  padding: 4px 8px;
+  border-radius: 6px;
   transition: all 0.15s;
+  font-weight: 600;
 }
 
 .evtEdit:hover {
-  opacity: 1;
-  background: var(--lavender-light);
-  color: var(--lavender-dark);
+  background: var(--lavender);
+  color: white;
 }
 
 .evtDel {
-  background: none;
+  background: var(--pink-light);
   border: none;
-  color: var(--text-muted);
-  font-size: 12px;
+  color: var(--pink-dark);
+  font-size: 14px;
   cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 4px;
-  opacity: 0.4;
+  padding: 4px 8px;
+  border-radius: 6px;
   transition: all 0.15s;
 }
 
 .evtDel:hover {
-  opacity: 1;
-  background: var(--pink-light);
-  color: var(--pink-dark);
+  background: var(--pink);
+  color: white;
 }
 
 .evtEditForm {

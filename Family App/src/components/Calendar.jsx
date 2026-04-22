@@ -459,10 +459,10 @@ export default function Calendar({
 
                         <div className={styles.evtActions}>
                           {onUpdateEvent && !ev.isChore && (
-                            <button className={styles.evtEdit} onClick={() => startEdit(ev)}>✎</button>
+                            <button className={styles.evtEdit} onClick={() => startEdit(ev)} title="Edit">✎</button>
                           )}
                           {onDeleteEvent && !ev.isChore && (
-                            <button className={styles.evtDel} onClick={() => onDeleteEvent(ev.id)}>✕</button>
+                            <button className={styles.evtDel} onClick={() => onDeleteEvent(ev.id)} title="Delete">🗑</button>
                           )}
                         </div>
                       </>
