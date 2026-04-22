@@ -15,11 +15,26 @@ const choreToRow = (c) => ({
   frequency: c.frequency, completed: c.completed, due_date: c.dueDate,
 });
 
-const trimTime = (t) => t ? t.slice(0, 5) : t;
+// Normalize any time string to "HH:MM" for <input type="time">
+// Handles: "17:30", "17:30:00", "5:30 PM", "6:15 AM", null
+const normalizeTime = (t) => {
+  if (!t) return t;
+  const ampm = t.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if (ampm) {
+    let h = parseInt(ampm[1], 10);
+    const m = ampm[2];
+    const period = ampm[3].toUpperCase();
+    if (period === 'PM' && h !== 12) h += 12;
+    if (period === 'AM' && h === 12) h = 0;
+    return `${String(h).padStart(2, '0')}:${m}`;
+  }
+  // Already 24-hour — just ensure HH:MM (trim seconds if present)
+  return t.slice(0, 5);
+};
 
 const eventFromRow = (r) => ({
   id: r.id, title: r.title, memberId: r.member_id,
-  date: r.date, time: trimTime(r.time), endTime: trimTime(r.end_time), color: r.color, transportParent: r.transport_parent,
+  date: r.date, time: normalizeTime(r.time), endTime: normalizeTime(r.end_time), color: r.color, transportParent: r.transport_parent,
 });
 const eventToRow = (e) => ({
   id: e.id, title: e.title, member_id: e.memberId,
