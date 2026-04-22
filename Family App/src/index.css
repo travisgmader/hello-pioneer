@@ -261,11 +261,11 @@ h1, h2, h3, h4 {
 
   /* Space for fixed bottom tab bar */
   main {
-    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(64px + max(env(safe-area-inset-bottom, 12px), 12px));
   }
 
   footer {
-    margin-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+    margin-bottom: calc(64px + max(env(safe-area-inset-bottom, 12px), 12px));
   }
 }
 
