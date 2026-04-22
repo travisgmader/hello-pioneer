@@ -32,6 +32,7 @@ export default function Nav({ page, setPage, theme, setTheme }) {
     .find(i => i.id === page)?.label ?? '🏠 Dashboard';
 
   return (
+    <>
     <nav className={styles.nav}>
       <button className={styles.logo} onClick={() => navigate('dashboard')}><img src="/fox-logo.png" alt="" style={{ width: 28, height: 28, objectFit: 'contain', verticalAlign: 'middle', marginRight: 8 }} />Family Plan</button>
 
@@ -74,19 +75,6 @@ export default function Nav({ page, setPage, theme, setTheme }) {
         </button>
       )}
 
-      {/* Mobile bottom tab bar */}
-      <div className={styles.bottomBar}>
-        {BOTTOM_BAR_ITEMS.map(item => (
-          <button
-            key={item.id}
-            className={`${styles.bottomTab} ${page === item.id ? styles.bottomTabActive : ''}`}
-            onClick={() => navigate(item.id)}
-          >
-            {item.emoji}
-          </button>
-        ))}
-      </div>
-
       {/* Mobile dropdown */}
       {open && (
         <div className={styles.dropdown}>
@@ -117,5 +105,19 @@ export default function Nav({ page, setPage, theme, setTheme }) {
         </div>
       )}
     </nav>
+
+    {/* Mobile bottom tab bar — outside <nav> to avoid stacking context issues */}
+    <div className={styles.bottomBar}>
+      {BOTTOM_BAR_ITEMS.map(item => (
+        <button
+          key={item.id}
+          className={`${styles.bottomTab} ${page === item.id ? styles.bottomTabActive : ''}`}
+          onClick={() => navigate(item.id)}
+        >
+          {item.emoji}
+        </button>
+      ))}
+    </div>
+    </>
   );
 }
