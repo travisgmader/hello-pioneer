@@ -1,6 +1,17 @@
+function to12(t) {
+  if (!t) return '';
+  const [hStr, mStr] = t.split(':');
+  let h = parseInt(hStr, 10);
+  const m = mStr || '00';
+  const period = h >= 12 ? 'PM' : 'AM';
+  if (h === 0) h = 12;
+  else if (h > 12) h -= 12;
+  return `${h}:${m} ${period}`;
+}
+
 export function formatTimeRange(start, end) {
   if (!start) return '';
-  return end ? `${start} – ${end}` : start;
+  return end ? `${to12(start)} – ${to12(end)}` : to12(start);
 }
 
 // Returns today's date as "YYYY-MM-DD" in LOCAL time (not UTC)
