@@ -167,10 +167,18 @@ export default function Calendar({
               className={`${styles.cell} ${isToday ? styles.today : ''} ${isSel ? styles.selected : ''}`}
               onClick={() => { setSelected(d); setShowEventForm(false); }}
             >
-              {/* Day number — colored by custody parent */}
+              {/* Day number — cycles custody color on click */}
               <span
                 className={styles.dayNum}
-                style={custodyCol ? { background: custodyCol.accent, color: 'white', borderRadius: '50%' } : {}}
+                style={custodyCol
+                  ? { background: custodyCol.accent, color: 'white', borderRadius: '50%' }
+                  : isToday ? {} : {}}
+                onClick={onCustodyChange ? (e) => {
+                  e.stopPropagation();
+                  const next = custodyParent === null ? 'mom' : custodyParent === 'mom' ? 'dad' : null;
+                  onCustodyChange(dateStr, next);
+                } : undefined}
+                title={onCustodyChange ? 'Click to set custody' : undefined}
               >
                 {d}
               </span>
@@ -212,26 +220,6 @@ export default function Calendar({
                 )}
               </div>
 
-              {/* Parent custody toggle icons */}
-              {onCustodyChange && (
-                <div className={styles.custodyIcons} onClick={e => e.stopPropagation()}>
-                  {PARENTS.map(p => {
-                    const isActive = custodyParent === p.id;
-                    const col = parentColor(p.id);
-                    return (
-                      <button
-                        key={p.id}
-                        className={`${styles.custodyIcon} ${isActive ? styles.custodyActive : ''}`}
-                        style={isActive ? { background: col.accent, color: 'white' } : {}}
-                        title={`${p.label}'s custody`}
-                        onClick={() => onCustodyChange(dateStr, p.id)}
-                      >
-                        {p.emoji}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
             </div>
           );
         })}

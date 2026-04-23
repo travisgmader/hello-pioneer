@@ -124,6 +124,10 @@
 
 .cell:hover { background: var(--lavender-light) !important; }
 
+.cell.today {
+  background: color-mix(in srgb, var(--lavender) 8%, var(--card-bg));
+}
+
 .cell.today .dayNum {
   background: var(--lavender);
   color: white;
@@ -144,7 +148,15 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  border-radius: 50%;
   transition: all 0.2s;
+  cursor: pointer;
+  user-select: none;
+}
+
+.dayNum:hover {
+  opacity: 0.8;
+  box-shadow: 0 0 0 2px var(--border);
 }
 
 /* Meal chips — pinned above events in each cell */
