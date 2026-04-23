@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { MEMBERS, MEAL_SLOTS } from '../data/initialData';
+import { localDateStr } from '../lib/utils';
 import { PARENT_EMAILS } from '../lib/allowedEmails';
 import styles from './Meals.module.css';
 
@@ -29,7 +30,7 @@ function getMondayOf(date) {
   return d;
 }
 
-function fmtDate(d) { return d.toISOString().split('T')[0]; }
+function fmtDate(d) { return localDateStr(d); }
 function fmtShort(d) {
   return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 }

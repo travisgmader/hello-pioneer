@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { MEMBERS, MEAL_SLOTS } from '../data/initialData';
-import { formatTimeRange } from '../lib/utils';
+import { formatTimeRange, localToday } from '../lib/utils';
 import styles from './Dashboard.module.css';
 
 const PARENTS = [
@@ -23,7 +23,6 @@ const COLOR_VARS = {
   peach: { bg: 'var(--peach-light)', accent: 'var(--peach)', dark: 'var(--peach-dark)' },
 };
 
-function today() { return new Date().toISOString().split('T')[0]; }
 
 function formatDate(d) {
   return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
@@ -33,7 +32,7 @@ const MEAL_ICONS = { Breakfast: '🌅', Lunch: '☀️', Dinner: '🌙' };
 
 export default function Dashboard({ setPage }) {
   const { chores, events, mealPlan, groceries, toggleChore, updateEvent, deleteEvent } = useApp();
-  const todayStr = today();
+  const todayStr = localToday();
   const [activeEvent, setActiveEvent] = useState(null);
   const [editing, setEditing] = useState(false);
   const [editFields, setEditFields] = useState({});

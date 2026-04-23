@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { MEMBERS } from '../data/initialData';
+import { localToday } from '../lib/utils';
 import styles from './Chores.module.css';
 
 const COLOR_VARS = {
@@ -11,7 +12,7 @@ const COLOR_VARS = {
   yellow: { bg: 'var(--yellow-light)', accent: 'var(--yellow)', dark: 'var(--yellow-dark)' },
 };
 
-const EMPTY_FORM = { title: '', assignedTo: '', frequency: 'weekly', dueDate: new Date().toISOString().split('T')[0] };
+const EMPTY_FORM = { title: '', assignedTo: '', frequency: 'weekly', dueDate: localToday() };
 
 function formatDate(d) {
   return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });

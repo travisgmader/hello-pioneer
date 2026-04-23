@@ -1,6 +1,6 @@
 import { useApp } from '../context/AppContext';
 import { MEMBERS } from '../data/initialData';
-import { formatTimeRange } from '../lib/utils';
+import { formatTimeRange, localToday } from '../lib/utils';
 import Calendar from '../components/Calendar';
 import styles from './MemberPage.module.css';
 
@@ -28,7 +28,7 @@ export default function MemberPage({ memberId }) {
   const pct = memberChores.length ? Math.round((done / memberChores.length) * 100) : 0;
 
   const upcomingEvents = memberEvents
-    .filter(e => e.date >= new Date().toISOString().split('T')[0])
+    .filter(e => e.date >= localToday())
     .sort((a, b) => a.date.localeCompare(b.date))
     .slice(0, 5);
 

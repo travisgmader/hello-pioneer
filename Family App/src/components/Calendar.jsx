@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styles from './Calendar.module.css';
-import { formatTimeRange } from '../lib/utils';
+import { formatTimeRange, localToday, localDateStr } from '../lib/utils';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -46,7 +46,7 @@ export default function Calendar({
 
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const todayStr = now.toISOString().split('T')[0];
+  const todayStr = localToday();
 
   const prevMonth = () => { if (month === 0) { setMonth(11); setYear(y => y - 1); } else setMonth(m => m - 1); };
   const nextMonth = () => { if (month === 11) { setMonth(0); setYear(y => y + 1); } else setMonth(m => m + 1); };
@@ -97,7 +97,7 @@ export default function Calendar({
     while (cur <= end && guard-- > 0) {
       const dow = cur.getDay();
       if (repeat !== 'weekdays' || (dow >= 1 && dow <= 5)) {
-        dates.push(cur.toISOString().split('T')[0]);
+        dates.push(localDateStr(cur));
       }
       if (repeat === 'daily' || repeat === 'weekdays') cur.setDate(cur.getDate() + 1);
       else if (repeat === 'weekly') cur.setDate(cur.getDate() + 7);
@@ -305,7 +305,7 @@ export default function Calendar({
                     const repeat = e.target.value;
                     const d = new Date(fmt(selected) + 'T00:00:00');
                     d.setDate(d.getDate() + (repeat === 'daily' || repeat === 'weekdays' ? 14 : repeat === 'weekly' ? 28 : 90));
-                    setNewEvent(f => ({ ...f, repeat, repeatUntil: repeat !== 'none' ? d.toISOString().split('T')[0] : '' }));
+                    setNewEvent(f => ({ ...f, repeat, repeatUntil: repeat !== 'none' ? localDateStr(d) : '' }));
                   }}
                 >
                   <option value="none">Never</option>
