@@ -23,6 +23,15 @@ export function localToday() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+// Advances a due date by one recurrence interval
+export function nextDueDate(dateStr, frequency) {
+  const d = new Date(dateStr + 'T00:00:00');
+  if (frequency === 'daily')   d.setDate(d.getDate() + 1);
+  if (frequency === 'weekly')  d.setDate(d.getDate() + 7);
+  if (frequency === 'monthly') d.setMonth(d.getMonth() + 1);
+  return localDateStr(d);
+}
+
 // Formats any Date object as "YYYY-MM-DD" in LOCAL time
 export function localDateStr(d) {
   const yyyy = d.getFullYear();

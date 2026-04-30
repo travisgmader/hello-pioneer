@@ -8,7 +8,6 @@ const PARENTS = [
   { id: 'mom', emoji: '👩', label: 'Mom' },
   { id: 'dad', emoji: '👨', label: 'Dad' },
 ];
-const CHILD_IDS = ['stella', 'roman', 'layla'];
 const PARENT_COLORS = {
   mom: { accent: 'var(--pink)', dark: 'var(--pink-dark)', bg: 'var(--pink-light)' },
   dad: { accent: 'var(--blue)', dark: 'var(--blue-dark)', bg: 'var(--blue-light)' },
@@ -59,12 +58,16 @@ export default function Dashboard({ setPage }) {
 
   const handleDelete = (id) => { deleteEvent(id); closeModal(); };
 
-  const todayChores = chores.filter(c => c.dueDate === todayStr);
+  const todayChores = chores.filter(c => !c.completed || c.dueDate === todayStr);
   const todayMeals = MEAL_SLOTS.map(slot => ({ slot, meal: mealPlan[todayStr]?.[slot] || '' }));
   const pendingGroceries = groceries.filter(g => !g.checked).slice(0, 8);
   const upcomingEvents = events
     .filter(e => e.date >= todayStr)
-    .sort((a, b) => a.date.localeCompare(b.date))
+    .sort((a, b) => {
+      const d = a.date.localeCompare(b.date);
+      if (d !== 0) return d;
+      return (a.time || '').localeCompare(b.time || '');
+    })
     .slice(0, 6);
 
   return (
@@ -125,16 +128,30 @@ export default function Dashboard({ setPage }) {
               {upcomingEvents.map(e => {
                 const member = MEMBERS.find(m => m.id === e.memberId);
                 const col = COLOR_VARS[e.color] || COLOR_VARS.lavender;
+                const dropoff = e.dropoffParent ? PARENTS.find(p => p.id === e.dropoffParent) : null;
+                const pickup  = e.pickupParent  ? PARENTS.find(p => p.id === e.pickupParent)  : null;
+                const dropCol = dropoff ? PARENT_COLORS[dropoff.id] : null;
+                const pickCol = pickup  ? PARENT_COLORS[pickup.id]  : null;
                 return (
                   <div key={e.id} className={styles.eventItem} style={{ borderLeftColor: col.accent }} onClick={() => openModal(e)}>
-                    <div className={styles.eventDate} style={{ color: col.dark }}>{formatDate(e.date)}</div>
-                    <div className={styles.eventTitle}>{e.title}</div>
-                    {member && (
-                      <span className={styles.eventMember} style={{ background: col.bg, color: col.dark }}>
-                        {member.emoji} {member.name}
-                      </span>
-                    )}
-                    {!e.memberId && <span className={styles.eventMember} style={{ background: 'var(--peach-light)', color: 'var(--peach-dark)' }}>👨‍👩‍👧‍👦 Everyone</span>}
+                    <div className={styles.eventDate} style={{ color: col.dark }}>
+                      {formatDate(e.date)}{e.time && <span className={styles.eventTime}> · {formatTimeRange(e.time, e.endTime)}</span>}
+                    </div>
+                    <div className={styles.eventMeta}>
+                      <div className={styles.eventTitle}>{e.title}</div>
+                      <div className={styles.eventBadges}>
+                        {dropoff && <span className={styles.pickupBadge} style={{ background: dropCol.bg, color: dropCol.dark, borderColor: dropCol.accent }}>⬇️ {dropoff.label}</span>}
+                        {pickup  && <span className={styles.pickupBadge} style={{ background: pickCol.bg, color: pickCol.dark, borderColor: pickCol.accent }}>⬆️ {pickup.label}</span>}
+                      </div>
+                    </div>
+                    <div className={styles.eventBadges}>
+                      {member && (
+                        <span className={styles.eventMember} style={{ background: col.bg, color: col.dark }}>
+                          {member.emoji} {member.name}
+                        </span>
+                      )}
+                      {!e.memberId && <span className={styles.eventMember} style={{ background: 'var(--peach-light)', color: 'var(--peach-dark)' }}>👨‍👩‍👧‍👦 Everyone</span>}
+                    </div>
                   </div>
                 );
               })}
@@ -225,7 +242,6 @@ export default function Dashboard({ setPage }) {
         const e = activeEvent;
         const member = MEMBERS.find(m => m.id === e.memberId);
         const col = COLOR_VARS[e.color] || COLOR_VARS.lavender;
-        const isChildEvent = CHILD_IDS.includes(e.memberId);
         return (
           <div className={styles.overlay} onClick={closeModal}>
             <div className={styles.modal} onClick={ev => ev.stopPropagation()}>
@@ -305,12 +321,15 @@ export default function Dashboard({ setPage }) {
                         : <span className={styles.eventMember} style={{ background: 'var(--peach-light)', color: 'var(--peach-dark)' }}>👨‍👩‍👧‍👦 Everyone</span>
                       }
                     </div>
-                    {isChildEvent && (
-                      <div className={styles.modalRow} style={{ flexWrap: 'wrap', gap: 8 }}>
-                        <span className={styles.modalLabel}>👥 Pickup</span>
+                    {[
+                      { key: 'dropoffParent', label: '⬇️ Dropoff' },
+                      { key: 'pickupParent',  label: '⬆️ Pickup' },
+                    ].map(({ key, label }) => (
+                      <div key={key} className={styles.modalRow} style={{ flexWrap: 'wrap', gap: 8 }}>
+                        <span className={styles.modalLabel}>{label}</span>
                         <div className={styles.transportBtns}>
                           {PARENTS.map(p => {
-                            const isActive = e.transportParent === p.id;
+                            const isActive = e[key] === p.id;
                             const pcol = PARENT_COLORS[p.id];
                             return (
                               <button
@@ -320,9 +339,7 @@ export default function Dashboard({ setPage }) {
                                   ? { background: pcol.accent, color: 'white', borderColor: pcol.accent }
                                   : { borderColor: pcol.accent, color: pcol.dark }}
                                 onClick={() => {
-                                  const updated = {
-                                    transportParent: e.transportParent === p.id ? null : p.id,
-                                  };
+                                  const updated = { [key]: isActive ? null : p.id };
                                   updateEvent(e.id, updated);
                                   setActiveEvent(ev => ({ ...ev, ...updated }));
                                 }}
@@ -333,7 +350,7 @@ export default function Dashboard({ setPage }) {
                           })}
                         </div>
                       </div>
-                    )}
+                    ))}
                   </>
                 )}
               </div>

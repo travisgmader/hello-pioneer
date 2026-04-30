@@ -2,7 +2,7 @@
 // Add one email per line (lowercase).
 export const ALLOWED_EMAILS = [
   'travis.g.mader@gmail.com',
-  'angelia.merryman14@gmail.com',
+  'angelia.m.merryman14@gmail.com',
   'laylamerrman11@gmail.com',
   'stellamader6@gmail.com',
   'maderroman5@gmail.com',
@@ -11,5 +11,5 @@ export const ALLOWED_EMAILS = [
 // Emails that have parent-level permissions (schedule meals, approve groceries)
 export const PARENT_EMAILS = [
   'travis.g.mader@gmail.com',
-  'angelia.merryman14@gmail.com',
+  'angelia.m.merryman14@gmail.com',
 ];

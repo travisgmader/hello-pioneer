@@ -34,11 +34,13 @@ const normalizeTime = (t) => {
 
 const eventFromRow = (r) => ({
   id: r.id, title: r.title, memberId: r.member_id,
-  date: r.date, time: normalizeTime(r.time), endTime: normalizeTime(r.end_time), color: r.color, transportParent: r.transport_parent,
+  date: r.date, time: normalizeTime(r.time), endTime: normalizeTime(r.end_time),
+  color: r.color, dropoffParent: r.dropoff_parent ?? null, pickupParent: r.pickup_parent ?? null,
 });
 const eventToRow = (e) => ({
   id: e.id, title: e.title, member_id: e.memberId,
-  date: e.date, time: e.time, end_time: e.endTime, color: e.color, transport_parent: e.transportParent,
+  date: e.date, time: e.time, end_time: e.endTime,
+  color: e.color, dropoff_parent: e.dropoffParent ?? null, pickup_parent: e.pickupParent ?? null,
 });
 
 const recFromRow = (r) => ({
@@ -76,6 +78,16 @@ const mealPlanFromRows = (rows) =>
     ...acc, [r.date]: { ...(acc[r.date] || {}), [r.slot]: r.meal },
   }), {});
 
+// ── Per-table loaders (used by real-time subscriptions) ─
+
+export const loadChores   = () => supabase.from('chores').select('*').order('created_at').then(r => (r.data ?? []).map(choreFromRow));
+export const loadEvents   = () => supabase.from('events').select('*').order('date').then(r => (r.data ?? []).map(eventFromRow));
+export const loadCustody  = () => supabase.from('custody').select('*').then(r => custodyFromRows(r.data ?? []));
+export const loadMealPlan = () => supabase.from('meal_plan').select('*').then(r => mealPlanFromRows(r.data ?? []));
+export const loadMealRecs = () => supabase.from('meal_recommendations').select('*').order('created_at').then(r => (r.data ?? []).map(recFromRow));
+export const loadGroceries      = () => supabase.from('groceries').select('*').order('created_at').then(r => (r.data ?? []).map(groceryFromRow));
+export const loadGroceryRequests = () => supabase.from('grocery_requests').select('*').order('created_at').then(r => (r.data ?? []).map(reqFromRow));
+
 // ── Load all ───────────────────────────────────────────
 
 export async function loadAll() {
@@ -104,13 +116,19 @@ export async function loadAll() {
 // ── Chores ─────────────────────────────────────────────
 
 export const dbAddChore    = (c) => checked(supabase.from('chores').insert(choreToRow(c)));
-export const dbUpdateChore = (id, u) => checked(supabase.from('chores').update(choreToRow({ id, ...u })).eq('id', id));
+export const dbUpdateChore = (id, u) => {
+  const { id: _id, ...fields } = choreToRow({ id: '', ...u });
+  return checked(supabase.from('chores').update(fields).eq('id', id));
+};
 export const dbDeleteChore = (id) => checked(supabase.from('chores').delete().eq('id', id));
 
 // ── Events ─────────────────────────────────────────────
 
 export const dbAddEvent    = (e) => checked(supabase.from('events').insert(eventToRow(e)));
-export const dbUpdateEvent = (id, u) => checked(supabase.from('events').update(eventToRow({ id, ...u })).eq('id', id));
+export const dbUpdateEvent = (id, u) => {
+  const { id: _id, ...fields } = eventToRow({ id: '', ...u });
+  return checked(supabase.from('events').update(fields).eq('id', id));
+};
 export const dbDeleteEvent = (id) => checked(supabase.from('events').delete().eq('id', id));
 
 // ── Custody ────────────────────────────────────────────

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { MEMBERS } from '../data/initialData';
+import { PARENT_EMAILS } from '../lib/allowedEmails';
 import { localToday } from '../lib/utils';
 import styles from './Chores.module.css';
 
@@ -12,6 +13,8 @@ const COLOR_VARS = {
   yellow: { bg: 'var(--yellow-light)', accent: 'var(--yellow)', dark: 'var(--yellow-dark)' },
 };
 
+const FREQ_LABELS = { once: 'Once', daily: '↻ Daily', weekly: '↻ Weekly', monthly: '↻ Monthly' };
+
 const EMPTY_FORM = { title: '', assignedTo: '', frequency: 'weekly', dueDate: localToday() };
 
 function formatDate(d) {
@@ -19,7 +22,8 @@ function formatDate(d) {
 }
 
 export default function Chores() {
-  const { chores, addChore, deleteChore, toggleChore } = useApp();
+  const { chores, addChore, deleteChore, toggleChore, user } = useApp();
+  const isParent = PARENT_EMAILS.includes(user?.email?.toLowerCase());
   const [filter, setFilter] = useState('all');
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -43,9 +47,11 @@ export default function Chores() {
     <div className={styles.page}>
       <div className={styles.header}>
         <h1 className={styles.title}>✅ Chore List</h1>
-        <button className={styles.addBtn} onClick={() => setShowForm(s => !s)}>
-          {showForm ? '✕ Cancel' : '+ Add Chore'}
-        </button>
+        {isParent && (
+          <button className={styles.addBtn} onClick={() => setShowForm(s => !s)}>
+            {showForm ? '✕ Cancel' : '+ Add Chore'}
+          </button>
+        )}
       </div>
 
       {showForm && (
@@ -62,9 +68,10 @@ export default function Chores() {
             {MEMBERS.map(m => <option key={m.id} value={m.id}>{m.emoji} {m.name}</option>)}
           </select>
           <select className={styles.input} value={form.frequency} onChange={e => setForm(f => ({ ...f, frequency: e.target.value }))}>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
+            <option value="once">One-time</option>
+            <option value="daily">Repeats Daily</option>
+            <option value="weekly">Repeats Weekly</option>
+            <option value="monthly">Repeats Monthly</option>
           </select>
           <input
             type="date"
@@ -123,7 +130,7 @@ export default function Chores() {
                 <th>Assigned To</th>
                 <th>Frequency</th>
                 <th>Due Date</th>
-                <th></th>
+                {isParent && <th></th>}
               </tr>
             </thead>
             <tbody>
@@ -150,12 +157,14 @@ export default function Chores() {
                       ) : '—'}
                     </td>
                     <td>
-                      <span className={styles.freqBadge}>{c.frequency}</span>
+                      <span className={styles.freqBadge}>{FREQ_LABELS[c.frequency] || c.frequency}</span>
                     </td>
                     <td className={styles.dateCell}>{c.dueDate ? formatDate(c.dueDate) : '—'}</td>
-                    <td>
-                      <button className={styles.deleteBtn} onClick={() => deleteChore(c.id)} title="Delete">✕</button>
-                    </td>
+                    {isParent && (
+                      <td>
+                        <button className={styles.deleteBtn} onClick={() => deleteChore(c.id)} title="Delete">✕</button>
+                      </td>
+                    )}
                   </tr>
                 );
               })}

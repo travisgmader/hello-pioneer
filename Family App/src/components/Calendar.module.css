@@ -122,16 +122,33 @@
   background: var(--bg);
 }
 
+.otherMonth {
+  background: var(--bg);
+}
+
+.otherMonth .dayNum {
+  color: var(--text-muted);
+  opacity: 0.55;
+}
+
+.otherMonth .mealChip,
+.otherMonth .evtChip {
+  opacity: 0.5;
+}
+
 .cell:hover { background: var(--lavender-light) !important; }
 
 .cell.today {
-  background: color-mix(in srgb, var(--lavender) 8%, var(--card-bg));
+  background: color-mix(in srgb, var(--lavender) 18%, var(--card-bg));
+  border-top: 3px solid var(--lavender);
 }
 
 .cell.today .dayNum {
   background: var(--lavender);
   color: white;
   border-radius: 50%;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--lavender) 30%, transparent);
+  font-weight: 700;
 }
 
 .cell.selected {
@@ -474,6 +491,77 @@
   color: var(--text);
 }
 
+.mealEditBtn {
+  flex: 1;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mealEditIcon {
+  font-size: 11px;
+  opacity: 0.4;
+}
+
+.mealEditBtn:hover .mealEditIcon { opacity: 0.9; }
+
+.mealEditWrap {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.mealEditInput {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  outline: none;
+  background: var(--card-bg);
+  color: var(--text);
+  min-width: 0;
+}
+
+.mealEditInput:focus { border-color: var(--lavender); }
+
+.mealEditSave {
+  color: white;
+  border: none;
+  border-radius: 5px;
+  width: 28px;
+  height: 28px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mealEditCancel {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .noEvts {
   color: var(--text-muted);
   font-size: 13px;
@@ -697,7 +785,14 @@
   .dialogBody { padding: 14px; }
 
   .evtForm { flex-direction: column; }
-  .evtInput { min-width: unset; }
+
+  /* Prevent iOS auto-zoom on input focus — must be >= 16px */
+  .evtInput,
+  .mealEditInput,
+  .evtForm select,
+  .evtEditForm select {
+    font-size: 16px;
+  }
 
   .transportRow { padding-left: 0; }
   .dialogHeader { flex-direction: column; align-items: flex-start; gap: 8px; }

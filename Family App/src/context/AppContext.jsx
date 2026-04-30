@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_CHORES, INITIAL_EVENTS, INITIAL_MEAL_PLAN, INITIAL_MEAL_RECOMMENDATIONS, INITIAL_GROCERIES, INITIAL_GROCERY_REQUESTS } from '../data/initialData';
 import { isConfigured, supabase } from '../lib/supabase';
+import { nextDueDate } from '../lib/utils';
 import * as db from '../lib/db';
 
 const AppContext = createContext(null);
@@ -56,6 +57,22 @@ export function AppProvider({ children }) {
     }).catch(console.error).finally(() => setLoading(false));
   }, [authLoading, user]);
 
+  // ── Real-time subscriptions ───────────────────────────
+  useEffect(() => {
+    if (!isConfigured || !user) return;
+    const channel = supabase
+      .channel('family-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chores' },           () => db.loadChores().then(setChores))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' },           () => db.loadEvents().then(setEvents))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'custody' },          () => db.loadCustody().then(setCustody))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'meal_plan' },        () => db.loadMealPlan().then(setMealPlan))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'meal_recommendations' }, () => db.loadMealRecs().then(setMealRecs))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'groceries' },        () => db.loadGroceries().then(setGroceries))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'grocery_requests' }, () => db.loadGroceryRequests().then(setGroceryRequests))
+      .subscribe();
+    return () => supabase.removeChannel(channel);
+  }, [user]);
+
   // ── localStorage sync (only when Supabase is NOT configured) ──
   useEffect(() => { if (!isConfigured) lsSave('family_chores', chores); }, [chores]);
   useEffect(() => { if (!isConfigured) lsSave('family_events', events); }, [events]);
@@ -83,7 +100,15 @@ export function AppProvider({ children }) {
   };
   const toggleChore = (id) => {
     const chore = chores.find(c => c.id === id);
-    if (chore) updateChore(id, { completed: !chore.completed });
+    if (!chore) return;
+    const isRecurring = chore.frequency && chore.frequency !== 'once';
+    if (!chore.completed && isRecurring) {
+      // Show checkmark briefly, then advance to next cycle
+      setChores(prev => prev.map(c => c.id === id ? { ...c, completed: true } : c));
+      setTimeout(() => updateChore(id, { completed: false, dueDate: nextDueDate(chore.dueDate, chore.frequency) }), 900);
+    } else {
+      updateChore(id, { completed: !chore.completed });
+    }
   };
 
   // ── Events ────────────────────────────────────────────
@@ -126,8 +151,8 @@ export function AppProvider({ children }) {
     let nextVotes;
     setMealRecs(prev => prev.map(r => {
       if (r.id !== id) return r;
-      const hasVoted = r.votes.includes(memberId);
-      nextVotes = hasVoted ? r.votes.filter(v => v !== memberId) : [...r.votes, memberId];
+      // Radio behavior: selecting a new emoji clears the previous pick; re-clicking deselects
+      nextVotes = r.votes[0] === memberId ? [] : [memberId];
       return { ...r, votes: nextVotes };
     }));
     if (isConfigured) db.dbVoteMealRec(id, nextVotes).catch(dbErr);

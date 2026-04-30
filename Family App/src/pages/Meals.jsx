@@ -217,7 +217,7 @@ export default function Meals() {
                   <span className={styles.recSlotBadge} style={{ background: slotCol.bg, color: slotCol.dark }}>
                     {rec.category}
                   </span>
-                  <button className={styles.recDelete} onClick={() => deleteMealRec(rec.id)}>✕</button>
+                  {isParent && <button className={styles.recDelete} onClick={() => deleteMealRec(rec.id)}>✕</button>}
                 </div>
                 <div className={styles.recName}>{rec.title}</div>
                 <div className={styles.recMeta}>
@@ -243,7 +243,11 @@ export default function Meals() {
                       </button>
                     );
                   })}
-                  <span className={styles.voteCount}>{rec.votes.length} 👍</span>
+                  {rec.votes[0] && (
+                    <span className={styles.voteCount}>
+                      {MEMBER_MAP[rec.votes[0]]?.emoji} picks this
+                    </span>
+                  )}
                 </div>
 
                 {/* Assign to a day — parents only */}

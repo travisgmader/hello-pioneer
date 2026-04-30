@@ -34,7 +34,7 @@ export default function Nav({ page, setPage, theme, setTheme }) {
   return (
     <>
     <nav className={styles.nav}>
-      <button className={styles.logo} onClick={() => navigate('dashboard')}><img src="/fox-logo.png" alt="" style={{ width: 28, height: 28, objectFit: 'contain', verticalAlign: 'middle', marginRight: 8 }} />Family Plan</button>
+      <button className={styles.logo} onClick={() => navigate('dashboard')}><img src={theme === 'midnight' ? '/fox-logo.png' : '/fox-logo-lavender.png'} alt="" style={{ width: 28, height: 28, objectFit: 'contain', verticalAlign: 'middle', marginRight: 8 }} />Family Plan</button>
 
       {/* Desktop links */}
       <div className={styles.links}>

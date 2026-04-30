@@ -9,12 +9,6 @@ const THEMES = [
     swatches: ['#c9a8e0', '#8ecf8e', '#f4a0b5', '#fdf6ff'],
   },
   {
-    id: 'electric',
-    name: 'Electric Lemonade',
-    description: 'Bold yellow & deep purple',
-    swatches: ['#ffff00', '#7c3aed', '#ec4899', '#ffffff'],
-  },
-  {
     id: 'midnight',
     name: 'Midnight Monolith',
     description: 'Deep dark with gold accents',

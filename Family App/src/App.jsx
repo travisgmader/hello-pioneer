@@ -79,7 +79,7 @@ function AppInner() {
         borderTop: '1px solid var(--border)',
         background: 'var(--card-bg)',
       }}>
-        Family Plan — Made with love
+        Family Plan — Made with big muscles
       </footer>
     </div>
   );

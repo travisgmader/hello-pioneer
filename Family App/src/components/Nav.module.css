@@ -227,7 +227,7 @@
   .signOut   { display: none; }
   .themeWrap { display: none; }
   .mobileRight { display: flex; }
-  .nav { position: relative; flex-wrap: nowrap; }
+  .nav { position: sticky; top: 0; flex-wrap: nowrap; }
 
   .bottomBar {
     display: flex;

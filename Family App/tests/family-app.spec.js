@@ -62,19 +62,24 @@ test('chores: added chore persists after refresh', async ({ page }) => {
   await page.goto('/');
   await navTo(page, 'Chores');
 
+  // Clean up any leftovers from previous failed runs
+  while (await page.locator('tr').filter({ hasText: 'Persist Test Chore' }).first().isVisible().catch(() => false)) {
+    await page.locator('tr').filter({ hasText: 'Persist Test Chore' }).first().getByTitle('Delete').click();
+    await page.waitForTimeout(300);
+  }
+
   await page.getByRole('button', { name: '+ Add Chore' }).click();
   await page.getByPlaceholder('Chore title...').fill('Persist Test Chore');
   await page.locator('select').first().selectOption('dad');
   await page.getByRole('button', { name: 'Add Chore' }).click();
-  await expect(page.getByText('Persist Test Chore')).toBeVisible();
+  await expect(page.getByText('Persist Test Chore').first()).toBeVisible();
 
   await page.reload();
   await navTo(page, 'Chores');
-  await expect(page.getByText('Persist Test Chore')).toBeVisible();
+  await expect(page.getByText('Persist Test Chore').first()).toBeVisible();
 
   // Cleanup
-  const row = page.locator('tr').filter({ hasText: 'Persist Test Chore' });
-  await row.getByTitle('Delete').click();
+  await page.locator('tr').filter({ hasText: 'Persist Test Chore' }).first().getByTitle('Delete').click();
 });
 
 // ─── Calendar ─────────────────────────────────────────────────────────────────
@@ -93,8 +98,11 @@ test('calendar: can add and delete an event', async ({ page }) => {
   await page.goto('/');
   await navTo(page, 'Calendar');
 
-  // Click a day cell — opens the overlay/detail panel
-  await page.locator('[class*="day"], [class*="cell"]').filter({ hasNot: page.locator('[class*="outside"]') }).nth(10).click();
+  // Click the cell containing day 15 (always exists in every month)
+  await page.locator('[class*="cell"]')
+    .filter({ has: page.locator('[class*="dayNum"]', { hasText: /^15$/ }) })
+    .first()
+    .click();
 
   // "+ Event" button is inside the overlay
   await page.getByRole('button', { name: '+ Event' }).click();

@@ -239,9 +239,40 @@
   letter-spacing: 0.5px;
 }
 
+.eventTime {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.8;
+}
+
+.eventMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .eventTitle {
   font-size: 14px;
   font-weight: 500;
+  flex: 1;
+}
+
+.pickupBadge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1.5px solid;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.eventBadges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .eventMember {
