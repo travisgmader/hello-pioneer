@@ -28,6 +28,9 @@ export default function Groceries() {
   const [showReqForm, setShowReqForm] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState('All');
 
+  const walmartSearchUrl = (name) =>
+    `https://www.walmart.com/search?q=${encodeURIComponent(name)}`;
+
   const handleAddItem = (e) => {
     e.preventDefault();
     if (!itemForm.name.trim()) return;
@@ -141,6 +144,16 @@ export default function Groceries() {
                           {adder.emoji}
                         </span>
                       )}
+                      <a
+                        className={styles.walmartLink}
+                        href={walmartSearchUrl(g.name)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={`Search Walmart for "${g.name}"`}
+                        onClick={e => e.stopPropagation()}
+                      >
+                        Walmart
+                      </a>
                       <button className={styles.deleteBtn} onClick={() => deleteGrocery(g.id)}>✕</button>
                     </div>
                   );
