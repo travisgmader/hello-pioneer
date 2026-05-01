@@ -17,24 +17,26 @@ Playwright tests run against `https://family-hub-amber.vercel.app`. A saved Goog
 
 ## Deployment
 
-**Always deploy code changes, and verify the new build is live before reporting a task complete.** Do not call a task done on the basis of "I pushed" or "Vercel said success" alone — confirm the production URL is actually serving the new bundle.
+**Always deploy code changes, and verify the new build is live before reporting a task complete.** Do not call a task done on the basis of "I pushed" or "the build succeeded" alone — confirm the production URL is actually serving the new bundle.
 
-Production is `https://family-hub-amber.vercel.app`, served by the Vercel project `family-hub` (this directory is linked via `.vercel/project.json`). `git push origin main` auto-deploys.
+Production is `https://family-hub-amber.vercel.app`, served by the Vercel project `family-hub` (this directory is linked via `.vercel/project.json`).
+
+**Deploys are manual, not automatic.** The repo folder name `Family App` contains a space, which Vercel rejects in serverless function paths when deploying via Git. The CLI workaround (uploading folder contents directly) avoids this. Git auto-deploy is therefore intentionally disconnected on the `family-hub` project.
 
 Standard flow after editing code:
-1. Commit and `git push origin main`.
-2. Verify the deploy is live. Easiest check: compare asset hashes.
+1. Commit and push (`git push origin main`) — for source control only; this does **not** trigger a deploy.
+2. Deploy manually from this directory:
+   ```bash
+   vercel --prod --yes
+   ```
+3. Verify the deploy is live by comparing asset hashes:
    ```bash
    npm run build  # note the dist/assets/index-XXXX.css hash
    curl -s https://family-hub-amber.vercel.app/ | grep -oE '/assets/index-[^"]+\.css'
    ```
-   The deployed hash must match the local one. You can also confirm the GitHub commit status reports Vercel `state: success`:
-   ```bash
-   gh api repos/travisgmader/hello-pioneer/commits/<sha>/status
-   ```
-3. If auto-deploy is broken or slow, deploy manually from this directory: `vercel --prod --yes`.
+   The deployed hash must match the local one. If it doesn't match after the deploy completes, investigate — don't dismiss it as "cache."
 
-If the deployed hash doesn't match after a reasonable wait, investigate (Vercel project link, Git integration, build error) — don't shrug it off as "cache."
+To enable Git auto-deploy in the future, the `Family App` directory would need to be renamed to a name without spaces (or moved to the repo root).
 
 ## Architecture
 
