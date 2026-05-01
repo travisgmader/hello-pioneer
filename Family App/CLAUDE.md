@@ -15,6 +15,27 @@ npx playwright test tests/family-app.spec.js:39  # Run test at specific line
 
 Playwright tests run against `https://family-hub-amber.vercel.app`. A saved Google auth session is required at `tests/.auth/session.json`. If it's missing, the global setup opens a Chrome window for manual Google sign-in and then saves the session automatically.
 
+## Deployment
+
+**Always deploy code changes, and verify the new build is live before reporting a task complete.** Do not call a task done on the basis of "I pushed" or "Vercel said success" alone — confirm the production URL is actually serving the new bundle.
+
+Production is `https://family-hub-amber.vercel.app`, served by the Vercel project `family-hub` (this directory is linked via `.vercel/project.json`). `git push origin main` auto-deploys.
+
+Standard flow after editing code:
+1. Commit and `git push origin main`.
+2. Verify the deploy is live. Easiest check: compare asset hashes.
+   ```bash
+   npm run build  # note the dist/assets/index-XXXX.css hash
+   curl -s https://family-hub-amber.vercel.app/ | grep -oE '/assets/index-[^"]+\.css'
+   ```
+   The deployed hash must match the local one. You can also confirm the GitHub commit status reports Vercel `state: success`:
+   ```bash
+   gh api repos/travisgmader/hello-pioneer/commits/<sha>/status
+   ```
+3. If auto-deploy is broken or slow, deploy manually from this directory: `vercel --prod --yes`.
+
+If the deployed hash doesn't match after a reasonable wait, investigate (Vercel project link, Git integration, build error) — don't shrug it off as "cache."
+
 ## Architecture
 
 ### No router — manual page state
