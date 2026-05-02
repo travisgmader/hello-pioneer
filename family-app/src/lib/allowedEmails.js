@@ -3,7 +3,7 @@
 export const ALLOWED_EMAILS = [
   'travis.g.mader@gmail.com',
   'angelia.m.merryman14@gmail.com',
-  'laylamerrman11@gmail.com',
+  'laylamerryman11@gmail.com',
   'stellamader6@gmail.com',
   'maderroman5@gmail.com',
 ];
