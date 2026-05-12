@@ -1,0 +1,386 @@
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 28px 20px 96px;
+}
+
+.title {
+  font-family: 'Noto Serif', Georgia, serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── empty state ── */
+
+.empty {
+  text-align: center;
+  padding: 64px 24px;
+  color: var(--text-muted);
+}
+
+.emptyIcon {
+  font-size: 2.5rem;
+  color: var(--accent-deep);
+  opacity: 0.4;
+  margin-bottom: 16px;
+}
+
+.empty h2 {
+  font-family: 'Noto Serif', Georgia, serif;
+  font-size: 1.2rem;
+  color: var(--text);
+  margin: 0 0 8px;
+}
+
+.empty p {
+  font-size: 0.88rem;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── stat summary strip ── */
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.statCard {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 14px 14px;
+  overflow: hidden;
+}
+
+.statCard::before,
+.statCard::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--accent-deep);
+  opacity: 0.4;
+}
+.statCard::before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+.statCard::after  { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+
+.statValue {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.statLabel {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.statSub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  opacity: 0.7;
+}
+
+/* ── sections ── */
+
+.section {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+
+.section::before,
+.section::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--accent-deep);
+  opacity: 0.4;
+}
+.section::before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+.section::after  { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+
+.sectionTitle {
+  font-family: 'Noto Serif', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 0 0 16px;
+}
+
+/* ── exercise pills ── */
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.pill {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 5px 12px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 120ms, color 120ms, background 120ms;
+  white-space: nowrap;
+}
+
+.pill:hover {
+  border-color: var(--accent-deep);
+  color: var(--text);
+}
+
+.pillActive {
+  border-color: var(--accent-deep);
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+/* ── chart meta ── */
+
+.chartMeta {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.chartCurrent {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.chartDelta {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* ── SVG chart shared ── */
+
+.svgChart {
+  display: block;
+  overflow: visible;
+}
+
+.axisText {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 9px;
+  fill: var(--text-muted);
+}
+
+/* ── single data point ── */
+
+.singlePoint {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 20px 0;
+}
+
+.singleWeight {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.singleDate {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ── chart legend ── */
+
+.legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.volLegend {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.volLegend span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.legendDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── personal records ── */
+
+.prGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.prCard {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+
+.prWeight {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.prUnit {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.prName {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── recent workouts ── */
+
+.recentList {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.recentRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  gap: 12px;
+}
+
+.recentRow:hover {
+  background: rgba(212, 175, 55, 0.04);
+}
+
+.recentLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.recentDay {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recentDate {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.recentRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.recentSets {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.recentRate {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  min-width: 52px;
+  text-align: right;
+}
+
+/* ── misc ── */
+
+.noData {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+  padding: 8px 0;
+}
+
+/* ── responsive ── */
+
+@media (max-width: 560px) {
+  .statGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 380px) {
+  .statGrid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .statValue { font-size: 1.2rem; }
+}

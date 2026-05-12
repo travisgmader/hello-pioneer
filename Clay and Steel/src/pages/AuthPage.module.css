@@ -1,0 +1,82 @@
+.root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 24px;
+}
+
+.card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 40px 32px;
+}
+
+.title {
+  font-family: 'Noto Serif', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  margin: 0 0 28px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input {
+  width: 100%;
+}
+
+.error {
+  color: var(--accent-nogo);
+  font-size: 0.84rem;
+  margin: 0;
+}
+
+.success {
+  color: var(--accent-go);
+  font-size: 0.84rem;
+  margin: 0;
+}
+
+.btn {
+  background: var(--accent);
+  color: #0c0b0f;
+  font-weight: 700;
+  padding: 12px;
+  border-radius: var(--radius);
+  margin-top: 6px;
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+  transition: opacity 120ms;
+}
+
+.btn:hover:not(:disabled) { opacity: 0.88; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.toggle {
+  display: block;
+  margin: 20px auto 0;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  text-align: center;
+  transition: color 120ms;
+}
+
+.toggle:hover { color: var(--accent); }

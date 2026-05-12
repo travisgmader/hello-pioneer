@@ -1,0 +1,132 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 24px;
+  background: rgba(9, 8, 8, 0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(180, 133, 20, 0.3);
+  box-shadow: 0 2px 15px -3px rgba(212, 175, 55, 0.2);
+}
+
+.brand {
+  font-family: 'Noto Serif', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.45);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.adminBadge {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 2px 6px;
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  background: rgba(28, 27, 27, 0.6);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px;
+}
+
+.tab {
+  padding: 7px 16px;
+  border-radius: 2px;
+  color: var(--text-muted);
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: color 120ms, background 120ms;
+}
+
+.tab:hover { color: var(--text); }
+
+.tabActive {
+  color: var(--accent);
+  background: var(--accent-dim);
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+}
+
+.rightArea {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.gearBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  transition: color 120ms, background 120ms;
+}
+
+.gearBtn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.gearActive {
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.userEmail {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.signOut {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: color 120ms, border-color 120ms;
+}
+
+.signOut:hover {
+  color: var(--accent-nogo);
+  border-color: var(--accent-nogo);
+}
+
+@media (max-width: 560px) {
+  .nav { padding: 10px 14px; flex-wrap: wrap; }
+  .brand { font-size: 0.85rem; letter-spacing: 0.12em; }
+  .tabs { width: 100%; order: 3; justify-content: space-between; }
+  .tab { flex: 1; padding: 9px 8px; text-align: center; font-size: 0.68rem; }
+  .userEmail { display: none; }
+}
