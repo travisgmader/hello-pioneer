@@ -91,6 +91,32 @@
   transform: scale(1.2);
 }
 
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.garminBtn {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 120ms, color 120ms;
+}
+
+.garminBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .cards {
   display: flex;
   flex-direction: column;

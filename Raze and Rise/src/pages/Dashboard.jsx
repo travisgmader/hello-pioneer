@@ -2,6 +2,7 @@ import ExerciseCard from '../components/ExerciseCard/ExerciseCard.jsx'
 import { currentDayLabels, dayKey, deriveDayOrder, PHASE_META } from '../lib/split.js'
 import { suggestWeight } from '../lib/progress.js'
 import { getPhraseForWorkout } from '../lib/phrases.js'
+import { downloadWorkoutFit } from '../lib/garmin.js'
 import styles from './Dashboard.module.css'
 
 function roundToPlate(lbs) {
@@ -188,6 +189,15 @@ export default function Dashboard({ state, setState, setPage }) {
         <span className={styles.heroText}>{getPhraseForWorkout(state.history?.length ?? 0)}</span>
       </div>
       <Header dayDisplay={dayDisplay} order={order} pointer={state.rotation.pointer} settings={state.settings} />
+      <div className={styles.toolbar}>
+        <button
+          className={styles.garminBtn}
+          onClick={() => downloadWorkoutFit(dayDisplay, composite.exercises)}
+          title="Download this workout as a .fit file to import into Garmin Connect"
+        >
+          Download for Garmin
+        </button>
+      </div>
       <div className={styles.cards}>
         {composite.exercises.map(ex => {
           const setData = getSetData(ex.id)
