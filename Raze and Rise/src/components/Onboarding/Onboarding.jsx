@@ -12,12 +12,14 @@ export default function Onboarding({ setState }) {
   const [step, setStep]         = useState(1)
   const [split, setSplit]       = useState('ppl')
   const [weightMethod, setWeightMethod] = useState('manual')
+  const [fullBodyDays, setFullBodyDays] = useState(3)
   const [age, setAge]           = useState('')
   const [sex, setSex]           = useState('')
   const [targetScore, setTargetScore] = useState(85)
   const [cardioType, setCardioType]   = useState('run')
 
   const isAfPt     = split === 'af-pt'
+  const isFullBody = split === 'full-body'
   const totalSteps = isAfPt ? 3 : 2
 
   const finish = () => {
@@ -40,6 +42,23 @@ export default function Onboarding({ setState }) {
         rotation: { pointer: 0 },
         session: null,
       }))
+    } else if (isFullBody) {
+      const seedTemplates = buildDefaultTemplates('full-body', fullBodyDays)
+      setState(s => ({
+        ...s,
+        onboarded: true,
+        settings: {
+          ...s.settings,
+          split: 'full-body',
+          fullBodyDays,
+          weightMethod: 'manual',
+          splitStartedAt: new Date().toISOString(),
+          splitPhase: 0,
+        },
+        templates: Object.keys(s.templates).length === 0 ? seedTemplates : s.templates,
+        rotation: { pointer: 0 },
+        session: null,
+      }))
     } else {
       const seedTemplates = buildDefaultTemplates(split)
       setState(s => ({
@@ -49,6 +68,8 @@ export default function Onboarding({ setState }) {
           ...s.settings,
           split,
           weightMethod,
+          splitStartedAt: new Date().toISOString(),
+          splitPhase: 0,
           ...(split === 'hybrid' ? { hybridSequence: HYBRID_SEQUENCE } : {}),
         },
         templates: Object.keys(s.templates).length === 0 ? seedTemplates : s.templates,
@@ -68,7 +89,16 @@ export default function Onboarding({ setState }) {
           <StepSplit split={split} setSplit={setSplit} onNext={() => setStep(2)} />
         )}
 
-        {step === 2 && !isAfPt && (
+        {step === 2 && isFullBody && (
+          <StepFullBodyDays
+            days={fullBodyDays}
+            setDays={setFullBodyDays}
+            onBack={() => setStep(1)}
+            onFinish={finish}
+          />
+        )}
+
+        {step === 2 && !isAfPt && !isFullBody && (
           <StepWeightMethod
             weightMethod={weightMethod}
             setWeightMethod={setWeightMethod}
@@ -307,6 +337,41 @@ function StepPTGoal({ age, sex, targetScore, setTargetScore, cardioType, setCard
         </div>
       </div>
 
+      <div className={styles.footer}>
+        <button className={styles.ghost} onClick={onBack}>← Back</button>
+        <button className={styles.primary} onClick={onFinish} style={{ flex: 1 }}>
+          Generate Program
+        </button>
+      </div>
+    </>
+  )
+}
+
+const FULL_BODY_SCHEDULES = {
+  2: 'Mon / Thu — balanced recovery',
+  3: 'Mon / Wed / Fri — classic three days',
+  4: 'Mon / Tue / Thu / Fri — upper-lower split days',
+}
+
+function StepFullBodyDays({ days, setDays, onBack, onFinish }) {
+  return (
+    <>
+      <h2 className={styles.heading}>How many days a week?</h2>
+      <p className={styles.sub}>
+        We'll build home gym-friendly full body workouts. All you need is a pair of dumbbells and a pull-up bar.
+      </p>
+      <div className={styles.methodCards}>
+        {[2, 3, 4].map(d => (
+          <button
+            key={d}
+            className={`${styles.methodCard} ${days === d ? styles.methodCardActive : ''}`}
+            onClick={() => setDays(d)}
+          >
+            <span className={styles.methodTitle}>{d} Days / Week</span>
+            <span className={styles.methodDesc}>{FULL_BODY_SCHEDULES[d]}</span>
+          </button>
+        ))}
+      </div>
       <div className={styles.footer}>
         <button className={styles.ghost} onClick={onBack}>← Back</button>
         <button className={styles.primary} onClick={onFinish} style={{ flex: 1 }}>

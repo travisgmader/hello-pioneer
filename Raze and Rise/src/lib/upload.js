@@ -1,5 +1,7 @@
 import * as XLSX from 'xlsx'
-import { VALID_LABELS } from './split.js'
+import { VALID_LABELS, PT_LABELS, FULL_BODY_LABELS } from './split.js'
+
+const ALL_VALID_LABELS = [...VALID_LABELS, ...PT_LABELS, ...FULL_BODY_LABELS]
 
 export async function parseTemplateFile(file) {
   const name = (file.name || '').toLowerCase()
@@ -174,11 +176,11 @@ export function validateTemplate(data) {
   const { dayLabel, exercises } = data
   const isValidDayLabel =
     typeof dayLabel === 'string' &&
-    dayLabel.split(' + ').every(p => VALID_LABELS.includes(p)) &&
+    dayLabel.split(' + ').every(p => ALL_VALID_LABELS.includes(p)) &&
     dayLabel.split(' + ').length >= 1
   if (!isValidDayLabel) {
     throw new Error(
-      `dayLabel must be one of: ${VALID_LABELS.join(', ')} (or a combination joined with " + "). Got: ${dayLabel}`
+      `dayLabel must be one of: ${ALL_VALID_LABELS.join(', ')} (or a combination joined with " + "). Got: ${dayLabel}`
     )
   }
   if (!Array.isArray(exercises) || exercises.length === 0) {

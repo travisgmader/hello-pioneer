@@ -15,11 +15,11 @@ No test or lint tooling is configured.
 
 ## Architecture
 
-**Clay and Steel** is a client-side-only React/Vite SPA for workout template management and tracking. There is no backend, no API, and no authentication — `localStorage` is the sole persistence layer.
+**Raze and Rise** is a client-side-only React/Vite SPA for workout template management and tracking. There is no backend, no API, and no authentication — `localStorage` is the sole persistence layer.
 
 ### State
 
-All application state lives in `App.jsx` as a single `useState` object, serialized to `localStorage` under the key `steel-and-clay-state` via `src/lib/storage.js`.
+All application state lives in `App.jsx` as a single `useState` object, serialized to Supabase via `src/lib/storage.js`.
 
 ```js
 {

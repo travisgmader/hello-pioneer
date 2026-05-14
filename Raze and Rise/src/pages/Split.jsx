@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { SPLIT_OPTIONS, VALID_LABELS, normalizeHybridDay } from '../lib/split.js'
+import { SPLIT_OPTIONS, VALID_LABELS, FULL_BODY_LABELS, normalizeHybridDay, PHASE_META, daysOnSplit } from '../lib/split.js'
 import { HYBRID_SEQUENCE, buildDefaultTemplates } from '../lib/defaults.js'
 import {
   getTables, distributeScore, targetReps, targetRunSecs,
@@ -13,14 +13,25 @@ export default function Settings({ state, setState, setPage }) {
 
   const setSplit = split => {
     setState(s => {
-      const nextSettings = { ...s.settings, split }
+      const nextSettings = {
+        ...s.settings,
+        split,
+        splitStartedAt: new Date().toISOString(),
+        splitPhase: 0,
+      }
       let nextTemplates = s.templates
       if (split === 'hybrid') {
         if (!(s.settings.hybridSequence?.length)) {
           nextSettings.hybridSequence = HYBRID_SEQUENCE
         }
-        const hybridTemplates = buildDefaultTemplates('hybrid')
+        const hybridTemplates = buildDefaultTemplates('hybrid', undefined, 0)
         nextTemplates = { ...hybridTemplates, ...s.templates }
+      }
+      if (split === 'full-body') {
+        const days = s.settings.fullBodyDays ?? 3
+        nextSettings.fullBodyDays = days
+        const fbTemplates = buildDefaultTemplates('full-body', days, 0)
+        nextTemplates = { ...fbTemplates, ...s.templates }
       }
       return {
         ...s,
@@ -71,6 +82,10 @@ export default function Settings({ state, setState, setPage }) {
         </p>
       </section>
 
+      {settings.split === 'full-body' && (
+        <FullBodyConfig state={state} setState={setState} />
+      )}
+
       {settings.split === 'hybrid' && (
         <HybridEditor sequence={settings.hybridSequence} onChange={setHybrid} />
       )}
@@ -78,7 +93,75 @@ export default function Settings({ state, setState, setPage }) {
       {settings.split === 'af-pt' && (
         <AFPTConfig state={state} setState={setState} setPage={setPage} />
       )}
+
+      {settings.split !== 'af-pt' && (
+        <PeriodizationSection state={state} setState={setState} />
+      )}
     </div>
+  )
+}
+
+const FULL_BODY_SCHEDULE_LABELS = {
+  2: 'Mon / Thu',
+  3: 'Mon / Wed / Fri',
+  4: 'Mon / Tue / Thu / Fri',
+}
+
+function FullBodyConfig({ state, setState }) {
+  const [days, setDays] = useState(state.settings?.fullBodyDays ?? 3)
+  const [applied, setApplied] = useState(false)
+
+  const apply = () => {
+    const newTemplates = buildDefaultTemplates('full-body', days)
+    setState(s => ({
+      ...s,
+      settings: { ...s.settings, fullBodyDays: days },
+      templates: { ...s.templates, ...newTemplates },
+      rotation: { pointer: 0 },
+      session: null,
+    }))
+    setApplied(true)
+    setTimeout(() => setApplied(false), 2200)
+  }
+
+  return (
+    <section className={styles.section}>
+      <h2 className={styles.sectionTitle}>Training Days</h2>
+      <p className={styles.note}>
+        All workouts use dumbbells, bodyweight, and a pull-up bar — no gym required.
+      </p>
+      <div className={styles.options} style={{ marginTop: 14 }}>
+        {[2, 3, 4].map(d => (
+          <label
+            key={d}
+            className={`${styles.option} ${days === d ? styles.optionActive : ''}`}
+          >
+            <input
+              type="radio"
+              name="fullBodyDays"
+              value={d}
+              checked={days === d}
+              onChange={() => setDays(d)}
+            />
+            <span>{d} days — {FULL_BODY_SCHEDULE_LABELS[d]}</span>
+          </label>
+        ))}
+      </div>
+      <div className={styles.rotationRow} style={{ marginTop: 14 }}>
+        <span className={styles.rotationLabel}>{days}-day rotation</span>
+        <div className={styles.rotationDays}>
+          {FULL_BODY_LABELS.slice(0, days).map(label => (
+            <span key={label} className={styles.rotationDay}>{label}</span>
+          ))}
+        </div>
+      </div>
+      <button
+        className={`${styles.generateBtn} ${applied ? styles.generateBtnDone : ''}`}
+        onClick={apply}
+      >
+        {applied ? 'Templates Generated!' : 'Generate Templates'}
+      </button>
+    </section>
   )
 }
 
@@ -318,6 +401,99 @@ function AFPTConfig({ state, setState, setPage }) {
             {applied ? 'Templates Generated!' : ptWeek > 0 ? 'Restart Program (Week 1)' : 'Start 6-Week Program'}
           </button>
         </>
+      )}
+    </section>
+  )
+}
+
+function PeriodizationSection({ state, setState }) {
+  const { settings } = state
+  const phase = settings.splitPhase ?? 0
+  const meta  = PHASE_META[phase]
+  const days  = daysOnSplit(settings)
+  const [applied, setApplied] = useState(false)
+
+  const advance = () => {
+    const nextPhase  = Math.min(phase + 1, 2)
+    const split      = settings.split
+    const fullBodyDays = settings.fullBodyDays ?? 3
+    const newTemplates = buildDefaultTemplates(split, fullBodyDays, nextPhase)
+    setState(s => ({
+      ...s,
+      settings: { ...s.settings, splitPhase: nextPhase },
+      templates: { ...s.templates, ...newTemplates },
+    }))
+  }
+
+  const restart = () => {
+    const split      = settings.split
+    const fullBodyDays = settings.fullBodyDays ?? 3
+    const newTemplates = buildDefaultTemplates(split, fullBodyDays, 0)
+    setState(s => ({
+      ...s,
+      settings: {
+        ...s.settings,
+        splitPhase: 0,
+        splitStartedAt: new Date().toISOString(),
+      },
+      templates: { ...s.templates, ...newTemplates },
+    }))
+    setApplied(true)
+    setTimeout(() => setApplied(false), 2200)
+  }
+
+  return (
+    <section className={styles.section}>
+      <h2 className={styles.sectionTitle}>Periodization</h2>
+      <p className={styles.note}>
+        Advance your program every 4 weeks to keep progressive overload on track.
+        Templates update automatically — any custom edits you've made are preserved.
+      </p>
+
+      <div className={styles.weekRow} style={{ marginTop: 14 }}>
+        <span className={`${styles.weekBadge} ${phase === 2 ? styles.weekBadgePeak : ''}`}>
+          Phase {phase + 1} of 3 — {meta.name}
+        </span>
+        {days !== null && (
+          <span className={styles.breakdownMin} style={{ fontSize: '0.8rem' }}>
+            Day {days} on this split
+          </span>
+        )}
+      </div>
+
+      <div className={styles.breakdown} style={{ marginTop: 10 }}>
+        {PHASE_META.map((p, i) => (
+          <div
+            key={i}
+            className={styles.breakdownRow}
+            style={i === phase ? { borderColor: 'var(--accent-deep)' } : {}}
+          >
+            <span className={styles.breakdownLabel}>
+              Phase {i + 1} — {p.name}
+              {i === phase && ' ◀'}
+            </span>
+            <span className={styles.breakdownTarget} style={{ color: i === phase ? 'var(--accent)' : 'var(--text-muted)', fontWeight: 500 }}>
+              {p.repRange}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <p className={styles.note} style={{ marginBottom: 14 }}>
+        {meta.description}
+      </p>
+
+      {phase < 2 ? (
+        <button className={styles.advanceBtn} style={{ width: '100%', padding: '11px 24px' }} onClick={advance}>
+          Advance to Phase {phase + 2} — {PHASE_META[phase + 1].name} →
+        </button>
+      ) : (
+        <button
+          className={`${styles.generateBtn} ${applied ? styles.generateBtnDone : ''}`}
+          onClick={restart}
+        >
+          {applied ? 'Restarted!' : 'Restart from Phase 1 — Hypertrophy'}
+        </button>
       )}
     </section>
   )

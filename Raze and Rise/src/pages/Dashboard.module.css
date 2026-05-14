@@ -4,6 +4,27 @@
   padding: 28px 20px 96px;
 }
 
+.heroBanner {
+  width: 100%;
+  padding: 11px 18px;
+  margin-bottom: 24px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--surface) 0%, #1e1a12 100%);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: inset 0 1px 0 rgba(212, 175, 55, 0.08), 0 2px 12px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.heroText {
+  font-family: 'Noto Serif', Georgia, serif;
+  font-size: 0.9rem;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  color: var(--accent);
+  opacity: 0.85;
+}
+
 .header {
   display: flex;
   align-items: center;
@@ -31,6 +52,21 @@
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--text);
+}
+
+.phasePill {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 0.67rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
 }
 
 .dots {

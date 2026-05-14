@@ -5,6 +5,8 @@ export function defaultState() {
       split: 'ppl',
       hybridSequence: ['Push', 'Pull', 'Legs'],
       weightMethod: 'manual',
+      splitStartedAt: null,
+      splitPhase: 0,
     },
     exerciseOrm: {},
     profile: {

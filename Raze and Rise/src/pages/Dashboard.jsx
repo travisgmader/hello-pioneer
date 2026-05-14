@@ -1,6 +1,7 @@
 import ExerciseCard from '../components/ExerciseCard/ExerciseCard.jsx'
-import { currentDayLabels, dayKey, deriveDayOrder } from '../lib/split.js'
+import { currentDayLabels, dayKey, deriveDayOrder, PHASE_META } from '../lib/split.js'
 import { suggestWeight } from '../lib/progress.js'
+import { getPhraseForWorkout } from '../lib/phrases.js'
 import styles from './Dashboard.module.css'
 
 function roundToPlate(lbs) {
@@ -83,7 +84,7 @@ export default function Dashboard({ state, setState, setPage }) {
   if (!composite || composite.missing.length > 0 || composite.exercises.length === 0) {
     return (
       <div className={styles.page}>
-        <Header dayDisplay={dayDisplay} order={order} pointer={state.rotation.pointer} />
+        <Header dayDisplay={dayDisplay} order={order} pointer={state.rotation.pointer} settings={state.settings} />
         <div className={styles.empty}>
           <h2>
             {composite && composite.missing.length > 0
@@ -183,7 +184,10 @@ export default function Dashboard({ state, setState, setPage }) {
 
   return (
     <div className={styles.page}>
-      <Header dayDisplay={dayDisplay} order={order} pointer={state.rotation.pointer} />
+      <div className={styles.heroBanner}>
+        <span className={styles.heroText}>{getPhraseForWorkout(state.history?.length ?? 0)}</span>
+      </div>
+      <Header dayDisplay={dayDisplay} order={order} pointer={state.rotation.pointer} settings={state.settings} />
       <div className={styles.cards}>
         {composite.exercises.map(ex => {
           const setData = getSetData(ex.id)
@@ -211,12 +215,21 @@ export default function Dashboard({ state, setState, setPage }) {
   )
 }
 
-function Header({ dayDisplay, order, pointer }) {
+function Header({ dayDisplay, order, pointer, settings }) {
+  const split = settings?.split
+  const phase = settings?.splitPhase ?? 0
+  const phaseMeta = split !== 'af-pt' ? PHASE_META[phase] : null
+
   return (
     <div className={styles.header}>
       <div>
         <div className={styles.eyebrow}>Today</div>
         <h1 className={styles.dayTitle}>{dayDisplay}</h1>
+        {phaseMeta && (
+          <div className={styles.phasePill}>
+            Phase {phase + 1} — {phaseMeta.name}
+          </div>
+        )}
       </div>
       <div className={styles.dots}>
         {order.map((labels, i) => (

@@ -93,11 +93,14 @@ export default function Workouts({ state, setState, isAdmin }) {
 
   const onSave = () => {
     setError(null)
-    if (draft.labels.length === 0) { setError('Select at least one day type.'); return }
+    const resolvedDayLabel = draft.labels.length > 0
+      ? computeDayLabel(draft.labels)
+      : editingLabel
+    if (!resolvedDayLabel) { setError('Select at least one day type.'); return }
     if (draft.exercises.length === 0) { setError('Add at least one exercise.'); return }
     try {
       const template = validateTemplate({
-        dayLabel: computeDayLabel(draft.labels),
+        dayLabel: resolvedDayLabel,
         exercises: draft.exercises.map(ex => ({
           name: ex.name.trim(),
           sets: Number(ex.sets),
@@ -216,7 +219,7 @@ export default function Workouts({ state, setState, isAdmin }) {
             </div>
           )}
 
-          {draft.labels.length > 0 && draft.exercises.length < 6 && (
+          {(draft.labels.length > 0 || !!editingLabel) && draft.exercises.length < 6 && (
             <button className={styles.addExBtn} onClick={addExercise}>
               + Add exercise
             </button>
