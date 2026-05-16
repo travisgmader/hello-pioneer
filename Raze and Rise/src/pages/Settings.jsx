@@ -247,6 +247,9 @@ function MacrosSection({ state, setState }) {
             </div>
           </div>
           <p className={styles.macroNote}>{macros.note}</p>
+          {macros.usingLbm && (
+            <p className={`${styles.note} ${styles.macroLbmNote}`}>Protein based on lean body mass.</p>
+          )}
         </div>
       )}
 
@@ -257,6 +260,10 @@ function MacrosSection({ state, setState }) {
             : `Check that your height is formatted correctly (e.g. 5'10" or 5 10) and body weight is set.`}
         </p>
       )}
+
+      <p className={styles.macroDisclaimer}>
+        These estimates are for informational purposes only and do not constitute medical or dietary advice. Consult a qualified healthcare provider before making any changes to your diet or nutrition.
+      </p>
     </CollapsibleSection>
   )
 }

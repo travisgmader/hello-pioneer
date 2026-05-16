@@ -57,7 +57,7 @@ export const GOALS = [
     label:           'Muscle Gain',
     desc:            'Lean bulk, ~0.25–0.5 lb/week',
     calAdj:          +300,
-    proteinPerLb:    0.8,
+    proteinPerLb:    1.2,
     fatPctRemaining: 0.35,
     note:            'Modest surplus with higher carbs to fuel training and maximize muscle growth',
   },
@@ -66,7 +66,7 @@ export const GOALS = [
     label:           'Athletic Performance',
     desc:            'Carb-forward fueling for training',
     calAdj:          +200,
-    proteinPerLb:    0.75,
+    proteinPerLb:    0.85,
     fatPctRemaining: 0.30,
     note:            'Higher carbs to fuel intense training sessions and aid recovery',
   },
@@ -130,6 +130,12 @@ export function calculateMacros(profile, measurements, macroGoal) {
   const yrs       = parseFloat(age)
   if (!cm || !kg || !yrs) return null
 
+  // Use lean body mass for protein when body fat % is available
+  const bfPct  = measurements?.bodyFat ? parseFloat(measurements.bodyFat) : null
+  const lbmLbs = (bfPct !== null && bfPct > 0 && bfPct < 100)
+    ? weightLbs * (1 - bfPct / 100)
+    : weightLbs
+
   // Mifflin-St Jeor
   const bmr  = 10 * kg + 6.25 * cm - 5 * yrs + (sex === 'male' ? 5 : -161)
   const tdee = bmr * (ACTIVITY_MULTIPLIERS[activityLevel] ?? 1.55)
@@ -138,9 +144,9 @@ export function calculateMacros(profile, measurements, macroGoal) {
 
   const calories = Math.round(tdee + cfg.calAdj)
 
-  // Protein from body weight (g/lb), capped at 50% of calories to handle edge cases
+  // Protein from lean body mass (or total weight as fallback), capped at 50% of calories
   const proteinG     = Math.min(
-    Math.round(cfg.proteinPerLb * weightLbs),
+    Math.round(cfg.proteinPerLb * lbmLbs),
     Math.round(calories * 0.50 / 4),
   )
   const remainingCal = Math.max(0, calories - proteinG * 4)
@@ -149,10 +155,11 @@ export function calculateMacros(profile, measurements, macroGoal) {
 
   return {
     calories,
-    protein: proteinG,
-    carbs:   carbG,
-    fat:     fatG,
-    tdee:    Math.round(tdee),
-    note:    cfg.note,
+    protein:    proteinG,
+    carbs:      carbG,
+    fat:        fatG,
+    tdee:       Math.round(tdee),
+    note:       cfg.note,
+    usingLbm:   lbmLbs !== weightLbs,
   }
 }
