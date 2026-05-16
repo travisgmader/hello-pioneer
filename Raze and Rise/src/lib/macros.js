@@ -89,13 +89,38 @@ export const ACTIVITY_LEVELS = [
 
 function parseHeightCm(str) {
   if (!str) return null
-  const ftIn = str.match(/(\d+)\s*[''′ft]+\s*(\d+)?/)
+  const s = str.trim()
+
+  // "5'10"", "5' 10"", "5ft 10in", "5′10″", etc.
+  const ftIn = s.match(/(\d+)\s*[''′`ft]+\s*(\d+)?/)
   if (ftIn) return (parseInt(ftIn[1], 10) * 12 + parseInt(ftIn[2] ?? '0', 10)) * 2.54
-  const cm = str.match(/(\d+\.?\d*)\s*cm/)
-  if (cm) return parseFloat(cm[1])
-  // bare number treated as inches
-  const bare = str.match(/^(\d+\.?\d*)$/)
-  if (bare) return parseFloat(bare[1]) * 2.54
+
+  // "5 10" — space-separated feet and inches with no symbol
+  const ftInSpace = s.match(/^(\d)\s+(\d{1,2})$/)
+  if (ftInSpace) {
+    const ft = parseInt(ftInSpace[1], 10)
+    const inches = parseInt(ftInSpace[2], 10)
+    if (ft >= 4 && ft <= 8 && inches <= 11) return (ft * 12 + inches) * 2.54
+  }
+
+  // "178cm" or "178 cm"
+  const cmMatch = s.match(/^(\d+\.?\d*)\s*cm$/i)
+  if (cmMatch) return parseFloat(cmMatch[1])
+
+  // Bare number heuristics
+  const n = parseFloat(s)
+  if (!isNaN(n) && /^[\d.]+$/.test(s)) {
+    // "510" → 5 feet 10 inches (FTIN compact notation)
+    if (Number.isInteger(n) && n >= 400 && n <= 711) {
+      const ft = Math.floor(n / 100)
+      const inches = n % 100
+      if (ft >= 4 && ft <= 7 && inches <= 11) return (ft * 12 + inches) * 2.54
+    }
+    if (n >= 48 && n <= 96)   return n * 2.54  // inches (4'0" – 8'0")
+    if (n >= 100 && n <= 250) return n          // centimeters
+    if (n >= 4 && n < 8)      return n * 12 * 2.54  // decimal feet e.g. 5.83
+  }
+
   return null
 }
 

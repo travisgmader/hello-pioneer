@@ -250,9 +250,11 @@ function MacrosSection({ state, setState }) {
         </div>
       )}
 
-      {!macros && form.goal && form.activityLevel && missingFields.length > 0 && (
+      {!macros && form.goal && form.activityLevel && (
         <p className={`${styles.note} ${styles.macroMissing}`}>
-          Add your {missingFields.join(', ')} in Profile &amp; Measurements above to see your macros.
+          {missingFields.length > 0
+            ? `Add your ${missingFields.join(', ')} in Profile & Measurements above to see your macros.`
+            : `Check that your height is formatted correctly (e.g. 5'10" or 5 10) and body weight is set.`}
         </p>
       )}
     </CollapsibleSection>
