@@ -158,6 +158,13 @@
   box-shadow: 0 0 24px rgba(212, 175, 55, 0.4);
 }
 
+.completeBtnRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
 .empty {
   position: relative;
   max-width: 480px;

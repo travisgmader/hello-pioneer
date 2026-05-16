@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import ExerciseCard from '../components/ExerciseCard/ExerciseCard.jsx'
+import WorkoutCompleteOverlay from '../components/WorkoutCompleteOverlay/WorkoutCompleteOverlay.jsx'
 import { currentDayLabels, dayKey, deriveDayOrder, PHASE_META } from '../lib/split.js'
 import { suggestWeight } from '../lib/progress.js'
 import { getPhraseForWorkout } from '../lib/phrases.js'
@@ -61,6 +63,7 @@ function getOrInitSession(state, composite) {
 }
 
 export default function Dashboard({ state, setState, setPage }) {
+  const [overlay, setOverlay] = useState(null) // null | { variant, completing }
   const labels = currentDayLabels(state)
   const order = deriveDayOrder(state.settings)
   const composite = labels.length ? buildCompositeTemplate(labels, state.templates) : null
@@ -165,7 +168,7 @@ export default function Dashboard({ state, setState, setPage }) {
     })
   }
 
-  const completeWorkout = () => {
+  const doComplete = () => {
     setState(s => {
       const cur = s.session?.dayLabel === composite.dayKey
         ? s.session
@@ -181,6 +184,7 @@ export default function Dashboard({ state, setState, setPage }) {
       const nextPointer = ord.length === 0 ? 0 : (s.rotation.pointer + 1) % ord.length
       return { ...s, history: [...s.history, completed], session: null, rotation: { pointer: nextPointer } }
     })
+    setOverlay(null)
   }
 
   return (
@@ -218,9 +222,20 @@ export default function Dashboard({ state, setState, setPage }) {
           )
         })}
       </div>
-      <button className={styles.completeBtn} onClick={completeWorkout}>
-        Complete Workout
-      </button>
+      <div className={styles.completeBtnRow}>
+        <button className={styles.completeBtn} onClick={() => setOverlay({ variant: 'subtle', completing: true })}>
+          Complete Workout
+        </button>
+      </div>
+
+      {overlay && (
+        <WorkoutCompleteOverlay
+          key={`${overlay.variant}-${overlay.completing}`}
+          variant={overlay.variant}
+          dayLabel={dayDisplay}
+          onDone={overlay.completing ? doComplete : () => setOverlay(null)}
+        />
+      )}
     </div>
   )
 }
