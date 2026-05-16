@@ -32,6 +32,10 @@ export function defaultState() {
       barbellRow: '',
       pullUp: '',
     },
+    macroGoal: {
+      goal: '',
+      activityLevel: '',
+    },
     templates: {},
     rotation: { pointer: 0 },
     session: null,

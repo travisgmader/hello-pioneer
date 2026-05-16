@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import styles from './Settings.module.css'
 import AdminPanel from './AdminPanel.jsx'
+import { calculateMacros, GOALS, ACTIVITY_LEVELS } from '../lib/macros.js'
 
 export default function Settings({ state, setState, isAdmin }) {
   return (
@@ -9,6 +10,7 @@ export default function Settings({ state, setState, isAdmin }) {
       <ProfileSection state={state} setState={setState} />
       <MeasurementsSection state={state} setState={setState} />
       <OneRepMaxSection state={state} setState={setState} />
+      <MacrosSection state={state} setState={setState} />
       {isAdmin && <AdminPanel />}
     </div>
   )
@@ -144,6 +146,115 @@ function MeasurementsSection({ state, setState }) {
       <button className={`${styles.saveBtn} ${saved ? styles.saveBtnDone : ''}`} onClick={save}>
         {saved ? 'Saved' : 'Save'}
       </button>
+    </CollapsibleSection>
+  )
+}
+
+function MacrosSection({ state, setState }) {
+  const src = state.macroGoal ?? {}
+  const [form, setForm] = useState({
+    goal:          src.goal          ?? '',
+    activityLevel: src.activityLevel ?? '',
+  })
+  const [saved, setSaved] = useState(false)
+
+  const save = () => {
+    setState(s => ({ ...s, macroGoal: { ...s.macroGoal, ...form } }))
+    setSaved(true)
+    setTimeout(() => setSaved(false), 1800)
+  }
+
+  // Live preview: use saved profile/measurements but current form selections
+  const macros = calculateMacros(state.profile, state.measurements, form)
+
+  const missingFields = []
+  if (!state.profile?.age)         missingFields.push('age')
+  if (!state.profile?.height)      missingFields.push('height')
+  if (!state.profile?.sex)         missingFields.push('sex')
+  if (!state.measurements?.weight) missingFields.push('body weight')
+
+  return (
+    <CollapsibleSection title="Macro Calculator">
+      <p className={styles.macroSubhead}>Goal</p>
+      <div className={styles.splitOptions}>
+        {GOALS.map(g => (
+          <label
+            key={g.key}
+            className={`${styles.splitOption} ${form.goal === g.key ? styles.splitOptionActive : ''}`}
+          >
+            <input
+              type="radio"
+              name="macroGoal"
+              value={g.key}
+              checked={form.goal === g.key}
+              onChange={() => setForm(f => ({ ...f, goal: g.key }))}
+            />
+            <div>
+              <div>{g.label}</div>
+              <div className={styles.macroOptionDesc}>{g.desc}</div>
+            </div>
+          </label>
+        ))}
+      </div>
+
+      <p className={styles.macroSubhead} style={{ marginTop: 16 }}>Activity Level</p>
+      <div className={styles.splitOptions}>
+        {ACTIVITY_LEVELS.map(a => (
+          <label
+            key={a.key}
+            className={`${styles.splitOption} ${form.activityLevel === a.key ? styles.splitOptionActive : ''}`}
+          >
+            <input
+              type="radio"
+              name="activityLevel"
+              value={a.key}
+              checked={form.activityLevel === a.key}
+              onChange={() => setForm(f => ({ ...f, activityLevel: a.key }))}
+            />
+            <div>
+              <div>{a.label}</div>
+              <div className={styles.macroOptionDesc}>{a.desc}</div>
+            </div>
+          </label>
+        ))}
+      </div>
+
+      <button className={`${styles.saveBtn} ${saved ? styles.saveBtnDone : ''}`} onClick={save}>
+        {saved ? 'Saved' : 'Save'}
+      </button>
+
+      {macros && (
+        <div className={styles.macroResults}>
+          <div className={styles.macroCalRow}>
+            <div className={styles.macroCalMain}>
+              <span className={styles.macroCalValue}>{macros.calories.toLocaleString()}</span>
+              <span className={styles.macroCalUnit}>kcal / day</span>
+            </div>
+            <span className={styles.macroTdee}>TDEE {macros.tdee.toLocaleString()} kcal</span>
+          </div>
+          <div className={styles.macroGrid}>
+            <div className={styles.macroCard}>
+              <span className={styles.macroCardValue}>{macros.protein}g</span>
+              <span className={styles.macroCardLabel}>Protein</span>
+            </div>
+            <div className={styles.macroCard}>
+              <span className={styles.macroCardValue}>{macros.carbs}g</span>
+              <span className={styles.macroCardLabel}>Carbs</span>
+            </div>
+            <div className={styles.macroCard}>
+              <span className={styles.macroCardValue}>{macros.fat}g</span>
+              <span className={styles.macroCardLabel}>Fat</span>
+            </div>
+          </div>
+          <p className={styles.macroNote}>{macros.note}</p>
+        </div>
+      )}
+
+      {!macros && form.goal && form.activityLevel && missingFields.length > 0 && (
+        <p className={`${styles.note} ${styles.macroMissing}`}>
+          Add your {missingFields.join(', ')} in Profile &amp; Measurements above to see your macros.
+        </p>
+      )}
     </CollapsibleSection>
   )
 }
