@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { VALID_LABELS } from '../lib/split.js'
+import { VALID_LABELS, deriveDayOrder } from '../lib/split.js'
 import { validateTemplate } from '../lib/upload.js'
 import { DEFAULTS } from '../lib/defaults.js'
 import SwapModal from '../components/SwapModal/SwapModal.jsx'
@@ -44,9 +44,21 @@ export default function Workouts({ state, setState, isAdmin }) {
   // { dayLabel, exerciseId, exerciseName } — which exercise in which template to swap
   const [swapTarget, setSwapTarget] = useState(null)
 
-  const templates = Object.values(state.templates).sort((a, b) =>
-    a.dayLabel.localeCompare(b.dayLabel)
-  )
+  const splitLabelSet = new Set(deriveDayOrder(state.settings ?? {}).flat())
+  const hasSplit = splitLabelSet.size > 0
+
+  // Only show labels relevant to the current split in the builder
+  const builderLabels = (() => {
+    const inValid = VALID_LABELS.filter(l => splitLabelSet.has(l))
+    return inValid.length > 0 ? inValid : VALID_LABELS
+  })()
+
+  const templates = Object.values(state.templates)
+    .filter(t => {
+      if (!hasSplit) return true
+      return t.dayLabel.split(' + ').every(l => splitLabelSet.has(l))
+    })
+    .sort((a, b) => a.dayLabel.localeCompare(b.dayLabel))
 
   const openBuilder = () => {
     setDraft({ labels: [], exercises: [] })
@@ -172,7 +184,7 @@ export default function Workouts({ state, setState, isAdmin }) {
           <div className={styles.fieldBlock}>
             <div className={styles.fieldLabel}>Day type</div>
             <div className={styles.labelToggles}>
-              {VALID_LABELS.map(l => (
+              {builderLabels.map(l => (
                 <button
                   key={l}
                   className={`${styles.labelToggle} ${draft.labels.includes(l) ? styles.labelToggleActive : ''}`}
