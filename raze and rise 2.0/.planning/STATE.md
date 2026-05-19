@@ -11,8 +11,8 @@ See: .planning/PROJECT.md (updated 2026-05-18)
 
 Phase: 1 of 6 (Foundation)
 Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-05-18 — Roadmap created; 123 requirements mapped across 6 phases
+Status: Ready to plan — discuss-phase complete
+Last activity: 2026-05-19 — Phase 1 discuss-phase complete; CONTEXT.md written with all design decisions
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -66,6 +66,10 @@ Key decisions relevant to Phase 1:
 - **AI proxy:** All Claude API calls route through Supabase Edge Functions. The `@anthropic-ai/sdk` requires Node.js globals absent from Hermes runtime and must never run client-side.
 - **ExerciseDB:** Cache-first strategy only. The RapidAPI free tier is capped at 10 requests/day — unusable for real-time calls. Seed exercise library to Supabase at build time; never call ExerciseDB during a workout session.
 - **Wearables priority:** HealthKit (iOS native, free, reads from all connected wearables) first; Health Connect (Android) second; Terra API for Garmin/Whoop/Fitbit/Suunto as unified third-party integration.
+- **Expo workflow:** Bare workflow from day one (not managed). Required for HealthKit, widgets, RevenueCat. STATE.md previously had a stale "managed" note — bare is correct per FOUND-01.
+- **Onboarding:** All steps required (profile + split + template); practice set is optional/skippable. Full-screen stack — tab nav hidden until onboarding complete.
+- **Auth screen:** Single screen with Sign In / Sign Up toggle. Email/password + Google + Apple all visible at once.
+- **v1 migration:** Auto-runs silently on first v2 login for existing users. Edge Function, idempotent, progress indicator. New users skip migration entirely.
 
 ### Pending Todos
 
