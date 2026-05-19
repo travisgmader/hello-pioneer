@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { VALID_LABELS } from '../lib/split.js'
 import { validateTemplate } from '../lib/upload.js'
 import { DEFAULTS } from '../lib/defaults.js'
+import SwapModal from '../components/SwapModal/SwapModal.jsx'
 import styles from './Workouts.module.css'
 
 // Always 5 for a single label, 6 split evenly across multiple labels.
@@ -37,9 +38,11 @@ const computeDayLabel = labels =>
 
 export default function Workouts({ state, setState, isAdmin }) {
   const [creating, setCreating] = useState(false)
-  const [editingLabel, setEditingLabel] = useState(null) // dayLabel being edited
+  const [editingLabel, setEditingLabel] = useState(null)
   const [draft, setDraft] = useState({ labels: [], exercises: [] })
   const [error, setError] = useState(null)
+  // { dayLabel, exerciseId, exerciseName } — which exercise in which template to swap
+  const [swapTarget, setSwapTarget] = useState(null)
 
   const templates = Object.values(state.templates).sort((a, b) =>
     a.dayLabel.localeCompare(b.dayLabel)
@@ -119,6 +122,26 @@ export default function Workouts({ state, setState, isAdmin }) {
     } catch (err) {
       setError(err.message)
     }
+  }
+
+  const swapTemplateExercise = (dayLabel, exerciseId, newName) => {
+    setState(s => {
+      const template = s.templates[dayLabel]
+      if (!template) return s
+      return {
+        ...s,
+        templates: {
+          ...s.templates,
+          [dayLabel]: {
+            ...template,
+            exercises: template.exercises.map(ex =>
+              ex.id === exerciseId ? { ...ex, name: newName } : ex
+            ),
+          },
+        },
+      }
+    })
+    setSwapTarget(null)
   }
 
   const onDelete = dayLabel => {
@@ -267,7 +290,14 @@ export default function Workouts({ state, setState, isAdmin }) {
               <ul className={styles.exerciseList}>
                 {t.exercises.map(ex => (
                   <li key={ex.id} className={styles.exerciseRow}>
-                    <span className={styles.exName}>{ex.name}</span>
+                    <button
+                      className={styles.exNameBtn}
+                      onClick={() => setSwapTarget({ dayLabel: t.dayLabel, exerciseId: ex.id, exerciseName: ex.name })}
+                      title="Tap to swap this exercise"
+                    >
+                      {ex.name}
+                      <span className={styles.swapHint}>⇄</span>
+                    </button>
                     <span className={styles.exMeta}>
                       {ex.sets} × {ex.repLow}–{ex.repHigh}
                     </span>
@@ -277,6 +307,13 @@ export default function Workouts({ state, setState, isAdmin }) {
             </div>
           ))}
         </div>
+      )}
+      {swapTarget && (
+        <SwapModal
+          exerciseName={swapTarget.exerciseName}
+          onSelect={name => swapTemplateExercise(swapTarget.dayLabel, swapTarget.exerciseId, name)}
+          onClose={() => setSwapTarget(null)}
+        />
       )}
     </div>
   )

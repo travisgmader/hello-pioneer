@@ -174,6 +174,7 @@ function AFPTConfig({ state, setState, setPage }) {
 
   const savedGoal = state.settings?.ptGoal ?? 85
   const [targetScore, setTargetScore] = useState(savedGoal)
+  const [scoreStr, setScoreStr]       = useState(String(savedGoal))
   const [cardioType, setCardioType]   = useState(state.settings?.cardioType ?? 'run')
   const [applied, setApplied] = useState(false)
 
@@ -254,10 +255,17 @@ function AFPTConfig({ state, setState, setPage }) {
               type="number"
               min="75"
               max="100"
-              value={targetScore}
+              value={scoreStr}
               onChange={e => {
+                setScoreStr(e.target.value)
                 const v = parseInt(e.target.value, 10)
                 if (v >= 75 && v <= 100) setTargetScore(v)
+              }}
+              onBlur={() => {
+                const v = parseInt(scoreStr, 10)
+                const clamped = Math.min(100, Math.max(75, isNaN(v) ? targetScore : v))
+                setTargetScore(clamped)
+                setScoreStr(String(clamped))
               }}
             />
           </label>
@@ -406,12 +414,66 @@ function AFPTConfig({ state, setState, setPage }) {
   )
 }
 
+function PeriodizationModal({ onClose }) {
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalSheet} onClick={e => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <span className={styles.modalTitle}>How Periodization Works</span>
+          <button className={styles.modalClose} onClick={onClose} aria-label="Close">×</button>
+        </div>
+        <div className={styles.modalBody}>
+          <div className={styles.modalStep}>
+            <span className={styles.modalStepNum}>1</span>
+            <div>
+              <strong>Progressive Overload</strong>
+              <p>Your muscles adapt to whatever stress you impose on them. To keep growing stronger, you must progressively increase that stress over time — via added weight, more reps, or more sets. Without this, adaptation stops. Research confirms that both load and volume progression drive equivalent gains in muscle and strength.</p>
+            </div>
+          </div>
+          <div className={styles.modalStep}>
+            <span className={styles.modalStepNum}>2</span>
+            <div>
+              <strong>What Periodization Is</strong>
+              <p>Periodization is the deliberate, planned variation of training intensity, volume, and rep ranges over time. It prevents accommodation (the body's tendency to stop adapting to a fixed stimulus), manages fatigue, and sequences training so each phase builds on the last.</p>
+            </div>
+          </div>
+          <div className={styles.modalStep}>
+            <span className={styles.modalStepNum}>3</span>
+            <div>
+              <strong>The 3-Phase Block Model</strong>
+              <p><em>Phase 1 — Hypertrophy (8–12 reps):</em> Higher volume, moderate load. Builds muscle size and aerobic work capacity — the raw material for strength.<br /><em>Phase 2 — Strength (4–6 reps):</em> Heavier loads, reduced volume. Teaches the nervous system to recruit more motor units and express the muscle built in Phase 1.<br /><em>Phase 3 — Power (1–3 reps):</em> Maximal intensity, low volume. Peaks neuromuscular output and force production.</p>
+            </div>
+          </div>
+          <div className={styles.modalStep}>
+            <span className={styles.modalStepNum}>4</span>
+            <div>
+              <strong>Why Cycle?</strong>
+              <p>Block periodization outperforms fixed training across a 9-week comparison for both strength and hypertrophy outcomes. Each phase creates the physiological conditions the next phase exploits — you can't peak what you haven't built.</p>
+            </div>
+          </div>
+
+          <div className={styles.modalDivider} />
+
+          <p className={styles.modalCiteHeading}>References</p>
+          <ol className={styles.modalCites}>
+            <li>Plotkin D, et al. "Progressive overload without progressing load? The effects of load or repetition progression on muscular adaptations." <em>PeerJ.</em> 2022;10:e14142.</li>
+            <li>Schoenfeld BJ, et al. "Dose-response relationship between weekly resistance training volume and increases in muscle mass: A systematic review and meta-analysis." <em>J Sports Sci.</em> 2017;35(11):1073–1082.</li>
+            <li>Williams TD, et al. "Comparison of Periodization Models for the Development of Athletic Performance: A Systematic Review with Meta-Analysis." <em>Sports Med.</em> 2017;47(12):2543–2555.</li>
+            <li>Ralston GW, et al. "The Effect of Weekly Set Volume on Strength Gain: A Meta-Analysis." <em>Sports Med.</em> 2017;47(12):2585–2601.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function PeriodizationSection({ state, setState }) {
   const { settings } = state
   const phase = settings.splitPhase ?? 0
   const meta  = PHASE_META[phase]
   const days  = daysOnSplit(settings)
   const [applied, setApplied] = useState(false)
+  const [showModal, setShowModal] = useState(false)
 
   const advance = () => {
     const nextPhase  = Math.min(phase + 1, 2)
@@ -495,6 +557,12 @@ function PeriodizationSection({ state, setState }) {
           {applied ? 'Restarted!' : 'Restart from Phase 1 — Hypertrophy'}
         </button>
       )}
+
+      <button className={styles.infoBtn} onClick={() => setShowModal(true)}>
+        How does periodization work?
+      </button>
+
+      {showModal && <PeriodizationModal onClose={() => setShowModal(false)} />}
     </section>
   )
 }

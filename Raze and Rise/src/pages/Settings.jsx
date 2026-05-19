@@ -150,6 +150,66 @@ function MeasurementsSection({ state, setState }) {
   )
 }
 
+function MacroMethodModal({ onClose }) {
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalSheet} onClick={e => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <span className={styles.modalTitle}>How Macros Are Calculated</span>
+          <button className={styles.modalClose} onClick={onClose} aria-label="Close">×</button>
+        </div>
+        <div className={styles.modalBody}>
+          <div className={styles.modalStep}>
+            <span className={styles.modalStepNum}>1</span>
+            <div>
+              <strong>Basal Metabolic Rate (BMR)</strong>
+              <p>We use the <em>Mifflin–St Jeor equation</em> to estimate how many calories your body burns at rest, based on your weight, height, age, and sex — the most validated formula for general populations.</p>
+            </div>
+          </div>
+          <div className={styles.modalStep}>
+            <span className={styles.modalStepNum}>2</span>
+            <div>
+              <strong>Total Daily Energy Expenditure (TDEE)</strong>
+              <p>BMR is multiplied by an activity factor (1.2–1.9) based on your selected activity level to estimate total daily calorie burn, including exercise and daily movement.</p>
+            </div>
+          </div>
+          <div className={styles.modalStep}>
+            <span className={styles.modalStepNum}>3</span>
+            <div>
+              <strong>Calorie Target</strong>
+              <p>A goal-specific adjustment is applied to TDEE — for example, a 500 kcal deficit for weight loss or a 300 kcal surplus for muscle gain.</p>
+            </div>
+          </div>
+          <div className={styles.modalStep}>
+            <span className={styles.modalStepNum}>4</span>
+            <div>
+              <strong>Protein</strong>
+              <p>Protein is set using lean body mass (if body fat % is entered) or total body weight. Targets range from 0.75–1.2 g/lb depending on your goal, consistent with research on muscle retention and hypertrophy.</p>
+            </div>
+          </div>
+          <div className={styles.modalStep}>
+            <span className={styles.modalStepNum}>5</span>
+            <div>
+              <strong>Fat & Carbohydrates</strong>
+              <p>Remaining calories after protein are split between fat and carbs. Fat takes 30–45% of remaining calories (goal-dependent); carbohydrates fill the rest.</p>
+            </div>
+          </div>
+
+          <div className={styles.modalDivider} />
+
+          <p className={styles.modalCiteHeading}>References</p>
+          <ol className={styles.modalCites}>
+            <li>Thom G, et al. "Validity of predictive equations to estimate RMR in females with varying BMI." <em>J Nutr Sci.</em> 2020;9:e17. (Mifflin–St Jeor among most accurate vs. indirect calorimetry.)</li>
+            <li>Morton RW, et al. "A systematic review, meta-analysis and meta-regression of the effect of protein supplementation on resistance training-induced gains in muscle mass and strength in healthy adults." <em>Br J Sports Med.</em> 2018;52(6):376–384.</li>
+            <li>Murphy C, Koehler K. "Energy deficiency impairs resistance training gains in lean mass but not strength." <em>Scand J Med Sci Sports.</em> 2022;32(1):125–137.</li>
+            <li>Prado-Nóvoa O, et al. "Validity of predictive equations for total energy expenditure against doubly labeled water." <em>Sci Rep.</em> 2024;14:15754.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function MacrosSection({ state, setState }) {
   const src = state.macroGoal ?? {}
   const [form, setForm] = useState({
@@ -157,6 +217,7 @@ function MacrosSection({ state, setState }) {
     activityLevel: src.activityLevel ?? '',
   })
   const [saved, setSaved] = useState(false)
+  const [showMethod, setShowMethod] = useState(false)
 
   const save = () => {
     setState(s => ({ ...s, macroGoal: { ...s.macroGoal, ...form } }))
@@ -264,6 +325,12 @@ function MacrosSection({ state, setState }) {
       <p className={styles.macroDisclaimer}>
         These estimates are for informational purposes only and do not constitute medical or dietary advice. Consult a qualified healthcare provider before making any changes to your diet or nutrition.
       </p>
+
+      <button className={styles.macroMethodBtn} onClick={() => setShowMethod(true)}>
+        How is this calculated?
+      </button>
+
+      {showMethod && <MacroMethodModal onClose={() => setShowMethod(false)} />}
     </CollapsibleSection>
   )
 }

@@ -35,6 +35,32 @@
   margin-bottom: 14px;
 }
 
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.swapBtn {
+  flex-shrink: 0;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 120ms, border-color 120ms, background 120ms;
+}
+
+.swapBtn:hover {
+  color: var(--accent);
+  border-color: var(--accent-deep);
+  background: var(--accent-dim);
+}
+
 .name {
   font-family: 'Noto Serif', Georgia, serif;
   font-size: 1.05rem;

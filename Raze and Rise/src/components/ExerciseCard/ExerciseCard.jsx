@@ -10,7 +10,7 @@ export default function ExerciseCard({
   exercise, weight, results,
   weightMethod, orm, pct,
   onWeightChange, onOrmChange, onPctChange,
-  onMark,
+  onMark, onSwap,
 }) {
   const isOrm = weightMethod === 'orm'
   const isRun = exercise.type === 'run'
@@ -67,7 +67,14 @@ export default function ExerciseCard({
   return (
     <div className={styles.card}>
       <div className={styles.header}>
-        <h3 className={styles.name}>{exercise.name}</h3>
+        <div className={styles.nameRow}>
+          <h3 className={styles.name}>{exercise.name}</h3>
+          {onSwap && (
+            <button className={styles.swapBtn} onClick={onSwap} title="Swap exercise">
+              ⇄
+            </button>
+          )}
+        </div>
         <span className={styles.range}>
           {exercise.repLow}–{exercise.repHigh} reps
         </span>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import ExerciseCard from '../components/ExerciseCard/ExerciseCard.jsx'
+import SwapModal from '../components/SwapModal/SwapModal.jsx'
 import WorkoutCompleteOverlay from '../components/WorkoutCompleteOverlay/WorkoutCompleteOverlay.jsx'
 import { currentDayLabels, dayKey, deriveDayOrder, PHASE_META } from '../lib/split.js'
 import { suggestWeight } from '../lib/progress.js'
@@ -63,7 +64,8 @@ function getOrInitSession(state, composite) {
 }
 
 export default function Dashboard({ state, setState, setPage }) {
-  const [overlay, setOverlay] = useState(null) // null | { variant, completing }
+  const [overlay, setOverlay] = useState(null)   // null | { variant, completing }
+  const [swapExId, setSwapExId] = useState(null) // exerciseId whose swap sheet is open
   const labels = currentDayLabels(state)
   const order = deriveDayOrder(state.settings)
   const composite = labels.length ? buildCompositeTemplate(labels, state.templates) : null
@@ -168,6 +170,15 @@ export default function Dashboard({ state, setState, setPage }) {
     })
   }
 
+  const swapExercise = (exerciseId, newName) => {
+    withSession(cur => {
+      const ex = composite.exercises.find(e => e.id === exerciseId)
+      const existing = normalizeSetData(cur.sets[exerciseId], ex)
+      return { ...cur, sets: { ...cur.sets, [exerciseId]: { ...existing, name: newName } } }
+    })
+    setSwapExId(null)
+  }
+
   const doComplete = () => {
     setState(s => {
       const cur = s.session?.dayLabel === composite.dayKey
@@ -205,10 +216,12 @@ export default function Dashboard({ state, setState, setPage }) {
       <div className={styles.cards}>
         {composite.exercises.map(ex => {
           const setData = getSetData(ex.id)
+          // Use session name so swapped exercises show the new name
+          const displayEx = setData.name !== ex.name ? { ...ex, name: setData.name } : ex
           return (
             <ExerciseCard
               key={ex.id}
-              exercise={ex}
+              exercise={displayEx}
               weight={setData.weight}
               results={setData.results}
               weightMethod={weightMethod}
@@ -218,6 +231,7 @@ export default function Dashboard({ state, setState, setPage }) {
               onOrmChange={v => updateOrm(ex.id, v)}
               onPctChange={p => updatePct(ex.id, p)}
               onMark={(i, v) => markSet(ex.id, i, v)}
+              onSwap={displayEx.type !== 'run' ? () => setSwapExId(ex.id) : undefined}
             />
           )
         })}
@@ -227,6 +241,18 @@ export default function Dashboard({ state, setState, setPage }) {
           Complete Workout
         </button>
       </div>
+
+      {swapExId && (() => {
+        const ex = composite.exercises.find(e => e.id === swapExId)
+        const currentName = getSetData(swapExId).name
+        return (
+          <SwapModal
+            exerciseName={currentName}
+            onSelect={name => swapExercise(swapExId, name)}
+            onClose={() => setSwapExId(null)}
+          />
+        )
+      })()}
 
       {overlay && (
         <WorkoutCompleteOverlay

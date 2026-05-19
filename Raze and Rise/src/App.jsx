@@ -52,7 +52,8 @@ export default function App() {
       .select('state')
       .eq('user_id', user.id)
       .maybeSingle()
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) console.error('Failed to load user state:', error)
         if (data?.state) setState({ ...defaultState(), ...data.state })
         stateLoaded.current = true
         setStateReady(true)
@@ -65,6 +66,7 @@ export default function App() {
     supabase
       .from('user_state')
       .upsert({ user_id: user.id, state, updated_at: new Date().toISOString() })
+      .then()
   }, [state])
 
   const isAdmin = user?.email === ADMIN_EMAIL
