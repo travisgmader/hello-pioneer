@@ -804,7 +804,7 @@ Configure in Supabase Dashboard → Database → Webhooks:
 //
 // Source: supabase.com/docs/guides/functions/auth + community-verified pattern
 import { createClient } from 'jsr:@supabase/supabase-js@2';
-import Stripe from 'npm:stripe@^17';   // server-side Stripe SDK
+import Stripe from 'npm:stripe@^22';   // server-side Stripe SDK
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!);
 const WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_FAMILY_SHARED_SECRET')!;
@@ -855,7 +855,7 @@ Deno.serve(async (req) => {
 ```typescript
 // supabase/functions/stripe-webhook/index.ts
 // supabase/config.toml: [functions.stripe-webhook] verify_jwt = false
-import Stripe from 'npm:stripe@^17';
+import Stripe from 'npm:stripe@^22';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!);
@@ -882,12 +882,21 @@ Deno.serve(async (req) => {
     case 'customer.subscription.updated':
     case 'customer.subscription.deleted': {
       const sub = event.data.object as Stripe.Subscription;
-      // Update family_settings.trial_ends_at + future subscription_status columns
-      // (Phase 2 expands this; Phase 1 just persists.)
-      await admin
-        .from('family_settings')
-        .update({ stripe_subscription_status: sub.status })
-        .eq('stripe_customer_id', sub.customer);
+      const customerId = typeof sub.customer === 'string' ? sub.customer : sub.customer.id;
+      // Two-step: stripe_customer_id lives on families, not family_settings.
+      // Step 1: Resolve the family id from families.stripe_customer_id.
+      // Step 2: Update family_settings by family_id.
+      const { data: fam } = await admin
+        .from('families')
+        .select('id')
+        .eq('stripe_customer_id', customerId)
+        .single();
+      if (fam) {
+        await admin
+          .from('family_settings')
+          .update({ stripe_subscription_status: sub.status, updated_at: new Date().toISOString() })
+          .eq('family_id', fam.id);
+      }
       break;
     }
     case 'customer.subscription.trial_will_end':
@@ -1433,27 +1442,27 @@ on conflict do nothing;
 | A7 | Browser-derived timezone (Intl.DateTimeFormat().resolvedOptions().timeZone) is the right default for `family_settings.timezone` at first family creation | Family Creation Wizard | Low — STATE.md flags this as a Phase 1 open question; the recommendation is to use browser default and let user edit later |
 | A8 | Stripe Node SDK pinning `npm:stripe@^17` inside Edge Function works with current Deno + Stripe API | Stripe Edge Function code | Low — Stripe SDK is well-supported on Deno; verify at deploy. (Latest stable is 22.x as of 2026-05; the Edge Function `^17` pin needs to be bumped to `^22` in Wave 5.) |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should `families.created_by` cascade or set NULL on auth.users delete?**
+1. **RESOLVED: Should `families.created_by` cascade or set NULL on auth.users delete?** — Phase 1 sets NULL; Phase 7 (COMP-01) revisits with a proper account-deletion flow.
    - What we know: We chose `set null`. v1 had no such constraint because it didn't link to auth.users.
    - What's unclear: GDPR (COMP-01 in Phase 7) needs a story for "user deletes account" — should the family persist with no creator, or be deleted?
-   - Recommendation: Phase 1 sets NULL; Phase 7 (COMP-01) revisits with a proper account-deletion flow.
+   - Resolution: Phase 1 sets NULL; Phase 7 (COMP-01) revisits with a proper account-deletion flow.
 
-2. **Webhook retry policy for `stripe-create-customer`?**
+2. **RESOLVED: Webhook retry policy for `stripe-create-customer`?** — Enable webhook retries (3 attempts, exponential backoff); the idempotency key makes retries safe.
    - What we know: Supabase Database Webhooks support retries; default count is unclear from docs.
    - What's unclear: If the Edge Function 500s after a partial success (e.g., Stripe created Customer but the UPDATE failed), the retry will hit `stripe.customers.create` with the same idempotency key and not double-create. That's safe.
-   - Recommendation: Enable webhook retries (3 attempts, exponential backoff). The idempotency key makes retries safe. Document this in the runbook.
+   - Resolution: Enable webhook retries (3 attempts, exponential backoff). The idempotency key makes retries safe. Document this in the runbook.
 
-3. **Service worker registration timing relative to auth?**
+3. **RESOLVED: Service worker registration timing relative to auth?** — Phase 1 SW is precache-only, no runtime caching; OAuth redirect is a hard navigation that isn't intercepted; verified by Playwright smoke test in Plan 06.
    - What we know: `vite-plugin-pwa`'s `injectRegister: 'auto'` registers on page load.
    - What's unclear: If the SW activates during the OAuth redirect flow, could the redirect be cached?
-   - Recommendation: Phase 1 SW only does precache (no runtime caching of HTML/fetch). The redirect is a hard navigation that isn't intercepted. Document and verify with a Playwright smoke test.
+   - Resolution: Phase 1 SW only does precache (no runtime caching of HTML/fetch). The redirect is a hard navigation that isn't intercepted. Document and verify with a Playwright smoke test.
 
-4. **First-ever family creation requires the user to NOT yet be in `members` — but RLS `families_insert` policy doesn't gate on this. Should it?**
+4. **RESOLVED: First-ever family creation requires the user to NOT yet be in `members` — but RLS `families_insert` policy doesn't gate on this. Should it?** — Phase 1 uses `with check (true)` on `families_insert`; Phase 2 + Stripe billing will gate this.
    - What we know: Currently `families_insert` has `with check (true)`, allowing any authenticated user to insert.
    - What's unclear: This means a user could create unlimited families. Phase 2 may want to restrict to "first family only" or "billing-gated".
-   - Recommendation: Phase 1 accepts this — it's not a security hole (RLS still prevents seeing other families), just an abuse vector for one trusted family. Phase 2 + Stripe billing will gate this.
+   - Resolution: Phase 1 accepts this — it's not a security hole (RLS still prevents seeing other families), just an abuse vector for one trusted family. Phase 2 + Stripe billing will gate this.
 
 ## Environment Availability
 
