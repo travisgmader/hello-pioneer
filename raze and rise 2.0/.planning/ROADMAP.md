@@ -7,7 +7,7 @@
 
 ## Phases
 
-- [>] **Phase 1: Foundation** — Expo bare workflow, normalized schema + RLS, PowerSync offline sync, MMKV session, all auth providers, EAS Build, v1 migration script, 5-tab nav, onboarding (2/9 plans complete)
+- [>] **Phase 1: Foundation** — Expo bare workflow, normalized schema + RLS, PowerSync offline sync, MMKV session, all auth providers, EAS Build, v1 migration script, 5-tab nav, onboarding (3/9 plans complete)
 - [ ] **Phase 2: Core Session Loop** — Rest timer (background notification), previous performance column, set types, RPE, warm-up flag, supersets, bodyweight exercise, session notes, injury map, Anubis overlay, offline persistence
 - [ ] **Phase 3: Templates, Programs & Progress** — Searchable exercise library + ExerciseDB videos, template builder with supersets, editable history, manual + AI program builder, deload system, progress charts, measurement history, progress photos, gamification
 - [ ] **Phase 4: Premium & AI** — RevenueCat billing (StoreKit + Google Play + Stripe web), premium JWT auth hook, AI coach chat (streaming, rate-limited), AI workout generation, AI meal planning, Instacart MCP, supplement checklist, meal reminders, nutrition from Apple Health
@@ -36,8 +36,9 @@
 Plans:
 **Wave 1**
 
-- [x] 01-scaffold-PLAN.md — Bare Expo scaffold, NativeWind, MMKV, PowerSync, Expo Router shell, design-system atoms, Wave 0 test infrastructure (complete — 35db137)
-- [ ] 01-schema-PLAN.md — Normalized Supabase schema (10 tables), RLS policies, PowerSync publication, supabase db push
+- [x] 01-scaffold-init-PLAN.md — Bare Expo scaffold, NativeWind tokens, EAS build, Wave 0 test infra (complete — 35db137)
+- [x] 01-scaffold-lib-PLAN.md — MMKV+SecureStore, Supabase client, PowerSync schema/connector, core hooks (complete — 7344562)
+- [x] 01-schema-PLAN.md — 9-table schema + RLS + PowerSync publication, 36 exercises seeded (complete — ccbbf73)
 
 **Wave 3** *(blocked on Wave 1 completion)*
 

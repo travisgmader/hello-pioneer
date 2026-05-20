@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 1, Plan 01b (scaffold-lib) complete. Plan 01c (scaffold-routing) is next."
-last_updated: "2026-05-20T02:47:19Z"
-last_activity: 2026-05-20 -- Plan 01b complete (lib layer, Supabase client, PowerSync, MMKV+SecureStore, hooks, ~25 min)
+stopped_at: "Wave 1 complete (01a + 01b + 02). Wave 2 is next: scaffold-ui (01c) + scaffold-routing (01d)."
+last_updated: "2026-05-19T21:00:00.000Z"
+last_activity: 2026-05-19 -- Plan 02 complete (9-table schema + RLS + PowerSync + 36 exercises seeded)
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 9
-  completed_plans: 2
-  percent: 22
+  completed_plans: 3
+  percent: 33
 ---
 
 # Project State
@@ -26,14 +26,14 @@ See: .planning/PROJECT.md (updated 2026-05-18)
 ## Current Position
 
 Phase: 1 of 6 (Foundation)
-Plan: 3 of 9 in current phase (01c scaffold-routing — next)
-Status: Executing — Wave 1
-Last activity: 2026-05-20 -- Plan 01b complete (lib layer + hooks, ~25 min)
+Plan: 4 of 9 in current phase (01c scaffold-ui — Wave 2 next)
+Status: Executing — Wave 1 complete, Wave 2 starting
+Last activity: 2026-05-19 -- Plan 02 complete (9-table schema + RLS + PowerSync, ~30 min)
 
-Progress: [██░░░░░░░░] 22%
+Progress: [███░░░░░░░] 33%
 
 ```
-Phase 1: Foundation          [>] In progress (2/9 plans complete)
+Phase 1: Foundation          [>] In progress (3/9 plans complete)
 Phase 2: Core Session Loop   [ ] Not started
 Phase 3: Templates, Programs & Progress  [ ] Not started
 Phase 4: Premium & AI        [ ] Not started
