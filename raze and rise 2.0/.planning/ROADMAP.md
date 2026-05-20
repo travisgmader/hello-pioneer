@@ -7,7 +7,7 @@
 
 ## Phases
 
-- [>] **Phase 1: Foundation** — Expo bare workflow, normalized schema + RLS, PowerSync offline sync, MMKV session, all auth providers, EAS Build, v1 migration script, 5-tab nav, onboarding (4/9 plans complete)
+- [>] **Phase 1: Foundation** — Expo bare workflow, normalized schema + RLS, PowerSync offline sync, MMKV session, all auth providers, EAS Build, v1 migration script, 5-tab nav, onboarding (5/9 plans complete)
 - [ ] **Phase 2: Core Session Loop** — Rest timer (background notification), previous performance column, set types, RPE, warm-up flag, supersets, bodyweight exercise, session notes, injury map, Anubis overlay, offline persistence
 - [ ] **Phase 3: Templates, Programs & Progress** — Searchable exercise library + ExerciseDB videos, template builder with supersets, editable history, manual + AI program builder, deload system, progress charts, measurement history, progress photos, gamification
 - [ ] **Phase 4: Premium & AI** — RevenueCat billing (StoreKit + Google Play + Stripe web), premium JWT auth hook, AI coach chat (streaming, rate-limited), AI workout generation, AI meal planning, Instacart MCP, supplement checklist, meal reminders, nutrition from Apple Health
@@ -43,7 +43,7 @@ Plans:
 **Wave 2**
 
 - [x] 01-scaffold-ui-PLAN.md — 10 design-system atom components (Button, TextInput, Label, HelperText, Divider, IconButton, Toggle, Chip, ProgressBar, Spinner) (complete — 3bb7c74)
-- [ ] 01-scaffold-routing-PLAN.md — Expo Router layout files, root layout gate, tab navigator, onboarding stack
+- [x] 01-scaffold-routing-PLAN.md — Expo Router layout files, root layout gate, tab navigator, onboarding stack (complete — 806d8f5)
 
 **Wave 3** *(blocked on Wave 1 completion)*
 
