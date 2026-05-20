@@ -6,19 +6,21 @@
  * Note: These tests require two pre-created test users in the Supabase project.
  * Create them via the Supabase Dashboard → Authentication → Users before running.
  */
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { describe, it, expect, beforeAll } from 'vitest';
 import type { Database } from '@/types/database';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
 
-// Skip entire suite when env vars are not configured (avoids CI false-positives)
+// Skip entire suite when env vars are not configured (avoids CI false-positives).
+// createClient is deferred into beforeAll — NOT called at module evaluation time —
+// to prevent a hard throw when supabaseUrl is absent (pre-existing TS2882-class bug).
 const skipSuite = !supabaseUrl || !supabaseAnonKey;
 
 describe.skipIf(skipSuite)('RLS isolation', () => {
-  const clientA = createClient<Database>(supabaseUrl, supabaseAnonKey);
-  const clientB = createClient<Database>(supabaseUrl, supabaseAnonKey);
+  let clientA: SupabaseClient<Database>;
+  let clientB: SupabaseClient<Database>;
 
   const testUserAEmail = process.env.RLS_TEST_USER_A_EMAIL ?? 'rls-test-a@razeandrise.test';
   const testUserAPassword = process.env.RLS_TEST_USER_A_PASSWORD ?? '';
@@ -28,6 +30,10 @@ describe.skipIf(skipSuite)('RLS isolation', () => {
   let sessionAId: string;
 
   beforeAll(async () => {
+    // Create clients here so they are never constructed when supabaseUrl is empty.
+    clientA = createClient<Database>(supabaseUrl, supabaseAnonKey);
+    clientB = createClient<Database>(supabaseUrl, supabaseAnonKey);
+
     if (!testUserAPassword || !testUserBPassword) return;
 
     await clientA.auth.signInWithPassword({ email: testUserAEmail, password: testUserAPassword });
