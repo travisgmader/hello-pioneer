@@ -32,18 +32,18 @@
 
 ### Onboarding (ONBOARD)
 
-- [ ] **ONBOARD-01**: New user sees a multi-step onboarding flow on first launch (shown when `onboarded = false`)
-- [ ] **ONBOARD-02**: Step 1 — User sets profile and measurements (name, age, height, sex, weight, body fat %) so the bodyweight exercise type and macro calculator work immediately
-- [ ] **ONBOARD-03**: Step 3 — User chooses a split type with a visual calendar showing what the weekly schedule looks like for each option
-- [ ] **ONBOARD-04**: Step 3 — User creates or customizes their first workout template before leaving onboarding
-- [ ] **ONBOARD-05**: Step 4 — User walks through a practice set (marking go/no-go, seeing the rest timer fire) so the UX feels familiar before their first real session
-- [ ] **ONBOARD-06**: User sets a preferred workout notification time during onboarding; app uses this as the seed while smart timing learns from history
+- [x] **ONBOARD-01**: New user sees a multi-step onboarding flow on first launch (shown when `onboarded = false`)
+- [x] **ONBOARD-02**: Step 1 — User sets profile and measurements (name, age, height, sex, weight, body fat %) so the bodyweight exercise type and macro calculator work immediately
+- [x] **ONBOARD-03**: Step 3 — User chooses a split type with a visual calendar showing what the weekly schedule looks like for each option
+- [x] **ONBOARD-04**: Step 3 — User creates or customizes their first workout template before leaving onboarding
+- [x] **ONBOARD-05**: Step 4 — User walks through a practice set (marking go/no-go, seeing the rest timer fire) so the UX feels familiar before their first real session
+- [x] **ONBOARD-06**: User sets a preferred workout notification time during onboarding; app uses this as the seed while smart timing learns from history
 
 ### Navigation (NAV)
 
-- [ ] **NAV-01**: Five-tab bottom navigation: Dashboard / Workouts / Split / Progress / Settings
-- [ ] **NAV-02**: Split has its own dedicated tab (not nested inside Settings as in v1)
-- [ ] **NAV-03**: Active tab is visually highlighted; navigation works offline
+- [x] **NAV-01**: Five-tab bottom navigation: Dashboard / Workouts / Split / Progress / Settings
+- [x] **NAV-02**: Split has its own dedicated tab (not nested inside Settings as in v1)
+- [x] **NAV-03**: Active tab is visually highlighted; navigation works offline
 
 ### Core Workout Session (WORKOUT)
 
@@ -185,10 +185,10 @@
 
 ### Design (DESIGN)
 
-- [ ] **DESIGN-01**: Dark/light mode toggle in Settings; dark mode is the default
+- [x] **DESIGN-01**: Dark/light mode toggle in Settings; dark mode is the default
 - [ ] **DESIGN-02**: Visual aesthetic targets Whoop and Strong app: dark, data-dense, serious athlete feel — not gamified or lifestyle-forward
 - [ ] **DESIGN-03**: Anubis loading screen animation is kept and polished; it is the app's splash/loading screen, not a separate product
-- [ ] **DESIGN-04**: Transitions on interactive elements (150ms ease minimum); rest timer countdown is smooth
+- [x] **DESIGN-04**: Transitions on interactive elements (150ms ease minimum); rest timer countdown is smooth
 
 ---
 
@@ -237,15 +237,15 @@
 | AUTH-06 | Phase 1 | Pending |
 | AUTH-07 | Phase 4 | Pending |
 | AUTH-08 | Phase 1 | Pending |
-| ONBOARD-01 | Phase 1 | Pending |
-| ONBOARD-02 | Phase 1 | Pending |
-| ONBOARD-03 | Phase 1 | Pending |
-| ONBOARD-04 | Phase 1 | Pending |
-| ONBOARD-05 | Phase 1 | Pending |
-| ONBOARD-06 | Phase 1 | Pending |
-| NAV-01 | Phase 1 | Pending |
-| NAV-02 | Phase 1 | Pending |
-| NAV-03 | Phase 1 | Pending |
+| ONBOARD-01 | Phase 1 | Complete |
+| ONBOARD-02 | Phase 1 | Complete |
+| ONBOARD-03 | Phase 1 | Complete |
+| ONBOARD-04 | Phase 1 | Complete |
+| ONBOARD-05 | Phase 1 | Complete |
+| ONBOARD-06 | Phase 1 | Complete |
+| NAV-01 | Phase 1 | Complete |
+| NAV-02 | Phase 1 | Complete |
+| NAV-03 | Phase 1 | Complete |
 | WORKOUT-01 | Phase 2 | Pending |
 | WORKOUT-02 | Phase 2 | Pending |
 | WORKOUT-03 | Phase 2 | Pending |
@@ -339,7 +339,7 @@
 | DATA-02 | Phase 1 | Pending |
 | DATA-03 | Phase 1 | Pending |
 | DATA-04 | Phase 6 | Pending |
-| DESIGN-01 | Phase 1 | Pending |
+| DESIGN-01 | Phase 1 | Complete |
 | DESIGN-02 | Phase 2 | Pending |
 | DESIGN-03 | Phase 2 | Pending |
-| DESIGN-04 | Phase 1 | Pending |
+| DESIGN-04 | Phase 1 | Complete |

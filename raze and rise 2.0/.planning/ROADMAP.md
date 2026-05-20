@@ -32,7 +32,7 @@
 4. Navigating to all five tabs (Dashboard / Workouts / Split / Progress / Settings) works offline and the active tab is visually highlighted
 5. Existing v1 user data (workout history, templates, split settings, measurements) is queryable from the normalized v2 tables after the migration script runs
 
-**Plans:** 6 plans
+**Plans:** 7/9 plans executed
 Plans:
 **Wave 1**
 
@@ -48,7 +48,7 @@ Plans:
 **Wave 3** *(blocked on Wave 1 completion)*
 
 - [x] 01-auth-PLAN.md — Email auth, Google OAuth, Apple Sign-In, password reset, change password, SMS MFA, sign-out (complete — faa4c4c)
-- [ ] 01-navigation-onboarding-PLAN.md — 5-tab nav, onboarding stack (profile + split + template + practice set + Dashboard), notification preference
+- [x] 01-navigation-onboarding-PLAN.md — 5-tab nav, onboarding stack (profile + split + template + practice set + Dashboard), notification preference
 - [ ] 01-migration-PLAN.md — v1 migration Edge Function, client trigger + polling, migration progress screen
 
 **Wave 4** *(blocked on Wave 3 completion)*
@@ -155,7 +155,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 6/9 | In progress | - |
+| 1. Foundation | 7/9 | In Progress|  |
 | 2. Core Session Loop | 0/? | Not started | - |
 | 3. Templates, Programs & Progress | 0/? | Not started | - |
 | 4. Premium & AI | 0/? | Not started | - |
