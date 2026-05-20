@@ -1,0 +1,62 @@
+appId: com.razeandrise.app
+---
+- launchApp
+- waitForAnimationToEnd
+
+# === SIGN UP ===
+- tapOn:
+    text: "Sign Up"
+- clearText
+- inputText: "testwalking@example.com"
+- tapOn:
+    text: "Password"
+    optional: true
+- inputText: "testWalking123"
+- tapOn:
+    text: "Confirm password"
+    optional: true
+- inputText: "testWalking123"
+- tapOn: "Create account"
+- waitForAnimationToEnd
+
+# === ONBOARDING STEP 1: PROFILE ===
+- assertVisible: "Set up your profile"
+- tapOn:
+    text: "What should we call you?"
+    optional: true
+- inputText: "Walker"
+- tapOn: "Continue"
+- waitForAnimationToEnd
+
+# === ONBOARDING STEP 2: SPLIT ===
+- assertVisible: "Choose your split"
+- tapOn: "Full Body"
+- tapOn: "Continue"
+- waitForAnimationToEnd
+
+# === ONBOARDING STEP 3: TEMPLATE ===
+- assertVisible: "Pick a starter template"
+- tapOn:
+    index: 0
+- tapOn: "Continue"
+- waitForAnimationToEnd
+
+# === ONBOARDING STEP 4: PRACTICE SET (SKIP) ===
+- assertVisible: "Try logging a set"
+- tapOn: "Skip for now"
+- waitForAnimationToEnd
+
+# === DASHBOARD ===
+- assertVisible: "Welcome, Walker"
+
+# === OFFLINE SET LOG (manual steps required) ===
+# The following steps require airplane mode ON — automated portion ends here.
+# Manual steps (run on real device after this YAML completes):
+# 1. Enable airplane mode on device
+# 2. Navigate to Settings tab → scroll to "Developer Tools" section
+# 3. Tap "Log test set offline" button
+# 4. Note the session UUID shown in the status message
+# 5. Verify the status shows "Set logged (local SQLite)"
+# 6. Disable airplane mode, wait 15 seconds
+# 7. Open Supabase Dashboard → Table Editor → session_sets
+# 8. Search for the session UUID — confirm row is present (ROADMAP success criterion 3)

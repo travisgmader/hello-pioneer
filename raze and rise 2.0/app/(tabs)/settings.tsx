@@ -23,6 +23,70 @@ import { Button } from '@/components/Button';
 import { HelperText } from '@/components/HelperText';
 import { Label } from '@/components/Label';
 
+/**
+ * __DEV__ only — logs a test set directly via PowerSync SQL for Walking Skeleton verification.
+ * Strips from production builds via Metro's __DEV__ dead-code elimination.
+ *
+ * Usage: Settings → Developer Tools → "Log test set offline"
+ * Step: enable airplane mode first, tap button, note UUID, re-enable network,
+ *       verify row appears in Supabase session_sets table.
+ */
+function DevOfflineSetLogger() {
+  const [status, setStatus] = React.useState<string>('');
+  const [loading, setLoading] = React.useState(false);
+
+  async function handleLogTestSet() {
+    setLoading(true);
+    setStatus('');
+    try {
+      const { getPowerSync } = await import('@/lib/powersync');
+      const db = getPowerSync();
+      // Use Date.now() as UUID fallback — exact format is not critical for dev helper.
+      const sessionId = `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const setId = `set-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      await db.execute(
+        'INSERT INTO session_sets (id, session_id, exercise_id, set_number, weight_kg, result, logged_at) VALUES (?,?,?,?,?,?,?)',
+        [setId, sessionId, 'bench-press-placeholder', 1, 100.0, 'go', new Date().toISOString()],
+      );
+      setStatus(`Set logged (local SQLite)\nSession UUID: ${sessionId}`);
+    } catch (err) {
+      setStatus(`Error: ${String(err)}`);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <View>
+      <Pressable
+        onPress={handleLogTestSet}
+        style={{
+          backgroundColor: '#F2CA50',
+          borderRadius: 8,
+          paddingVertical: 12,
+          paddingHorizontal: 16,
+          alignItems: 'center',
+        }}
+      >
+        <Text
+          style={{ fontFamily: 'Manrope', fontWeight: '700', color: '#0A0A0B' }}
+          allowFontScaling={false}
+        >
+          {loading ? 'Logging...' : 'Log test set offline'}
+        </Text>
+      </Pressable>
+      {status ? (
+        <Text
+          style={{ fontFamily: 'Manrope', fontSize: 12, color: '#99907C', marginTop: 8 }}
+          allowFontScaling={false}
+        >
+          {status}
+        </Text>
+      ) : null}
+    </View>
+  );
+}
+
 export default function SettingsScreen() {
   const { theme, setTheme } = useTheme();
 
@@ -299,6 +363,38 @@ export default function SettingsScreen() {
         >
           {'Manage two-factor authentication in your Supabase account settings.\n\nTo enable SMS MFA: Supabase Dashboard → Authentication → MFA → Phone → Enable. Full in-app enrollment flow coming in a future update.'}
         </Text>
+
+        {/* ── Developer Tools section (dev builds only — stripped in production) ── */}
+        {__DEV__ && (
+          <>
+            <View style={{ height: 24 }} />
+            <Text
+              style={{
+                fontFamily: 'NotoSerif-Bold',
+                fontSize: 24,
+                fontWeight: '700',
+                color: '#E5E2E1',
+              }}
+              allowFontScaling={false}
+            >
+              Developer Tools
+            </Text>
+            <View style={{ height: 8 }} />
+            <Text
+              style={{
+                fontFamily: 'Manrope',
+                fontSize: 12,
+                fontWeight: '400',
+                color: '#99907C',
+              }}
+              allowFontScaling={false}
+            >
+              Walking Skeleton verification only — not visible in production builds.
+            </Text>
+            <View style={{ height: 8 }} />
+            <DevOfflineSetLogger />
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

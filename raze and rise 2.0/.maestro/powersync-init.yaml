@@ -1,5 +1,11 @@
 appId: com.razeandrise.app
-# TODO: complete in 01b-lib plan (PowerSync local SQLite initialization)
-
-flows:
-  - launchApp
+---
+# PowerSync SQLite initialization check
+# Assumes user is already signed in (dev build with existing session)
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 5000
+# Dashboard shows "PowerSync: ready" indicator when __DEV__ and PowerSync is connected
+- assertVisible: "PowerSync: ready"
+# If "PowerSync: ready" is not visible within 5s, PowerSync failed to initialize
+# Check: src/lib/powersync.ts powersync.init() call in root layout

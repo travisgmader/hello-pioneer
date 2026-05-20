@@ -21,3 +21,12 @@ export const powersync = new PowerSyncDatabase({
     dbFilename: 'razeandrise.db',
   },
 });
+
+/**
+ * Returns the PowerSync singleton.
+ * Provided as a function to support dynamic imports in dev helpers
+ * (e.g. the Walking Skeleton DevOfflineSetLogger in settings.tsx).
+ */
+export function getPowerSync() {
+  return powersync;
+}

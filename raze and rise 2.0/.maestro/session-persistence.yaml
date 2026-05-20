@@ -1,5 +1,14 @@
 appId: com.razeandrise.app
-# TODO: complete in 01b-auth plan (session survives kill + relaunch via MMKV)
-
-flows:
-  - launchApp
+---
+# Session persistence: session survives app kill + relaunch
+# Assumes user is already signed in
+- launchApp
+- assertVisible: "Welcome"
+# Simulate app kill by terminating and relaunching
+- stopApp
+- launchApp
+- waitForAnimationToEnd
+# Session restored — user sees Dashboard, not auth screen
+- assertVisible: "Welcome"
+# If auth screen appears here, MMKV/SecureStore session restore failed
+# Check: src/lib/storage.ts initStorage() and supabaseStorageAdapter

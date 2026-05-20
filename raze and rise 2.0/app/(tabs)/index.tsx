@@ -11,11 +11,11 @@
  * Full Dashboard implemented in Phase 2 (Core Session Loop).
  */
 
+import React from 'react';
 import { SafeAreaView, ScrollView, View, Text } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useSession } from '@/hooks/useSession';
-import { powersync } from '@/lib/powersync';
 
 function useDashboardProfile(userId: string | undefined) {
   return useQuery({
@@ -33,19 +33,52 @@ function useDashboardProfile(userId: string | undefined) {
   });
 }
 
+/**
+ * __DEV__ only — reactive PowerSync status indicator.
+ * Used by .maestro/powersync-init.yaml Walking Skeleton test:
+ * asserts "PowerSync: ready" is visible on the Dashboard.
+ * Stripped by Metro bundler in production builds.
+ */
+function PowerSyncStatus() {
+  const [status, setStatus] = React.useState<string>('initializing');
+
+  React.useEffect(() => {
+    let cancelled = false;
+    import('@/lib/powersync').then(({ getPowerSync }) => {
+      const db = getPowerSync();
+      const updateStatus = () => {
+        if (cancelled) return;
+        const s = db.currentStatus;
+        setStatus(s.connected ? 'ready' : s.connecting ? 'connecting' : 'disconnected');
+      };
+      updateStatus();
+      const unsub = db.registerListener({ statusChanged: updateStatus });
+      return () => {
+        cancelled = true;
+        unsub();
+      };
+    }).catch(() => setStatus('error'));
+  }, []);
+
+  return (
+    <Text
+      style={{
+        fontFamily: 'Manrope',
+        fontSize: 11,
+        color: '#99907C',
+        marginTop: 4,
+      }}
+      allowFontScaling={false}
+    >
+      {`PowerSync: ${status}`}
+    </Text>
+  );
+}
+
 export default function DashboardScreen() {
   const { session } = useSession();
   const { data: profile } = useDashboardProfile(session?.user.id);
   const displayName = profile?.display_name ?? 'athlete';
-
-  // __DEV__ PowerSync status (used by 01-skeleton-verification-PLAN.md Walking Skeleton test).
-  const devStatus = __DEV__
-    ? powersync.currentStatus?.connected
-      ? 'connected'
-      : powersync.currentStatus?.connecting
-        ? 'connecting'
-        : 'initializing'
-    : null;
 
   return (
     <SafeAreaView className="flex-1 bg-bg">
@@ -60,6 +93,9 @@ export default function DashboardScreen() {
         >
           {`Welcome, ${displayName}`}
         </Text>
+
+        {/* __DEV__ PowerSync status indicator — stripped in production by Metro */}
+        {__DEV__ && <PowerSyncStatus />}
 
         {/* 8pt gap */}
         <View className="h-sm" />
@@ -82,19 +118,6 @@ export default function DashboardScreen() {
             Real workout logging ships in Phase 2.
           </Text>
         </View>
-
-        {/* __DEV__ PowerSync status indicator — stripped in production by Metro */}
-        {__DEV__ && devStatus !== null && (
-          <View className="mt-lg">
-            <Text
-              className="text-caption"
-              style={{ color: '#5C564B' }}
-              allowFontScaling={false}
-            >
-              {`PowerSync: ${devStatus}`}
-            </Text>
-          </View>
-        )}
       </ScrollView>
     </SafeAreaView>
   );
