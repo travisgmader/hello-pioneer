@@ -1,5 +1,11 @@
 appId: com.razeandrise.app
-# TODO: complete in 01b-auth plan
-
-flows:
-  - launchApp
+# Assumes user is already signed in
+---
+- launchApp
+- waitForAnimationToEnd
+- tapOn: "Settings"
+- tapOn: "Sign out"
+- tapOn:
+    text: "Sign out"
+    optional: true
+- assertVisible: "Sign In"

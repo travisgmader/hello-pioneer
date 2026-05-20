@@ -1,5 +1,34 @@
 appId: com.razeandrise.app
-# TODO: complete in 01b-auth plan
+---
+- launchApp
+- waitForAnimationToEnd
 
-flows:
-  - launchApp
+# Sign Up flow
+- tapOn: "Sign Up"
+- tapOn:
+    id: "email-input"
+    optional: true
+- inputText: "testuser@example.com"
+- tapOn:
+    id: "password-input"
+    optional: true
+- inputText: "testpass123"
+- tapOn:
+    id: "confirm-password-input"
+    optional: true
+- inputText: "testpass123"
+- tapOn: "Create account"
+- assertVisible: "Dashboard"
+
+# Sign In flow (assumes account exists from sign-up above or pre-seeded)
+- tapOn: "Sign In"
+- tapOn:
+    id: "email-input"
+    optional: true
+- inputText: "testuser@example.com"
+- tapOn:
+    id: "password-input"
+    optional: true
+- inputText: "testpass123"
+- tapOn: "Continue"
+- assertVisible: "Dashboard"

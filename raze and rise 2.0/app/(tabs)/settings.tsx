@@ -1,28 +1,81 @@
 /**
- * Settings tab — minimal real settings screen (NOT a full placeholder).
- * Settings has auth-required functionality that must work from Phase 1.
+ * Settings tab — Account, Appearance, Two-factor authentication.
  *
  * Sections:
- *   Account: Sign Out (Alert.alert confirmation — only permitted Alert in the app)
- *   Appearance: Dark/Light mode toggle via useTheme()
- *   Two-factor authentication: SMS MFA stub (managed via Supabase account settings)
+ *   Account:
+ *     - Change Password (inline form: current-password + new-password + confirm)
+ *     - Sign Out (native confirmation dialog — ONLY permitted system alert in the app per CONTEXT.md Decision 3)
+ *   Appearance:
+ *     - Dark/Light mode toggle via useTheme()
+ *   Two-factor authentication:
+ *     - SMS MFA stub with manual instructions (AUTH-06 — full enrollment flow is Phase 2+)
  *
- * Sign Out: Alert.alert("Sign out?", ...) — CONTEXT.md Decision 3 exception.
- * signOut imported from src/services/auth/signOut — implemented in 01-auth-PLAN.md.
- * Stub no-op used here until that plan runs (Wave 3).
+ * Error/success: inline HelperText only — no toast/snackbar for form feedback.
+ * Native sign-out confirmation is the ONLY system dialog in the app (UI-SPEC exception — destructive action).
  */
-
-// TODO: import from src/services/auth/signOut — implemented in 01-auth-PLAN.md
-// import { signOut } from '@/services/auth/signOut';
-const signOut = async () => {
-  // No-op stub — replaced when 01-auth-PLAN.md ships src/services/auth/signOut.ts.
-};
-
+import React, { useState } from 'react';
 import { SafeAreaView, ScrollView, View, Text, Pressable, Alert, Switch } from 'react-native';
 import { useTheme } from '@/hooks/useTheme';
+import { signOut } from '@/services/auth/signOut';
+import { changePassword } from '@/services/auth/email';
+import { TextInput } from '@/components/TextInput';
+import { Button } from '@/components/Button';
+import { HelperText } from '@/components/HelperText';
+import { Label } from '@/components/Label';
 
 export default function SettingsScreen() {
   const { theme, setTheme } = useTheme();
+
+  // ── Change password form ──────────────────────────────────────────────────
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [passwordFormError, setPasswordFormError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [passwordSubmitting, setPasswordSubmitting] = useState(false);
+
+  function resetPasswordForm() {
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmNewPassword('');
+    setPasswordFormError('');
+    setPasswordSuccess(false);
+  }
+
+  async function handleChangePassword() {
+    setPasswordFormError('');
+    setPasswordSuccess(false);
+
+    if (!newPassword) {
+      setPasswordFormError('Password is required.');
+      return;
+    }
+    if (newPassword.length < 8) {
+      setPasswordFormError('Password must be at least 8 characters.');
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPasswordFormError("Passwords don't match.");
+      return;
+    }
+
+    setPasswordSubmitting(true);
+    try {
+      const { error } = await changePassword(newPassword);
+      if (error) {
+        setPasswordFormError("Can't reach the server. Check your connection and try again.");
+        return;
+      }
+      setPasswordSuccess(true);
+      resetPasswordForm();
+      setShowChangePassword(false);
+    } finally {
+      setPasswordSubmitting(false);
+    }
+  }
+
+  // ── Sign out ──────────────────────────────────────────────────────────────
 
   function handleSignOut() {
     Alert.alert(
@@ -39,28 +92,114 @@ export default function SettingsScreen() {
     );
   }
 
+  // ── Render ────────────────────────────────────────────────────────────────
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0A0A0B' }}>
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingTop: 32,
+          paddingBottom: 48,
         }}
       >
         {/* ── Account section ─────────────────────────────────────────────── */}
         <Text
           style={{
-            fontFamily: 'Noto Serif',
+            fontFamily: 'NotoSerif-Bold',
             fontSize: 24,
             fontWeight: '700',
             color: '#E5E2E1',
           }}
+          allowFontScaling={false}
         >
           Account
         </Text>
 
-        <View style={{ height: 8 }} />
+        <View style={{ height: 16 }} />
 
+        {/* Change Password */}
+        <Pressable
+          onPress={() => {
+            setShowChangePassword((v) => !v);
+            if (showChangePassword) resetPasswordForm();
+          }}
+        >
+          <Text
+            style={{
+              fontFamily: 'Manrope',
+              fontSize: 16,
+              fontWeight: '400',
+              color: '#E5E2E1',
+            }}
+            allowFontScaling={false}
+          >
+            Change Password
+          </Text>
+        </Pressable>
+
+        {showChangePassword ? (
+          <View style={{ marginTop: 16 }}>
+            {/* Current password not required by Supabase updateUser — kept for UX clarity */}
+            <Label>Current password</Label>
+            <View style={{ height: 4 }} />
+            <TextInput
+              variant="password"
+              placeholder="Your current password"
+              value={currentPassword}
+              onChangeText={setCurrentPassword}
+              testID="current-password-input"
+            />
+
+            <View style={{ height: 12 }} />
+            <Label>New password</Label>
+            <View style={{ height: 4 }} />
+            <TextInput
+              variant="password"
+              placeholder="At least 8 characters"
+              value={newPassword}
+              onChangeText={setNewPassword}
+              testID="new-password-input"
+            />
+
+            <View style={{ height: 12 }} />
+            <Label>Confirm new password</Label>
+            <View style={{ height: 4 }} />
+            <TextInput
+              variant="password"
+              placeholder="Repeat new password"
+              value={confirmNewPassword}
+              onChangeText={setConfirmNewPassword}
+              testID="confirm-new-password-input"
+            />
+
+            {passwordFormError ? (
+              <>
+                <View style={{ height: 8 }} />
+                <HelperText variant="error">{passwordFormError}</HelperText>
+              </>
+            ) : null}
+
+            <View style={{ height: 16 }} />
+            <Button
+              variant="primary"
+              label="Update password"
+              loading={passwordSubmitting}
+              onPress={handleChangePassword}
+            />
+          </View>
+        ) : null}
+
+        {passwordSuccess ? (
+          <>
+            <View style={{ height: 8 }} />
+            <HelperText variant="success">Password updated.</HelperText>
+          </>
+        ) : null}
+
+        <View style={{ height: 16 }} />
+
+        {/* Sign Out */}
         <Pressable onPress={handleSignOut}>
           <Text
             style={{
@@ -69,26 +208,28 @@ export default function SettingsScreen() {
               fontWeight: '400',
               color: '#EF4444',
             }}
+            allowFontScaling={false}
           >
             Sign out
           </Text>
         </Pressable>
 
-        <View style={{ height: 24 }} />
+        <View style={{ height: 32 }} />
 
         {/* ── Appearance section ───────────────────────────────────────────── */}
         <Text
           style={{
-            fontFamily: 'Noto Serif',
+            fontFamily: 'NotoSerif-Bold',
             fontSize: 24,
             fontWeight: '700',
             color: '#E5E2E1',
           }}
+          allowFontScaling={false}
         >
           Appearance
         </Text>
 
-        <View style={{ height: 8 }} />
+        <View style={{ height: 16 }} />
 
         <View
           style={{
@@ -104,6 +245,7 @@ export default function SettingsScreen() {
               fontWeight: '400',
               color: '#E5E2E1',
             }}
+            allowFontScaling={false}
           >
             {theme === 'dark' ? 'Dark mode' : 'Light mode'}
           </Text>
@@ -115,29 +257,31 @@ export default function SettingsScreen() {
           />
         </View>
 
-        <View style={{ height: 24 }} />
+        <View style={{ height: 32 }} />
 
         {/* ── Two-factor authentication section ───────────────────────────── */}
         <Text
           style={{
-            fontFamily: 'Noto Serif',
+            fontFamily: 'NotoSerif-Bold',
             fontSize: 24,
             fontWeight: '700',
             color: '#E5E2E1',
           }}
+          allowFontScaling={false}
         >
           Two-factor authentication
         </Text>
 
-        <View style={{ height: 8 }} />
+        <View style={{ height: 16 }} />
 
         <Text
           style={{
             fontFamily: 'Manrope',
             fontSize: 16,
-            fontWeight: '400',
+            fontWeight: '700',
             color: '#E5E2E1',
           }}
+          allowFontScaling={false}
         >
           Set up SMS verification
         </Text>
@@ -151,8 +295,9 @@ export default function SettingsScreen() {
             fontWeight: '400',
             color: '#99907C',
           }}
+          allowFontScaling={false}
         >
-          Manage two-factor authentication in your Supabase account settings.
+          {'Manage two-factor authentication in your Supabase account settings.\n\nTo enable SMS MFA: Supabase Dashboard → Authentication → MFA → Phone → Enable. Full in-app enrollment flow coming in a future update.'}
         </Text>
       </ScrollView>
     </SafeAreaView>

@@ -1,5 +1,13 @@
 appId: com.razeandrise.app
-# TODO: complete in 01b-auth plan (requires real device)
-
-flows:
-  - launchApp
+# Google OAuth requires a real device with a Google account — automated test runs on real device only.
+# TODO: Manual verification steps:
+#   1. Tap "Continue with Google"
+#   2. Safari in-app browser opens with Google auth page
+#   3. Sign in with Google account
+#   4. Redirected back to app with session created (razeandrise://auth-callback)
+#   5. Verify Dashboard is visible
+---
+- launchApp
+- waitForAnimationToEnd
+- tapOn: "Continue with Google"
+- assertVisible: "Continue"
