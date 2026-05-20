@@ -7,7 +7,7 @@
 
 ## Phases
 
-- [>] **Phase 1: Foundation** — Expo bare workflow, normalized schema + RLS, PowerSync offline sync, MMKV session, all auth providers, EAS Build, v1 migration script, 5-tab nav, onboarding (5/9 plans complete)
+- [>] **Phase 1: Foundation** — Expo bare workflow, normalized schema + RLS, PowerSync offline sync, MMKV session, all auth providers, EAS Build, v1 migration script, 5-tab nav, onboarding (6/9 plans complete)
 - [ ] **Phase 2: Core Session Loop** — Rest timer (background notification), previous performance column, set types, RPE, warm-up flag, supersets, bodyweight exercise, session notes, injury map, Anubis overlay, offline persistence
 - [ ] **Phase 3: Templates, Programs & Progress** — Searchable exercise library + ExerciseDB videos, template builder with supersets, editable history, manual + AI program builder, deload system, progress charts, measurement history, progress photos, gamification
 - [ ] **Phase 4: Premium & AI** — RevenueCat billing (StoreKit + Google Play + Stripe web), premium JWT auth hook, AI coach chat (streaming, rate-limited), AI workout generation, AI meal planning, Instacart MCP, supplement checklist, meal reminders, nutrition from Apple Health
@@ -47,7 +47,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 1 completion)*
 
-- [ ] 01-auth-PLAN.md — Email auth, Google OAuth, Apple Sign-In, password reset, change password, SMS MFA, sign-out
+- [x] 01-auth-PLAN.md — Email auth, Google OAuth, Apple Sign-In, password reset, change password, SMS MFA, sign-out (complete — faa4c4c)
 - [ ] 01-navigation-onboarding-PLAN.md — 5-tab nav, onboarding stack (profile + split + template + practice set + Dashboard), notification preference
 - [ ] 01-migration-PLAN.md — v1 migration Edge Function, client trigger + polling, migration progress screen
 
@@ -155,7 +155,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/6 | Not started | - |
+| 1. Foundation | 6/9 | In progress | - |
 | 2. Core Session Loop | 0/? | Not started | - |
 | 3. Templates, Programs & Progress | 0/? | Not started | - |
 | 4. Premium & AI | 0/? | Not started | - |

@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Plan 01d (scaffold-routing) complete. Wave 2 done. Next: Wave 3 plans (01e auth, 01f onboarding)."
-last_updated: "2026-05-20T03:27:00.000Z"
-last_activity: 2026-05-20 -- Plan 01d complete (routing shell + 5-tab nav + screen stubs, ~7 min)
+stopped_at: "Plan 01-03 (auth) complete. Commits 71381c5 (TDD RED), c5dd2b5 (GREEN — auth services), faa4c4c (AuthScreen + screens + Maestro). Next: 01-onboarding plan (Wave 3 continuing)."
+last_updated: "2026-05-20T03:44:14.214Z"
+last_activity: 2026-05-20
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 9
-  completed_plans: 5
-  percent: 56
+  completed_plans: 7
+  percent: 0
 ---
 
 # Project State
@@ -26,14 +26,14 @@ See: .planning/PROJECT.md (updated 2026-05-18)
 ## Current Position
 
 Phase: 1 of 6 (Foundation)
-Plan: 6 of 9 in current phase (01e auth — next, Wave 3)
-Status: Executing — Wave 2 complete (01c + 01d done)
-Last activity: 2026-05-20 -- Plan 01d complete (routing shell + 5-tab nav + screen stubs, ~7 min)
+Plan: 8 of 9 in current phase (01-onboarding — next, Wave 3 continuing)
+Status: Ready to execute
+Last activity: 2026-05-20
 
-Progress: [█████░░░░░] 56%
+Progress: [████████░░] 78%
 
 ```
-Phase 1: Foundation          [>] In progress (5/9 plans complete)
+Phase 1: Foundation          [>] In progress (6/9 plans complete)
 Phase 2: Core Session Loop   [ ] Not started
 Phase 3: Templates, Programs & Progress  [ ] Not started
 Phase 4: Premium & AI        [ ] Not started
@@ -45,15 +45,15 @@ Phase 6: Polish & Platform   [ ] Not started
 
 **Velocity:**
 
-- Total plans completed: 5
-- Average duration: 14 min
-- Total execution time: 1.2 hours
+- Total plans completed: 6
+- Average duration: 13 min
+- Total execution time: ~1.4 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 — Foundation | 5/9 | 71 min | 14 min |
+| 1 — Foundation | 6/9 | 79 min | 13 min |
 | 2 — Core Session Loop | 0/? | — | — |
 | 3 — Templates, Programs & Progress | 0/? | — | — |
 | 4 — Premium & AI | 0/? | — | — |
@@ -62,8 +62,8 @@ Phase 6: Polish & Platform   [ ] Not started
 
 **Recent Trend:**
 
-- Last 5 plans: 01a (13 min), 01b (25 min), 01c (6 min), 01d (7 min)
-- Trend: fast and consistent — routing shell and screen stubs completed cleanly; 3 minor Rule 1/3 auto-fixes
+- Last 5 plans: 01a (13 min), 01b (25 min), 01c (6 min), 01d (7 min), 01-03 (8 min)
+- Trend: fast and consistent — auth services + full AuthScreen implemented cleanly; 2 minor Rule 1 auto-fixes
 
 *Updated after each plan completion*
 
@@ -78,6 +78,15 @@ Key decisions relevant to Phase 1 (01a additions):
 - **react-native version:** 0.82.1 (not 0.81.5 from template) — required by react-native-screens@4.25.1 in expo-router@55
 - **TypeScript version:** 6.x installed; ignoreDeprecations: '6.0' added to tsconfig for baseUrl compatibility
 - **Install flags:** --legacy-peer-deps required for all installs due to React 19/ecosystem peer dep gaps
+
+Key decisions relevant to Phase 1 (01-03 auth additions):
+
+- **Auth errors:** Inline HelperText only — zero toast/snackbar; single Alert.alert exception for sign-out confirmation
+- **Apple Sign-In platform guard:** Platform.OS !== 'ios' throws in apple.ts; renders null in AuthScreen (never shows error on Android)
+- **Google OAuth token parsing:** Hash fragment (not query string) per T-03-S-03 threat mitigation
+- **ForgotPassword generic copy:** Never confirm whether email exists in system (T-03-I-01)
+- **react-hook-form validation timing:** onBlur + reValidateMode: onBlur — no on-change validation
+- **Shimmer animation:** Deferred to Phase 2 — solid accent color used for wordmark
 
 Key decisions relevant to Phase 1 (01d additions):
 
@@ -150,4 +159,4 @@ Items carried forward from pre-v2 planning and explicitly deferred:
 ## Session Continuity
 
 Last session: 2026-05-20
-Stopped at: Plan 01d (scaffold-routing) complete. Commits 1d51208 (TDD RED), e065be0 (Task 1 layouts), 806d8f5 (Task 2 screens). Next: Wave 3 — Plan 01e (auth), Plan 01f (onboarding navigation).
+Stopped at: Plan 01-03 (auth) complete. Commits 71381c5 (TDD RED), c5dd2b5 (GREEN — auth services), faa4c4c (AuthScreen + screens + Maestro). Next: 01-onboarding plan (Wave 3 continuing).
