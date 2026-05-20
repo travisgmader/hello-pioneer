@@ -1,1 +1,59 @@
-/* Placeholder — populated in Task 1.2 */
+/*
+ * Family Hub 2.0 — base globals.
+ * Ported from v1 `../family-app/src/index.css` lines 218–271 with ONE
+ * substitution: body font-size is 16px (v1 was 15px) per UI-SPEC §Typography.
+ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: 14px;
+}
+
+h1, h2, h3, h4 {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ── Mobile globals ───────────────────────────────────── */
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+
+  /* Ensure tappable elements meet 44px minimum */
+  button { min-height: 36px; }
+
+  /* Space for fixed bottom tab bar */
+  main {
+    padding-bottom: calc(64px + max(env(safe-area-inset-bottom, 12px), 12px));
+  }
+
+  footer {
+    margin-bottom: calc(64px + max(env(safe-area-inset-bottom, 12px), 12px));
+  }
+}
