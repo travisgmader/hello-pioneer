@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 1 planned — 7 plans in 6 waves, ready to execute
-last_updated: "2026-05-20T07:00:00.000Z"
-last_activity: 2026-05-20 — Phase 1 planned; 7 plans across 6 waves (Walking Skeleton, MVP mode); all requirements covered and verification passed
+status: executing
+stopped_at: Phase 1 UI-SPEC approved
+last_updated: "2026-05-20T14:44:53.080Z"
+last_activity: 2026-05-20 -- Phase 01 execution started
 progress:
   total_phases: 10
   completed_phases: 0
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-19)
 
 **Core value:** Every family member always knows what needs doing, what's coming up, and who has the kids today — and gets a push notification when it actually matters.
-**Current focus:** Phase 1 — Foundation & Walking Skeleton
+**Current focus:** Phase 01 — foundation-walking-skeleton
 
 ## Current Position
 
-Phase: 1 of 10 (Foundation & Walking Skeleton)
-Plan: 0 of 7 in current phase
-Status: Ready to execute
-Last activity: 2026-05-20 — Phase 1 planned; 7 plans across 6 waves (Walking Skeleton, MVP mode); verification passed
+Phase: 01 (foundation-walking-skeleton) — EXECUTING
+Plan: 1 of 7
+Status: Executing Phase 01
+Last activity: 2026-05-20 -- Phase 01 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
