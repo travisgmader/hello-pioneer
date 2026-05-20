@@ -1,0 +1,92 @@
+/*
+ * Route error boundary fallback styles.
+ *
+ * Token-driven (CSS variables only — never raw hex). Buttons stack on
+ * mobile, sit side-by-side on desktop per UI-SPEC §Interaction Contracts
+ * row "Error boundary fallback".
+ */
+
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--bg);
+}
+
+.card {
+  max-width: 480px;
+  width: 100%;
+  background: var(--card-bg);
+  padding: 24px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title {
+  color: var(--pink-dark);
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.body {
+  color: var(--text);
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.primary {
+  flex: 1;
+  background: var(--lavender);
+  color: white;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  min-height: 44px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary:hover {
+  background: var(--lavender-dark);
+}
+
+.secondary {
+  flex: 1;
+  background: transparent;
+  color: var(--text);
+  text-decoration: none;
+  padding: 12px 20px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.secondary:hover {
+  background: var(--lavender-light);
+}
+
+@media (max-width: 768px) {
+  .actions {
+    flex-direction: column;
+  }
+}
