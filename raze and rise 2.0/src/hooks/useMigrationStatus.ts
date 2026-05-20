@@ -16,13 +16,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-
-export type MigrationStatus =
-  | 'none'
-  | 'pending'
-  | 'in_progress'
-  | 'complete'
-  | 'failed';
+import type { MigrationStatus } from '@/services/migration';
 
 interface UseMigrationStatusResult {
   migrationStatus: MigrationStatus;
@@ -31,34 +25,29 @@ interface UseMigrationStatusResult {
 
 const POLLING_STATUSES: MigrationStatus[] = ['pending', 'in_progress'];
 
-export function useMigrationStatus(userId?: string): UseMigrationStatusResult {
-  const { data, isPending } = useQuery({
-    queryKey: ['migration-status', userId],
+export function useMigrationStatus(
+  userId: string | undefined,
+): UseMigrationStatusResult {
+  const { data, isLoading } = useQuery<MigrationStatus | null>({
+    queryKey: ['migration_status', userId],
     queryFn: async () => {
       if (!userId) return null;
-
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('profiles')
         .select('migration_status')
         .eq('user_id', userId)
         .single();
-
-      if (error) throw error;
-      return data as { migration_status: MigrationStatus } | null;
+      return (data?.migration_status as MigrationStatus) ?? 'none';
     },
-    enabled: Boolean(userId),
+    enabled: !!userId,
     refetchInterval: (query) => {
-      const status = (query.state.data as { migration_status: MigrationStatus } | null)
-        ?.migration_status;
+      const status = query.state.data;
       return status && POLLING_STATUSES.includes(status) ? 2000 : false;
     },
   });
 
-  const migrationStatus: MigrationStatus =
-    (data?.migration_status) ?? 'none';
-
   return {
-    migrationStatus,
-    loading: isPending && Boolean(userId),
+    migrationStatus: data ?? 'none',
+    loading: isLoading,
   };
 }
