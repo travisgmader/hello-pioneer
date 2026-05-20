@@ -213,41 +213,142 @@
 
 ## Traceability
 
-*Populated during roadmap creation.*
+Every v1 requirement is mapped to exactly one phase below. Phases are defined in `.planning/ROADMAP.md`.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ARCH-01 through ARCH-13 | Phase 1 | Pending |
-| ONBD-01 through ONBD-05 | Phase 1–2 | Pending |
-| MEMB-01 through MEMB-07 | Phase 2 | Pending |
-| CHOR-01 through CHOR-07 | Phase 3 | Pending |
-| CALE-01 through CALE-07 | Phase 4 | Pending |
-| CUST-01 through CUST-07 | Phase 4 | Pending |
-| MEAL-01 through MEAL-04 | Phase 5 | Pending |
-| GROC-01 through GROC-06 | Phase 5 | Pending |
-| NOTE-01 through NOTE-02 | Phase 5 | Pending |
-| NOTF-01 through NOTF-09 | Phase 6 | Pending |
-| PAGE-01 through PAGE-04 | Phase 7 | Pending |
+| ARCH-01 | Phase 1 | Pending |
+| ARCH-02 | Phase 1 | Pending |
+| ARCH-03 | Phase 1 | Pending |
+| ARCH-04 | Phase 1 | Pending |
+| ARCH-05 | Phase 1 | Pending |
+| ARCH-06 | Phase 1 | Pending |
+| ARCH-07 | Phase 1 | Pending |
+| ARCH-08 | Phase 1 | Pending |
+| ARCH-09 | Phase 1 | Pending |
+| ARCH-10 | Phase 1 | Pending |
+| ARCH-11 | Phase 1 | Pending |
+| ARCH-12 | Phase 10 | Pending |
+| ARCH-13 | Phase 1 | Pending |
+| ONBD-01 | Phase 1 | Pending |
+| ONBD-02 | Phase 2 | Pending |
+| ONBD-03 | Phase 2 | Pending |
+| ONBD-04 | Phase 2 | Pending |
+| ONBD-05 | Phase 2 | Pending |
+| MEMB-01 | Phase 2 | Pending |
+| MEMB-02 | Phase 2 | Pending |
+| MEMB-03 | Phase 2 | Pending |
+| MEMB-04 | Phase 2 | Pending |
+| MEMB-05 | Phase 2 | Pending |
+| MEMB-06 | Phase 2 | Pending |
+| MEMB-07 | Phase 2 | Pending |
+| CHOR-01 | Phase 3 | Pending |
+| CHOR-02 | Phase 3 | Pending |
+| CHOR-03 | Phase 3 | Pending |
+| CHOR-04 | Phase 3 | Pending |
+| CHOR-05 | Phase 3 | Pending |
+| CHOR-06 | Phase 3 | Pending |
+| CHOR-07 | Phase 3 | Pending |
+| CALE-01 | Phase 4 | Pending |
+| CALE-02 | Phase 4 | Pending |
+| CALE-03 | Phase 4 | Pending |
+| CALE-04 | Phase 4 | Pending |
+| CALE-05 | Phase 4 | Pending |
+| CALE-06 | Phase 4 | Pending |
+| CALE-07 | Phase 4 | Pending |
+| CUST-01 | Phase 4 | Pending |
+| CUST-02 | Phase 4 | Pending |
+| CUST-03 | Phase 4 | Pending |
+| CUST-04 | Phase 4 | Pending |
+| CUST-05 | Phase 4 | Pending |
+| CUST-06 | Phase 4 | Pending |
+| CUST-07 | Phase 4 | Pending |
+| MEAL-01 | Phase 5 | Pending |
+| MEAL-02 | Phase 5 | Pending |
+| MEAL-03 | Phase 5 | Pending |
+| MEAL-04 | Phase 5 | Pending |
+| GROC-01 | Phase 5 | Pending |
+| GROC-02 | Phase 5 | Pending |
+| GROC-03 | Phase 5 | Pending |
+| GROC-04 | Phase 5 | Pending |
+| GROC-05 | Phase 5 | Pending |
+| GROC-06 | Phase 5 | Pending |
+| NOTE-01 | Phase 5 | Pending |
+| NOTE-02 | Phase 5 | Pending |
+| NOTF-01 | Phase 6 | Pending |
+| NOTF-02 | Phase 6 | Pending |
+| NOTF-03 | Phase 6 | Pending |
+| NOTF-04 | Phase 6 | Pending |
+| NOTF-05 | Phase 6 | Pending |
+| NOTF-06 | Phase 6 | Pending |
+| NOTF-07 | Phase 6 | Pending |
+| NOTF-08 | Phase 6 | Pending |
+| NOTF-09 | Phase 6 | Pending |
+| PAGE-01 | Phase 7 | Pending |
+| PAGE-02 | Phase 7 | Pending |
+| PAGE-03 | Phase 7 | Pending |
+| PAGE-04 | Phase 7 | Pending |
 | SRCH-01 | Phase 7 | Pending |
-| SETT-01 through SETT-05 | Phase 7 | Pending |
-| COMP-01 through COMP-04 | Phase 7–8 | Pending |
-| COPR-01 through COPR-04 | Phase 8 | Pending |
-| INFO-01 through INFO-04 | Phase 8 | Pending |
-| RWRD-01 through RWRD-02 | Phase 9 | Pending |
-| ROUT-01 through ROUT-03 | Phase 9 | Pending |
-| JOUR-01 through JOUR-02 | Phase 9 | Pending |
-| AIME-01 through AIME-02 | Phase 9 | Pending |
-| RECP-01 through RECP-02 | Phase 9 | Pending |
-| ARCH-12 (migration) | Phase 10 | Pending |
+| SETT-01 | Phase 7 | Pending |
+| SETT-02 | Phase 7 | Pending |
+| SETT-03 | Phase 7 | Pending |
+| SETT-04 | Phase 7 | Pending |
+| SETT-05 | Phase 7 | Pending |
+| COMP-01 | Phase 7 | Pending |
+| COMP-02 | Phase 7 | Pending |
+| COMP-03 | Phase 7 | Pending |
+| COMP-04 | Phase 7 | Pending |
+| COPR-01 | Phase 8 | Pending |
+| COPR-02 | Phase 8 | Pending |
+| COPR-03 | Phase 8 | Pending |
+| COPR-04 | Phase 8 | Pending |
+| INFO-01 | Phase 8 | Pending |
+| INFO-02 | Phase 8 | Pending |
+| INFO-03 | Phase 8 | Pending |
+| INFO-04 | Phase 8 | Pending |
+| RWRD-01 | Phase 9 | Pending |
+| RWRD-02 | Phase 9 | Pending |
+| ROUT-01 | Phase 9 | Pending |
+| ROUT-02 | Phase 9 | Pending |
+| ROUT-03 | Phase 9 | Pending |
+| JOUR-01 | Phase 9 | Pending |
+| JOUR-02 | Phase 9 | Pending |
+| AIME-01 | Phase 9 | Pending |
+| AIME-02 | Phase 9 | Pending |
+| RECP-01 | Phase 9 | Pending |
+| RECP-02 | Phase 9 | Pending |
 
 **Coverage:**
-- Free tier v1 requirements: 68 total
-- Premium tier v1 requirements: 20 total
-- Total v1 requirements: 88
-- Mapped to phases: 88
-- Unmapped: 0 ✓
+
+| Category | Count | Phase(s) |
+|----------|-------|----------|
+| ARCH | 13 | 12 in Phase 1, ARCH-12 in Phase 10 |
+| ONBD | 5 | ONBD-01 in Phase 1, ONBD-02..05 in Phase 2 |
+| MEMB | 7 | All in Phase 2 |
+| CHOR | 7 | All in Phase 3 |
+| CALE | 7 | All in Phase 4 |
+| CUST | 7 | All in Phase 4 |
+| MEAL | 4 | All in Phase 5 |
+| GROC | 6 | All in Phase 5 |
+| NOTE | 2 | All in Phase 5 |
+| NOTF | 9 | All in Phase 6 |
+| PAGE | 4 | All in Phase 7 |
+| SRCH | 1 | Phase 7 |
+| SETT | 5 | All in Phase 7 |
+| COMP | 4 | All in Phase 7 |
+| COPR | 4 | All in Phase 8 |
+| INFO | 4 | All in Phase 8 |
+| RWRD | 2 | All in Phase 9 |
+| ROUT | 3 | All in Phase 9 |
+| JOUR | 2 | All in Phase 9 |
+| AIME | 2 | All in Phase 9 |
+| RECP | 2 | All in Phase 9 |
+| **Total mapped** | **100** | **All v1 requirement IDs (free + premium)** |
+| Unmapped | 0 | ✓ |
+
+Note: The summary counts here (100 total IDs across 21 categories) are derived from a direct count of unique REQ-IDs in this file. The earlier "68 free + 20 premium = 88" line in this document undercounted some categories; the per-ID table above is the source of truth. Every REQ-ID appears in exactly one phase.
 
 ---
 
 *Requirements defined: 2026-05-19*
-*Last updated: 2026-05-19 after initial definition*
+*Last updated: 2026-05-19 — traceability populated after roadmap creation*
