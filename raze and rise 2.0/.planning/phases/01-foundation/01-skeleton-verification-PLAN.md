@@ -4,7 +4,10 @@ plan: 06
 type: execute
 wave: 4
 depends_on:
-  - 01-scaffold-PLAN.md
+  - 01-scaffold-init-PLAN.md
+  - 01-scaffold-lib-PLAN.md
+  - 01-scaffold-ui-PLAN.md
+  - 01-scaffold-routing-PLAN.md
   - 01-schema-PLAN.md
   - 01-auth-PLAN.md
   - 01-navigation-onboarding-PLAN.md
@@ -24,7 +27,7 @@ requirements:
 must_haves:
   truths:
     - "New user can open app → sign up → complete onboarding → reach Dashboard"
-    - "User can log one set with airplane mode ON; set appears in active session immediately"
+    - "Developer helper in Settings logs a test set offline; set appears in PowerSync local SQLite immediately and syncs to Supabase dashboard on reconnect (full session UI in Phase 2)"
     - "When connectivity returns, the set is visible in Supabase session_sets table"
     - "Session persists across app kill + relaunch (MMKV + SecureStore)"
     - "PowerSync local SQLite database initializes at app launch"
@@ -129,15 +132,15 @@ Query to verify: powersync.execute("SELECT * FROM session_sets WHERE session_id 
     10. Comment: "# The following steps require airplane mode ON — run this section manually on real device"
     11. Comment steps (not automatable inline — document as manual section):
       a. Enable airplane mode on device
-      b. Navigate to Workouts tab (or any screen that has a "Start session" entry point — stub exists in Phase 1)
-      c. Start a new session (stub: manually create session via a test helper if no UI yet)
-      d. Log a set: powersync.execute INSERT into session_sets
-      e. Verify set visible in local SQLite immediately (query powersync)
+      b. Navigate to Settings tab → Developer Tools section
+      c. Tap "Log test set offline" button — this uses the __DEV__ helper added by this plan (not the full workout session UI, which ships in Phase 2)
+      d. Note the session UUID displayed in the status message
+      e. Verify set visible in local SQLite immediately (status message confirms local write succeeded)
       f. Disable airplane mode
       g. Wait 10 seconds
-      h. Verify in Supabase Dashboard: session_sets table contains the set row
+      h. Verify in Supabase Dashboard: session_sets table contains the set row matching the session UUID
 
-    Note: In Phase 1, the full workout session UI lives in Phase 2. The walking skeleton offline set write is verified via a dedicated test helper screen or via direct powersync.execute in a developer-mode settings action, OR via a test component that exposes a "Log test set" button visible only in development builds (process.env.NODE_ENV === 'development').
+    Note: In Phase 1, the full workout session UI lives in Phase 2. The walking skeleton offline set write is verified via the __DEV__ Developer Tools helper in Settings (see Task 1 action below). This matches the reframed must_have: "Developer helper in Settings logs a test set offline; set appears in PowerSync local SQLite immediately and syncs to Supabase dashboard on reconnect".
 
     Add to app/(tabs)/settings.tsx (development-only section):
     If __DEV__: render a "Developer Tools" section with:

@@ -17,7 +17,7 @@ requirements:
 
 must_haves:
   truths:
-    - "10 Postgres tables exist in the Supabase project with correct column types"
+    - "9 Postgres tables exist in the Supabase project with correct column types"
     - "RLS is enabled on every table and all 4 CRUD policies exist per table"
     - "A profile row is auto-created when a new auth.users record is inserted"
     - "supabase db push succeeds with no errors"
@@ -25,7 +25,7 @@ must_haves:
     - "Querying a table as a non-owner returns empty rows (RLS enforcement)"
   artifacts:
     - path: "supabase/migrations/20260519000000_initial_schema.sql"
-      provides: "10 normalized tables with constraints, indexes, and auto-create trigger"
+      provides: "9 normalized tables with constraints, indexes, and auto-create trigger"
       contains: "CREATE TABLE public.profiles, CREATE TABLE public.sessions, CREATE TABLE public.session_sets, handle_new_user"
     - path: "supabase/migrations/20260519000100_rls_policies.sql"
       provides: "RLS enabled + 4 CRUD policies per table"
@@ -65,13 +65,13 @@ user_setup:
 ---
 
 <objective>
-This plan creates the complete normalized Supabase schema for v2 — 10 tables, RLS policies on every table (all 4 CRUD operations), a PowerSync replication role, and a Postgres publication. Then runs [BLOCKING] supabase db push to deploy the schema to the live Supabase project. Finally generates TypeScript types from the deployed schema.
+This plan creates the complete normalized Supabase schema for v2 — 9 tables, RLS policies on every table (all 4 CRUD operations), a PowerSync replication role, and a Postgres publication. Then runs [BLOCKING] supabase db push to deploy the schema to the live Supabase project. Finally generates TypeScript types from the deployed schema.
 
 This plan runs in Wave 1 parallel with the scaffold plan (01-scaffold-PLAN.md) — they share no files.
 
 Purpose: Without the deployed schema, all Phase 1 auth, onboarding, migration, and sync tasks cannot be verified against real Supabase rows. The schema must be live before Wave 2 auth integration begins.
 
-Output: All 10 tables deployed to jmtogdlsgpfoefbgdubm with RLS enabled, PowerSync publication active, and TypeScript types generated.
+Output: All 9 tables deployed to jmtogdlsgpfoefbgdubm with RLS enabled, PowerSync publication active, and TypeScript types generated.
 </objective>
 
 <execution_context>
@@ -121,7 +121,7 @@ PowerSync setup (migration 000200):
     Create three SQL migration files under supabase/migrations/. Initialize the supabase directory first with `supabase init` if not already present, then `supabase link --project-ref jmtogdlsgpfoefbgdubm`.
 
     File 1: supabase/migrations/20260519000000_initial_schema.sql
-    Create all 10 tables in this exact order (respects foreign key dependencies):
+    Create all 9 tables in this exact order (respects foreign key dependencies):
     1. profiles — user_id uuid PK REFERENCES auth.users ON DELETE CASCADE; display_name text; units text NOT NULL DEFAULT 'lbs' CHECK (units IN ('lbs','kg')); primary_goal text; age int; height_cm real; sex text CHECK (sex IN ('male','female','other',NULL)); onboarded boolean NOT NULL DEFAULT false; migration_status text NOT NULL DEFAULT 'none' CHECK (migration_status IN ('none','pending','in_progress','complete','failed')); created_at + updated_at timestamptz NOT NULL DEFAULT now(). Index: idx_profiles_user_id.
     2. split_settings — user_id uuid PK REFERENCES auth.users ON DELETE CASCADE; split_type text NOT NULL; rotation_pointer int NOT NULL DEFAULT 0; phase int NOT NULL DEFAULT 0; phase_started_at timestamptz; weeks_in_phase int NOT NULL DEFAULT 0; deload_active boolean NOT NULL DEFAULT false; global_rest_seconds int NOT NULL DEFAULT 90; weight_method text NOT NULL DEFAULT 'manual'; updated_at timestamptz NOT NULL DEFAULT now(). Index: idx_split_settings_user_id.
     3. exercises — id uuid PK DEFAULT gen_random_uuid(); name text NOT NULL; muscle_group text; equipment text; type text NOT NULL DEFAULT 'strength' CHECK (type IN ('strength','bodyweight','run','cardio')); exercisedb_video_id text; is_custom boolean NOT NULL DEFAULT false; created_by uuid REFERENCES auth.users ON DELETE CASCADE; created_at timestamptz NOT NULL DEFAULT now(). Indexes: idx_exercises_created_by, idx_exercises_muscle_group.
@@ -151,9 +151,15 @@ PowerSync setup (migration 000200):
     Add comment explaining the POWERSYNC_ROLE_PASSWORD placeholder must be replaced before pushing.
   </action>
   <verify>
-    <automated>npx tsc --noEmit</automated>
+    <automated>npx tsc --noEmit && grep -c "ENABLE ROW LEVEL SECURITY" supabase/migrations/20260519000100_rls_policies.sql && grep -c "CREATE TABLE" supabase/migrations/20260519000000_initial_schema.sql && ls supabase/migrations/ | wc -l</automated>
+    <!-- SQL correctness (RLS policies, triggers) is only fully verifiable post-deploy via the Task 2 human checkpoint.
+         The grep structural checks above are the best pre-deploy signal: they confirm RLS was applied to all 9 tables
+         and all 9 CREATE TABLE statements exist. Exact policy logic is verified in Task 2 via Supabase Dashboard. -->
   </verify>
   <acceptance_criteria>
+    - `grep -c "ENABLE ROW LEVEL SECURITY" supabase/migrations/20260519000100_rls_policies.sql` returns 9
+    - `grep -c "CREATE TABLE" supabase/migrations/20260519000000_initial_schema.sql` returns 9
+    - `ls supabase/migrations/ | wc -l` returns 3
     - `ls supabase/migrations/` shows 3 files with the exact timestamps 20260519000000, 20260519000100, 20260519000200
     - `grep "ENABLE ROW LEVEL SECURITY" supabase/migrations/20260519000100_rls_policies.sql | wc -l` returns 9 or more (one per table)
     - `grep "SELECT auth.uid()" supabase/migrations/20260519000100_rls_policies.sql` returns matches (cached form used)
@@ -182,12 +188,12 @@ PowerSync setup (migration 000200):
     1. Replace ${POWERSYNC_ROLE_PASSWORD} in 20260519000200_powersync_setup.sql with a real password.
     2. Run: `supabase db push`
     3. Confirm the command succeeds with no errors.
-    4. Verify in Supabase Dashboard → Table Editor: you should see all 10 tables: profiles, split_settings, exercises, templates, template_exercises, sessions, session_sets, measurements, notification_preferences.
+    4. Verify in Supabase Dashboard → Table Editor: you should see all 9 tables: profiles, split_settings, exercises, templates, template_exercises, sessions, session_sets, measurements, notification_preferences.
     5. Click on profiles table → click the lock icon or go to Authentication → Policies — confirm RLS is enabled and policies exist.
     6. Run: `npm run gen:types` — this runs `supabase gen types typescript --project-id jmtogdlsgpfoefbgdubm > src/types/database.ts`. Confirm src/types/database.ts is created.
     7. Run: `npx tsc --noEmit` — confirm it still passes with the generated types file.
   </how-to-verify>
-  <resume-signal>Type "schema deployed" when supabase db push succeeds and all 10 tables are visible in the Supabase dashboard. If push fails, paste the error output.</resume-signal>
+  <resume-signal>Type "schema deployed" when supabase db push succeeds and all 9 tables are visible in the Supabase dashboard. If push fails, paste the error output.</resume-signal>
 </task>
 
 <task type="auto">
@@ -256,7 +262,7 @@ PowerSync setup (migration 000200):
 </threat_model>
 
 <verification>
-1. `supabase sql "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name"` — returns all 10 expected tables
+1. `supabase sql "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name"` — returns all 9 expected tables
 2. `supabase sql "SELECT tablename FROM pg_policies WHERE schemaname='public' ORDER BY tablename, cmd"` — returns 4+ policies per table
 3. `supabase sql "SELECT count(*) FROM public.exercises WHERE is_custom = false"` — returns >= 20
 4. `npx tsc --noEmit` exits 0 with generated types
@@ -265,7 +271,7 @@ PowerSync setup (migration 000200):
 </verification>
 
 <success_criteria>
-- All 10 v2 normalized tables deployed to Supabase project jmtogdlsgpfoefbgdubm (FOUND-07)
+- All 9 v2 normalized tables deployed to Supabase project jmtogdlsgpfoefbgdubm (FOUND-07)
 - RLS enabled on every table with all 4 CRUD policies per table (FOUND-07)
 - PowerSync replication role and publication configured (FOUND-06 server-side)
 - Profile auto-create trigger functional (DATA-01 foundation)

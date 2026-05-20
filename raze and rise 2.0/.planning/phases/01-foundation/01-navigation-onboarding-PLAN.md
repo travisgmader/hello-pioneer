@@ -6,6 +6,7 @@ wave: 3
 depends_on:
   - 01-auth-PLAN.md
   - 01-schema-PLAN.md
+  - 01-scaffold-routing-PLAN.md
 files_modified:
   - app/(onboarding)/profile.tsx
   - app/(onboarding)/split.tsx
@@ -39,19 +40,20 @@ requirements:
 must_haves:
   truths:
     - "New user sees onboarding full-screen (no tabs visible) on first launch"
-    - "Profile step (step 1 of 4) requires display name before Continue is enabled"
+    - "Profile step (step 1 of 4) collects display name, units, primary goal, age, height, sex, weight, and body fat % — Continue enabled only when display name is non-empty"
     - "Split step (step 2 of 4) requires selecting a split type"
     - "Template step (step 3 of 4) requires selecting a starter template"
     - "Practice set step (step 4 of 4) has a Skip button — the ONLY Skip button in onboarding"
     - "After completing/skipping step 4, user lands on Dashboard and sees their display name"
     - "Profile + split + template rows exist in Supabase after onboarding completes"
+    - "Initial measurements row (weight_kg, body_fat_pct) written to measurements table on profile step completion (ONBOARD-02)"
     - "Back navigation within onboarding works; back from step 1 signs out and returns to auth"
     - "Onboarding complete flag (onboarding.complete in MMKV + profiles.onboarded in Supabase) set on finish"
     - "Notification preference time is saved during onboarding (step 4 or profile step)"
     - "All 5 tabs render with correct Lucide icons and labels; active tab is accent-colored"
   artifacts:
     - path: "app/(onboarding)/profile.tsx"
-      provides: "Step 1: display name + units + primary goal"
+      provides: "Step 1: display name + units + primary goal + age + height + sex + weight + body fat % (ONBOARD-02)"
     - path: "app/(onboarding)/split.tsx"
       provides: "Step 2: split type picker with weekly schedule previews"
     - path: "app/(onboarding)/template.tsx"
@@ -66,8 +68,12 @@ must_haves:
   key_links:
     - from: "app/(onboarding)/profile.tsx"
       to: "supabase.from('profiles').update"
-      via: "profile row updated with display_name, units, primary_goal on step 1 complete"
+      via: "profile row updated with display_name, units, primary_goal, age, height_cm, sex on step 1 complete (per ONBOARD-02)"
       pattern: "profiles.*update"
+    - from: "app/(onboarding)/profile.tsx"
+      to: "supabase.from('measurements').insert"
+      via: "initial measurements row (weight_kg, body_fat_pct) inserted on step 1 complete (per ONBOARD-02)"
+      pattern: "measurements.*insert"
     - from: "app/(onboarding)/split.tsx"
       to: "supabase.from('split_settings').upsert"
       via: "split_settings row created/updated on step 2 complete"
@@ -100,7 +106,7 @@ Output: Full onboarding flow completable end-to-end. Dashboard renders with user
 @.planning/phases/01-foundation/01-RESEARCH.md
 @.planning/phases/01-foundation/01-UI-SPEC.md
 @.planning/phases/01-foundation/01-SKELETON.md
-@.planning/phases/01-foundation/01-scaffold-SUMMARY.md
+@.planning/phases/01-foundation/01-scaffold-routing-SUMMARY.md
 @.planning/phases/01-foundation/01-schema-SUMMARY.md
 @.planning/phases/01-foundation/01-auth-SUMMARY.md
 
@@ -116,7 +122,8 @@ MMKV keys:
   "onboarding.selectedTemplateId" → uuid string
 
 Supabase rows written by onboarding:
-  profiles: display_name, units, primary_goal, onboarded (set to true on completion)
+  profiles: display_name, units, primary_goal, age, height_cm, sex, onboarded (set to true on completion) — per ONBOARD-02
+  measurements: weight_kg, body_fat_pct — initial row inserted on profile step completion (per ONBOARD-02)
   split_settings: split_type, rotation_pointer=0, phase=0
   templates + template_exercises: from starter-templates.json, inserted for user
   notification_preferences: workout_reminder_time (from ONBOARD-06)
@@ -165,7 +172,7 @@ Added to Step 4 (PracticeSetCard) layout: Label "Preferred workout time" + a tim
     .planning/phases/01-foundation/01-UI-SPEC.md (Onboarding Step Layout wireframe, Step 1-4 content, Component Inventory — ProfileStep, SplitSelector, TemplateBuilder stub, PracticeSetCard, Copywriting Contract onboarding sections)
     .planning/phases/01-foundation/CONTEXT.md (Decision 2 — all steps required, practice set optional; Decision 4b — no tabs during onboarding)
     supabase/starter-templates.json (created in 01-schema-PLAN.md — read the structure before writing template.tsx)
-    src/hooks/useOnboardingState.ts (current implementation from 01-scaffold-PLAN.md)
+    src/hooks/useOnboardingState.ts (current implementation from 01-scaffold-lib-PLAN.md)
   </read_first>
   <behavior>
     - OnboardingStepLayout: step 1 hides back button; steps 2-4 show ChevronLeft back button
@@ -177,7 +184,8 @@ Added to Step 4 (PracticeSetCard) layout: Label "Preferred workout time" + a tim
     - SplitSelector: Continue enabled only when a split option is selected; selected card has border-strong + accent-dim bg + Check icon
     - TemplateBuilder stub: Continue enabled only when a template is selected
     - PracticeSetCard: has both "Skip for now" (ghost) and "Try it" (primary) CTAs — the ONLY screen with Skip
-    - Completing profile step: writes to MMKV onboarding.displayName/units/goal AND calls supabase.from('profiles').update
+    - Completing profile step: writes to MMKV onboarding.displayName/units/goal AND calls supabase.from('profiles').update with display_name, units, primary_goal, age, height_cm, sex (per ONBOARD-02)
+    - If weight or bodyFat entered in profile step: inserts initial measurements row into supabase.from('measurements') with weight_kg (converted from lbs if needed) and body_fat_pct (per ONBOARD-02)
     - Completing split step: writes to MMKV onboarding.splitType AND calls supabase.from('split_settings').upsert
     - Completing template step: writes template + template_exercises rows to Supabase AND stores template UUID in MMKV
     - Completing practice-set (or Skip): sets MMKV onboarding.complete="true" AND updates profiles.onboarded=true in Supabase
@@ -199,14 +207,24 @@ Added to Step 4 (PracticeSetCard) layout: Label "Preferred workout time" + a tim
     Safe area bottom padding.
 
     app/(onboarding)/profile.tsx + src/components/ProfileStep/index.tsx:
-    Renders inside OnboardingStepLayout (step=1, onBack=signOut+navigate). Content:
-    - Label "Display name" + TextInput (text variant, placeholder "What should we call you?") — react-hook-form field, value persists to MMKV onboarding.displayName on change
-    - Label "Preferred units" + Toggle binary ("lbs" | "kg") — default "lbs", persists to MMKV onboarding.units, fires Haptics.selectionAsync() on toggle
-    - Label "Primary goal" + 2×2 grid of Chip components: Strength (Dumbbell icon), Hypertrophy (Flame icon), Fat Loss (TrendingDown icon), General Fitness (Activity icon) — selected chip persists to MMKV onboarding.goal; Haptics.impactAsync(Light) on selection
+    Renders inside OnboardingStepLayout (step=1, onBack=signOut+navigate). Content (single screen, fields laid out in 2-column grid below name/units/goal per ONBOARD-02):
+    - Label "Display name" + TextInput (text variant, placeholder "What should we call you?") — react-hook-form field, value persists to MMKV onboarding.displayName on change. Full-width row.
+    - Label "Preferred units" + Toggle binary ("lbs" | "kg") — default "lbs", persists to MMKV onboarding.units, fires Haptics.selectionAsync() on toggle. Full-width row.
+    - Label "Primary goal" + 2×2 grid of Chip components: Strength (Dumbbell icon), Hypertrophy (Flame icon), Fat Loss (TrendingDown icon), General Fitness (Activity icon) — selected chip persists to MMKV onboarding.goal; Haptics.impactAsync(Light) on selection. Full-width section.
+    - md gap, then 2-column row layout for the remaining fields (per ONBOARD-02 — required for bodyweight exercise type and macro calculator):
+      Left column: Label "Age" + TextInput (numeric, keyboardType="number-pad", placeholder "25")
+      Right column: Label "Sex" + a segmented control (3-option Chip group: Male, Female, Other) — compact, single-row
+    - md gap, then 2-column row layout:
+      Left column: Label "Height ({units == lbs ? "in" : "cm"})" + TextInput (numeric, placeholder units == lbs ? "70" : "178") — units-aware label
+      Right column: Label "Weight ({units == lbs ? "lbs" : "kg"})" + TextInput (numeric, placeholder units == lbs ? "175" : "80")
+    - md gap, full-width: Label "Body fat %" + TextInput (numeric, keyboardType="decimal-pad", placeholder "15") + Caption "(optional)" in fg-muted
+    - All numeric fields are optional except display name. No validation blocking on measurement fields — Continue enabled when displayName.trim().length >= 1 only.
+    - Values stored in local react-hook-form state until Continue; NOT written to MMKV (measurement data goes straight to Supabase on step completion).
     Continue enabled when displayName.trim().length >= 1. On Continue:
     1. Set MMKV onboarding.step="1"
-    2. Update supabase profiles: { display_name: displayName, units, primary_goal: goal } — handle error (show HelperText error)
-    3. Navigate to (onboarding)/split
+    2. Update supabase profiles: { display_name: displayName, units, primary_goal: goal, age: parsedAge, height_cm: parsedHeightCm, sex: selectedSex } — convert height from inches to cm if units == lbs (multiply by 2.54). Handle null/empty values gracefully (null columns permitted). Handle error (show HelperText error under the Continue button).
+    3. If weight or bodyFat were entered: Insert initial measurements row — supabase.from("measurements").insert({ id: Crypto.randomUUID(), user_id, measured_at: new Date().toISOString(), weight_kg: units == "lbs" ? lbs * 0.45359237 : kg, body_fat_pct: parsedBodyFat }). Convert lbs → kg using multiply 0.45359237.
+    4. Navigate to (onboarding)/split
 
     app/(onboarding)/split.tsx + src/components/SplitSelector/index.tsx:
     Renders inside OnboardingStepLayout (step=2). Content:
@@ -262,8 +280,11 @@ Added to Step 4 (PracticeSetCard) layout: Label "Preferred workout time" + a tim
     - `grep "onboarded.*true\|onboarded:.*true" app/\(onboarding\)/practice-set.tsx` returns a match
     - `grep "workout_reminder_time" app/\(onboarding\)/practice-set.tsx` returns a match (ONBOARD-06)
     - `grep "useReducedMotion" src/components/OnboardingStepLayout/index.tsx` returns a match
+    - `grep "age\|height_cm\|sex" src/components/ProfileStep/index.tsx` returns matches (ONBOARD-02 measurement fields present)
+    - `grep "measurements.*insert\|insert.*measurements" app/\(onboarding\)/profile.tsx` returns a match (initial measurements row written per ONBOARD-02)
+    - `grep "0.45359237\|lbs.*kg\|kg.*lbs" src/components/ProfileStep/index.tsx` returns a match (lbs→kg conversion present)
   </acceptance_criteria>
-  <done>All 4 onboarding screens implemented. OnboardingStepLayout shell reusable. ProfileStep, SplitSelector, TemplateBuilder stub, PracticeSetCard all fully implemented per UI-SPEC. Supabase rows written on each step completion. Notification preference time collected (ONBOARD-06). OnboardingComplete flag set in MMKV + Supabase on finish.</done>
+  <done>All 4 onboarding screens implemented. OnboardingStepLayout shell reusable. ProfileStep collects display name, units, goal, age, height, sex, weight, and body fat % (ONBOARD-02); writes profiles.age/height_cm/sex and inserts initial measurements row on completion. SplitSelector, TemplateBuilder stub, PracticeSetCard fully implemented per UI-SPEC. Supabase rows written on each step completion. Notification preference time collected (ONBOARD-06). OnboardingComplete flag set in MMKV + Supabase on finish.</done>
 </task>
 
 <task type="auto">
@@ -349,7 +370,7 @@ Added to Step 4 (PracticeSetCard) layout: Label "Preferred workout time" + a tim
 <success_criteria>
 - 5-tab nav renders Dashboard / Workouts / Split / Progress / Settings with Lucide icons and active accent state (NAV-01, NAV-02, NAV-03)
 - Onboarding shown on first launch; tab nav hidden until complete (ONBOARD-01)
-- Profile step collects display name + units + goal (ONBOARD-02)
+- Profile step collects display name, units, goal, age, height, sex, weight, body fat %; writes profiles and initial measurements row to Supabase (ONBOARD-02)
 - Split step shows 5 options with weekly schedule previews (ONBOARD-03)
 - Template step creates real template + template_exercises rows (ONBOARD-04)
 - Practice set has Skip button; both Skip and "Try it" complete onboarding (ONBOARD-05)

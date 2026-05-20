@@ -2107,47 +2107,47 @@ No `CLAUDE.md` exists in the project root (`/Users/travismader/Desktop/Pioneer/r
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **v1 blob exact shape**
+1. **v1 blob exact shape** — (GATED — resolved in Phase 1 migration plan Task 1 human checkpoint)
    - What we know: PROJECT.md lists fields; v1 admin panel shows top-level keys
    - What's unclear: Exact nested shape of `history[].sets[]`, exact `templates` structure, presence/absence of optional fields
-   - Recommendation: First task of Phase 1 is to dump a real v1 blob (admin user) to `.planning/phases/01-foundation/v1-sample-state.json` for the migration function to target.
+   - Resolution: Real blob must be inspected via Supabase SQL Editor before the migration function can be finalized. The 01-migration-PLAN.md Task 1 is a blocking human checkpoint that captures the real blob into `.planning/phases/01-foundation/v1-sample-state.json`. Task 2 of that plan is gated on the result.
 
-2. **PowerSync free tier sufficiency**
+2. **PowerSync free tier sufficiency** — RESOLVED: Use free tier for Phase 1 development. Decide paid plan before Phase 1 production launch.
    - What we know: 2GB synced / 500MB hosted on free tier; free projects deactivate after 1 week inactivity
    - What's unclear: Will single-user dev usage trigger deactivation? Does Travis want to pay $49/month from day one?
-   - Recommendation: Free tier for development. Decide paid plan before Phase 1 production release.
+   - Resolution: Free tier during development. Project will be kept active by regular development usage. Upgrade decision deferred to production launch milestone.
 
-3. **OP-SQLite vs JourneyApps SQLite driver for PowerSync**
+3. **OP-SQLite vs JourneyApps SQLite driver for PowerSync** — RESOLVED: Verified at install time in scaffold plan Task 0 (package legitimacy checkpoint). Use whichever PowerSync current docs recommend; the scaffold plan action text includes both options with an explicit conditional.
    - What we know: Both work; OP-SQLite is newer and more actively maintained
    - What's unclear: PowerSync's current officially recommended choice
-   - Recommendation: Check PowerSync docs at install time; default to whatever the official Expo+Supabase demo uses.
+   - Resolution: Human checkpoint in 01-scaffold-init-PLAN.md Task 0 verifies against current PowerSync docs before npm install runs.
 
-4. **Onboarding "primary goal" enum values**
+4. **Onboarding "primary goal" enum values** — RESOLVED: `['strength', 'hypertrophy', 'fat-loss', 'general']`
    - What we know: Goal is collected during onboarding (CONTEXT.md decision 2)
    - What's unclear: Specific options (`strength | hypertrophy | fat-loss | general`? `cut | bulk | maintain`?)
-   - Recommendation: Travis to choose in Phase 1 planning; default to `['strength', 'hypertrophy', 'fat-loss', 'general']`.
+   - Resolution: Values are `strength`, `hypertrophy`, `fat-loss`, `general`. Used in profiles.primary_goal CHECK constraint and MMKV onboarding.goal key.
 
-5. **Split type enum values for v2**
+5. **Split type enum values for v2** — RESOLVED: Keep v1 values plus `upper-lower`. Enum: `ppl` | `upper-lower` | `full-body` | `body-part` | `af-pt`.
    - What we know: v1 supports `PPL`, `Body-Part`, `Hybrid`, `Full Body`, `AF PT Prep`
    - What's unclear: Whether v2 keeps the same set and labels
-   - Recommendation: Keep v1 values plus `Upper/Lower` (popular among lifters). Travis can edit later.
+   - Resolution: v2 uses lowercase slugs: `ppl`, `upper-lower`, `full-body`, `body-part`, `af-pt`. The `Hybrid` v1 value maps to `full-body` during migration.
 
-6. **Starter templates content**
+6. **Starter templates content** — RESOLVED: Seed 3 starter templates per common split type. The 01-schema-PLAN.md Task 3 seeds exercises and creates `supabase/starter-templates.json` containing pre-defined configurations for ppl, upper-lower, full-body, body-part, and af-pt.
    - What we know: ONBOARD-04 requires the user to create or select a template
    - What's unclear: Do we seed any starter templates (e.g., a pre-built PPL) for new users to choose from, or is "create" the only path?
-   - Recommendation: Seed 3 starter templates (one per common split). Travis confirms in planning.
+   - Resolution: Seed built-in exercises (is_custom=false) + starter-templates.json static config. Onboarding step 3 filters by selected split and lets user pick one.
 
-7. **AUTH-06 SMS MFA scope for Phase 1**
+7. **AUTH-06 SMS MFA scope for Phase 1** — RESOLVED: Dashboard enablement only. No MFA enrollment/challenge UX in Phase 1. Settings screen shows a stub section with instructions to manage MFA in Supabase account settings. Full UX deferred to Phase 2+.
    - What we know: REQ-AUTH-06 is in Phase 1
    - What's unclear: Is full SMS MFA enrollment+challenge UX in scope, or is "enabling Supabase phone factor in dashboard" enough?
-   - Recommendation: Travis to clarify. If MFA UX is heavy, recommend deferring to Phase 2.
+   - Resolution: Phase 1 delivers: (1) Supabase dashboard phone factor enabled per user_setup instructions; (2) Settings screen has an "SMS verification" section with manual instructions. No in-app MFA enrollment flow.
 
-8. **Sign-out from "any screen" (AUTH-08)**
+8. **Sign-out from "any screen" (AUTH-08)** — RESOLVED: Settings → Account → Sign Out only. No header sign-out button on every screen.
    - What we know: Required; Settings is canonical
    - What's unclear: Does "any screen" mean a header button on every screen, or just "no dead-ends"?
-   - Recommendation: Settings → Account → Sign Out is enough. No header sign-out on every screen.
+   - Resolution: Settings tab → Account section → "Sign out" (text-danger) with Alert.alert confirmation. This is the single sign-out entry point. No header button on other screens.
 
 ---
 

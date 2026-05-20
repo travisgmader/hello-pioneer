@@ -4,7 +4,8 @@ plan: 03
 type: execute
 wave: 2
 depends_on:
-  - 01-scaffold-PLAN.md
+  - 01-scaffold-lib-PLAN.md
+  - 01-scaffold-routing-PLAN.md
   - 01-schema-PLAN.md
 files_modified:
   - app/(auth)/index.tsx
