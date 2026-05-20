@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 1, Plan 01a (scaffold-init) complete. Plan 01b (scaffold-lib) is next."
-last_updated: "2026-05-19T20:35:00.000Z"
-last_activity: 2026-05-19 -- Plan 01a complete (scaffold + NativeWind + EAS + test infra)
+stopped_at: "Phase 1, Plan 01b (scaffold-lib) complete. Plan 01c (scaffold-routing) is next."
+last_updated: "2026-05-20T02:47:19Z"
+last_activity: 2026-05-20 -- Plan 01b complete (lib layer, Supabase client, PowerSync, MMKV+SecureStore, hooks, ~25 min)
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 9
-  completed_plans: 1
-  percent: 11
+  completed_plans: 2
+  percent: 22
 ---
 
 # Project State
@@ -26,14 +26,14 @@ See: .planning/PROJECT.md (updated 2026-05-18)
 ## Current Position
 
 Phase: 1 of 6 (Foundation)
-Plan: 2 of 9 in current phase (01b scaffold-lib — next)
+Plan: 3 of 9 in current phase (01c scaffold-routing — next)
 Status: Executing — Wave 1
-Last activity: 2026-05-19 -- Plan 01a complete (13 min)
+Last activity: 2026-05-20 -- Plan 01b complete (lib layer + hooks, ~25 min)
 
-Progress: [█░░░░░░░░░] 11%
+Progress: [██░░░░░░░░] 22%
 
 ```
-Phase 1: Foundation          [>] In progress (1/9 plans complete)
+Phase 1: Foundation          [>] In progress (2/9 plans complete)
 Phase 2: Core Session Loop   [ ] Not started
 Phase 3: Templates, Programs & Progress  [ ] Not started
 Phase 4: Premium & AI        [ ] Not started
@@ -45,15 +45,15 @@ Phase 6: Polish & Platform   [ ] Not started
 
 **Velocity:**
 
-- Total plans completed: 1
-- Average duration: 13 min
-- Total execution time: 0.2 hours
+- Total plans completed: 2
+- Average duration: 19 min
+- Total execution time: 0.6 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 — Foundation | 1/9 | 13 min | 13 min |
+| 1 — Foundation | 2/9 | 38 min | 19 min |
 | 2 — Core Session Loop | 0/? | — | — |
 | 3 — Templates, Programs & Progress | 0/? | — | — |
 | 4 — Premium & AI | 0/? | — | — |
@@ -62,8 +62,8 @@ Phase 6: Polish & Platform   [ ] Not started
 
 **Recent Trend:**
 
-- Last 5 plans: 01a (13 min)
-- Trend: establishing baseline
+- Last 5 plans: 01a (13 min), 01b (25 min)
+- Trend: stabilizing — lib layer more complex than scaffold
 
 *Updated after each plan completion*
 
@@ -78,6 +78,13 @@ Key decisions relevant to Phase 1 (01a additions):
 - **react-native version:** 0.82.1 (not 0.81.5 from template) — required by react-native-screens@4.25.1 in expo-router@55
 - **TypeScript version:** 6.x installed; ignoreDeprecations: '6.0' added to tsconfig for baseUrl compatibility
 - **Install flags:** --legacy-peer-deps required for all installs due to React 19/ecosystem peer dep gaps
+
+Key decisions relevant to Phase 1 (01b additions):
+
+- **MMKV v4 API:** createMMKV() replaces new MMKV(); .remove(key) replaces .delete(key) — confirmed from @types in node_modules
+- **PowerSync fetchCredentials returns null:** Not throw — when session is absent, null signals PowerSync to retry; throwing causes spurious error logs
+- **Supabase Session type:** Exported as AuthSession from @supabase/supabase-js (aliased internally from @supabase/auth-js Session)
+- **@types/react:** Missing from 01a install; added in 01b as devDependency — required for TypeScript strict in React hooks
 
 Key decisions relevant to Phase 1 (pre-existing):
 
@@ -129,5 +136,5 @@ Items carried forward from pre-v2 planning and explicitly deferred:
 
 ## Session Continuity
 
-Last session: 2026-05-19
-Stopped at: Plan 01a (scaffold-init) complete. Commit 35db137. Next: Plan 01b (scaffold-lib) — lib layer, Supabase client, PowerSync, MMKV+SecureStore, hooks.
+Last session: 2026-05-20
+Stopped at: Plan 01b (scaffold-lib) complete. Commits 7344562 (lib layer) and f59fbfa (hooks). Next: Plan 01c (scaffold-routing) — Expo Router layout files, root layout gate, tab navigator, onboarding stack.
