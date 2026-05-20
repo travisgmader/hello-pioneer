@@ -1,0 +1,99 @@
+{
+  "ppl": {
+    "label": "Push / Pull / Legs",
+    "days": [
+      {
+        "day_label": "Push",
+        "exercises": ["Bench Press", "Overhead Press", "Incline Dumbbell Press", "Lateral Raise", "Tricep Pushdown"]
+      },
+      {
+        "day_label": "Pull",
+        "exercises": ["Pull-up", "Bent-over Row", "Lat Pulldown", "Barbell Curl", "Hammer Curl"]
+      },
+      {
+        "day_label": "Legs",
+        "exercises": ["Squat", "Romanian Deadlift", "Leg Press", "Leg Curl", "Calf Raise"]
+      }
+    ]
+  },
+  "upper-lower": {
+    "label": "Upper / Lower",
+    "days": [
+      {
+        "day_label": "Upper A",
+        "exercises": ["Bench Press", "Bent-over Row", "Overhead Press", "Barbell Curl", "Tricep Pushdown"]
+      },
+      {
+        "day_label": "Lower A",
+        "exercises": ["Squat", "Romanian Deadlift", "Hip Thrust", "Leg Curl", "Calf Raise"]
+      },
+      {
+        "day_label": "Upper B",
+        "exercises": ["Incline Dumbbell Press", "Lat Pulldown", "Arnold Press", "Incline Dumbbell Curl", "Skull Crusher"]
+      },
+      {
+        "day_label": "Lower B",
+        "exercises": ["Deadlift", "Leg Press", "Bulgarian Split Squat", "Leg Extension", "Calf Raise"]
+      }
+    ]
+  },
+  "full-body": {
+    "label": "Full Body",
+    "days": [
+      {
+        "day_label": "Full Body A",
+        "exercises": ["Squat", "Bench Press", "Bent-over Row", "Overhead Press", "Barbell Curl"]
+      },
+      {
+        "day_label": "Full Body B",
+        "exercises": ["Deadlift", "Incline Dumbbell Press", "Pull-up", "Lateral Raise", "Tricep Pushdown"]
+      },
+      {
+        "day_label": "Full Body C",
+        "exercises": ["Romanian Deadlift", "Dip", "Cable Row", "Arnold Press", "Hammer Curl"]
+      }
+    ]
+  },
+  "body-part": {
+    "label": "Body Part Split",
+    "days": [
+      {
+        "day_label": "Chest",
+        "exercises": ["Bench Press", "Incline Dumbbell Press", "Cable Fly", "Dip", "Push-up"]
+      },
+      {
+        "day_label": "Back",
+        "exercises": ["Deadlift", "Bent-over Row", "Pull-up", "Lat Pulldown", "Cable Row"]
+      },
+      {
+        "day_label": "Shoulders",
+        "exercises": ["Overhead Press", "Lateral Raise", "Arnold Press", "Face Pull", "Front Raise"]
+      },
+      {
+        "day_label": "Arms",
+        "exercises": ["Barbell Curl", "Hammer Curl", "Incline Dumbbell Curl", "Tricep Pushdown", "Skull Crusher"]
+      },
+      {
+        "day_label": "Legs",
+        "exercises": ["Squat", "Romanian Deadlift", "Hip Thrust", "Leg Press", "Calf Raise"]
+      }
+    ]
+  },
+  "af-pt": {
+    "label": "AF PT Prep",
+    "days": [
+      {
+        "day_label": "Run Day",
+        "exercises": ["Running", "Push-up", "Sit-up", "Pull-up"]
+      },
+      {
+        "day_label": "Strength A",
+        "exercises": ["Squat", "Bench Press", "Bent-over Row", "Overhead Press"]
+      },
+      {
+        "day_label": "Run + Core",
+        "exercises": ["Running", "Plank", "Sit-up", "Ab Wheel Rollout"]
+      }
+    ]
+  }
+}
