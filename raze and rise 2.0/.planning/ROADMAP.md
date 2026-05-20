@@ -29,7 +29,14 @@
 3. The app can start and log a set with no network connection; the set is visible in the active session immediately and syncs to Supabase when connectivity returns
 4. Navigating to all five tabs (Dashboard / Workouts / Split / Progress / Settings) works offline and the active tab is visually highlighted
 5. Existing v1 user data (workout history, templates, split settings, measurements) is queryable from the normalized v2 tables after the migration script runs
-**Plans:** TBD
+**Plans:** 6 plans
+Plans:
+- [ ] 01-scaffold-PLAN.md — Bare Expo scaffold, NativeWind, MMKV, PowerSync, Expo Router shell, design-system atoms, Wave 0 test infrastructure
+- [ ] 01-schema-PLAN.md — Normalized Supabase schema (10 tables), RLS policies, PowerSync publication, supabase db push
+- [ ] 01-auth-PLAN.md — Email auth, Google OAuth, Apple Sign-In, password reset, change password, SMS MFA, sign-out
+- [ ] 01-navigation-onboarding-PLAN.md — 5-tab nav, onboarding stack (profile + split + template + practice set + Dashboard), notification preference
+- [ ] 01-migration-PLAN.md — v1 migration Edge Function, client trigger + polling, migration progress screen
+- [ ] 01-skeleton-verification-PLAN.md — End-to-end Walking Skeleton test, EAS dev build verification, VERIFICATION.md
 
 ---
 
@@ -116,7 +123,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/? | Not started | - |
+| 1. Foundation | 0/6 | Not started | - |
 | 2. Core Session Loop | 0/? | Not started | - |
 | 3. Templates, Programs & Progress | 0/? | Not started | - |
 | 4. Premium & AI | 0/? | Not started | - |
