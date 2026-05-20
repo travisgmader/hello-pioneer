@@ -102,7 +102,7 @@ The schema.sql in v1 is stale — actual DB has `dropoff_parent` + `pickup_paren
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | Full rewrite, not refactor | v1 architectural debt (no router, monolithic context, hardcoded members) would constrain every phase | — Pending |
-| React + Vite + React Router v6 | Familiar stack, avoids Next.js complexity, React Router solves routing without framework switch | — Pending |
+| React + Vite + React Router v7 (Data mode) | v6 is feature-frozen; v7 is the non-breaking successor. `createBrowserRouter` + SPA mode — no SSR | — Pending |
 | TanStack Query over custom context | Handles caching, background refetch, optimistic updates w/ rollback — solves v1's biggest data reliability issues | — Pending |
 | vite-plugin-pwa for push notifications | Web Push API + service worker is the right primitive; vite-plugin-pwa integrates cleanly with Vite | — Pending |
 | New Supabase schema with migration | v1 schema is stale and has no RLS; starting clean is safer than patching live tables | — Pending |
