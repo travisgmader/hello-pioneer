@@ -7,8 +7,8 @@
 
 ## Phases
 
-- [>] **Phase 1: Foundation** — Expo bare workflow, normalized schema + RLS, PowerSync offline sync, MMKV session, all auth providers, EAS Build, v1 migration script, 5-tab nav, onboarding (8/9 plans complete)
-- [ ] **Phase 2: Core Session Loop** — Rest timer (background notification), previous performance column, set types, RPE, warm-up flag, supersets, bodyweight exercise, session notes, injury map, Anubis overlay, offline persistence
+- [x] **Phase 1: Foundation** — Expo bare workflow, normalized schema + RLS, PowerSync offline sync, MMKV session, all auth providers, EAS Build, v1 migration script, 5-tab nav, onboarding (9/9 plans complete)
+- [>] **Phase 2: Core Session Loop** — Rest timer (background notification), previous performance column, set types, RPE, warm-up flag, supersets, bodyweight exercise, session notes, injury map, Anubis overlay, offline persistence
 - [ ] **Phase 3: Templates, Programs & Progress** — Searchable exercise library + ExerciseDB videos, template builder with supersets, editable history, manual + AI program builder, deload system, progress charts, measurement history, progress photos, gamification
 - [ ] **Phase 4: Premium & AI** — RevenueCat billing (StoreKit + Google Play + Stripe web), premium JWT auth hook, AI coach chat (streaming, rate-limited), AI workout generation, AI meal planning, Instacart MCP, supplement checklist, meal reminders, nutrition from Apple Health
 - [ ] **Phase 5: Wearables & Notifications** — HealthKit (iOS), Health Connect (Android), Terra API (Garmin/Whoop/Fitbit/Suunto), recovery score on Dashboard, server-side push notifications via pg_cron, smart timing, PR alerts, weekly summary
@@ -32,7 +32,7 @@
 4. Navigating to all five tabs (Dashboard / Workouts / Split / Progress / Settings) works offline and the active tab is visually highlighted
 5. Existing v1 user data (workout history, templates, split settings, measurements) is queryable from the normalized v2 tables after the migration script runs
 
-**Plans:** 8/9 plans executed
+**Plans:** 9/9 plans complete
 Plans:
 **Wave 1**
 
@@ -53,7 +53,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 01-skeleton-verification-PLAN.md — End-to-end Walking Skeleton test, EAS dev build verification, VERIFICATION.md
+- [x] 01-skeleton-verification-PLAN.md — End-to-end Walking Skeleton test, EAS dev build verification, VERIFICATION.md (complete — 5e40b6e)
 
 ---
 

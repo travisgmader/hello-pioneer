@@ -1,0 +1,84 @@
+{
+  "history": [],
+  "profile": {
+    "age": "",
+    "sex": "",
+    "name": "",
+    "height": ""
+  },
+  "session": null,
+  "rotation": {
+    "pointer": 0
+  },
+  "settings": {
+    "split": "ppl",
+    "splitPhase": 0,
+    "weightMethod": "manual",
+    "hybridSequence": ["Push", "Pull", "Legs"],
+    "splitStartedAt": "2026-05-18T14:54:44.522Z"
+  },
+  "macroGoal": {
+    "goal": "",
+    "activityLevel": ""
+  },
+  "onboarded": true,
+  "oneRepMax": {
+    "squat": "",
+    "pullUp": "",
+    "deadlift": "",
+    "barbellRow": "",
+    "benchPress": "",
+    "overheadPress": ""
+  },
+  "templates": {
+    "Legs": {
+      "id": "0724804d-d77b-4cdc-b78b-ea93ea8211ac",
+      "dayLabel": "Legs",
+      "exercises": [
+        {"id": "3ff7fc69-c99a-4c54-a545-033847cc302c", "name": "Squat", "sets": 4, "repLow": 6, "repHigh": 10},
+        {"id": "63c0c3e3-1e8f-43aa-930f-eef8a1f79dfc", "name": "Romanian Deadlift", "sets": 3, "repLow": 8, "repHigh": 12},
+        {"id": "19c8e0d1-3764-47c5-9979-2603e93fdc5b", "name": "Leg Press", "sets": 3, "repLow": 10, "repHigh": 15},
+        {"id": "0d5e818d-7ce0-4248-8130-e1544d4150ac", "name": "Leg Curl", "sets": 3, "repLow": 10, "repHigh": 15},
+        {"id": "066407a8-805a-49a5-8cf9-7ef304868f3a", "name": "Leg Extension", "sets": 3, "repLow": 12, "repHigh": 15},
+        {"id": "64cfc7ff-976b-49df-a1d2-e36e9d93339e", "name": "Calf Raise", "sets": 4, "repLow": 15, "repHigh": 20}
+      ],
+      "uploadedAt": "2026-05-18T14:54:44.522Z"
+    },
+    "Pull": {
+      "id": "c498f850-2021-46ff-a50c-89e4891a4bc6",
+      "dayLabel": "Pull",
+      "exercises": [
+        {"id": "bcb5c389-813b-40a8-b726-7b6c351d8e92", "name": "Pull-Up", "sets": 4, "repLow": 6, "repHigh": 10},
+        {"id": "301b67cf-d7ff-4705-82c7-847c6165aea3", "name": "Barbell Row", "sets": 4, "repLow": 8, "repHigh": 12},
+        {"id": "bd6d8fa3-ec23-4053-a5ee-10159fcf6046", "name": "Lat Pulldown", "sets": 3, "repLow": 10, "repHigh": 12},
+        {"id": "98aedc12-3dca-460a-8a0d-d817efe8831a", "name": "Seated Cable Row", "sets": 3, "repLow": 10, "repHigh": 12},
+        {"id": "1b6ade43-3cd9-41bf-932f-87d8a17d74f4", "name": "Barbell Curl", "sets": 3, "repLow": 10, "repHigh": 12},
+        {"id": "d332c0e1-543b-4b95-be5b-a2a98ab834b9", "name": "Face Pull", "sets": 3, "repLow": 15, "repHigh": 20}
+      ],
+      "uploadedAt": "2026-05-18T14:54:44.522Z"
+    },
+    "Push": {
+      "id": "fcb2ad15-c523-486e-87ef-a0ce9ee250a0",
+      "dayLabel": "Push",
+      "exercises": [
+        {"id": "cd037c1f-773e-4507-aa0c-7edf23df6cf9", "name": "Incline Dumbbell Press", "sets": 4, "repLow": 8, "repHigh": 12},
+        {"id": "818639d7-41cb-496c-a91f-a9c67032670c", "name": "Bench Press", "sets": 3, "repLow": 8, "repHigh": 12},
+        {"id": "e7e7aa13-864c-4b25-9ca4-e8bfe261de61", "name": "Overhead Press", "sets": 3, "repLow": 8, "repHigh": 12},
+        {"id": "12812aac-8e88-45ac-8e28-5e816425fcab", "name": "Lateral Raise", "sets": 3, "repLow": 12, "repHigh": 15},
+        {"id": "9996fbae-0099-4f47-bffa-7ead4315afbc", "name": "Tricep Pushdown", "sets": 3, "repLow": 12, "repHigh": 15},
+        {"id": "e86c75d5-752a-4ade-bd47-88eedaf5bb4b", "name": "Cable Fly", "sets": 3, "repLow": 12, "repHigh": 15}
+      ],
+      "uploadedAt": "2026-05-18T14:54:44.522Z"
+    }
+  },
+  "exerciseOrm": {},
+  "measurements": {
+    "arms": "",
+    "hips": "",
+    "chest": "",
+    "waist": "",
+    "thighs": "",
+    "weight": "",
+    "bodyFat": ""
+  }
+}
