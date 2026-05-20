@@ -1,7 +1,8 @@
 ---
 phase: 1
 slug: foundation-walking-skeleton
-status: draft
+status: approved
+reviewed_at: 2026-05-19
 shadcn_initialized: false
 preset: none
 created: 2026-05-20
