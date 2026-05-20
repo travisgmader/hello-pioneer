@@ -1,17 +1,51 @@
 /**
- * Wave 0 RED stub — ARCH-02 (React Router v7 Data mode) + ARCH-08 (errorElement).
+ * ARCH-02 (React Router v7 Data mode) + ARCH-08 (errorElement).
  *
- * The router module is created in Plan 04 of this phase. Until then this test
- * MUST fail at import time (module-not-found is the RED state). Once Plan 04
- * lands `src/routes/router.tsx`, this test turns GREEN.
+ * Verifies the unauthenticated redirect path: with no Supabase session,
+ * the loader on `/` throws redirect('/login'), and the Login route renders
+ * its subtitle copy.
+ *
+ * GREEN transition: the router module landed in Plan 04 (01-04a).
+ *
+ * Mocking strategy:
+ *   - Stub `src/data/supabase` with a no-session client so requireAuthLoader
+ *     resolves `session` to null and throws redirect('/login') without
+ *     touching the network or env vars.
+ *   - Stub `src/lib/env` to short-circuit the env-vars throw — vitest
+ *     workers don't see the .env.local file by default.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { RouterProvider } from 'react-router';
-// @ts-expect-error — module is created in Plan 04
-import { router } from '../../src/routes/router';
 
-describe('router (Wave 0 RED stub — created in Plan 04)', () => {
+vi.mock('../../src/lib/env', () => ({
+  env: {
+    supabaseUrl: 'http://localhost:54321',
+    supabaseAnonKey: 'test-anon-key',
+    vapidPublicKey: undefined,
+  },
+}));
+
+vi.mock('../../src/data/supabase', () => ({
+  supabase: {
+    auth: {
+      getSession: async () => ({ data: { session: null } }),
+      signOut: async () => ({ error: null }),
+    },
+  } as unknown,
+  signInWithGoogle: vi.fn(),
+  check: <T,>(res: { data: T | null }) => res.data,
+}));
+
+// Allowlist is never reached when session is null, but stub it anyway so
+// the module import resolves cleanly without hitting Supabase.
+vi.mock('../../src/auth/allowlist', () => ({
+  isAllowedEmail: async () => true,
+}));
+
+const { router } = await import('../../src/routes/router');
+
+describe('router', () => {
   it('routes to /login when unauthenticated', async () => {
     render(<RouterProvider router={router} />);
     expect(
