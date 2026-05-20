@@ -2,7 +2,7 @@
 phase: 01-foundation
 plan: 03
 type: execute
-wave: 2
+wave: 3
 depends_on:
   - 01-scaffold-lib-PLAN.md
   - 01-scaffold-routing-PLAN.md
@@ -104,7 +104,8 @@ Output: AuthScreen renders correctly with Sign In / Sign Up toggle, all provider
 @.planning/phases/01-foundation/01-RESEARCH.md
 @.planning/phases/01-foundation/01-UI-SPEC.md
 @.planning/phases/01-foundation/01-SKELETON.md
-@.planning/phases/01-foundation/01-scaffold-SUMMARY.md
+@.planning/phases/01-foundation/01-scaffold-init-SUMMARY.md
+@.planning/phases/01-foundation/01-scaffold-lib-SUMMARY.md
 @.planning/phases/01-foundation/01-schema-SUMMARY.md
 
 <interfaces>

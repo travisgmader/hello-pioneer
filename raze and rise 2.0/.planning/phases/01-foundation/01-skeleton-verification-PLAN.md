@@ -72,7 +72,8 @@ Output: Walking Skeleton Maestro test file, session persistence test, PowerSync 
 @.planning/phases/01-foundation/CONTEXT.md
 @.planning/phases/01-foundation/01-RESEARCH.md
 @.planning/phases/01-foundation/01-SKELETON.md
-@.planning/phases/01-foundation/01-scaffold-SUMMARY.md
+@.planning/phases/01-foundation/01-scaffold-init-SUMMARY.md
+@.planning/phases/01-foundation/01-scaffold-lib-SUMMARY.md
 @.planning/phases/01-foundation/01-schema-SUMMARY.md
 @.planning/phases/01-foundation/01-auth-SUMMARY.md
 @.planning/phases/01-foundation/01-navigation-onboarding-SUMMARY.md
