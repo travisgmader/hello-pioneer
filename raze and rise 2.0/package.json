@@ -46,6 +46,7 @@
   "private": true,
   "devDependencies": {
     "@testing-library/react-native": "^13.3.3",
+    "@types/react": "^19.2.15",
     "@vitest/coverage-v8": "^4.1.6",
     "tailwindcss": "^3.4.19",
     "typescript": "^6.0.3",
