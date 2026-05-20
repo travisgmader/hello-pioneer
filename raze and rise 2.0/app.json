@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "raze-and-rise-v2",
+    "slug": "raze-and-rise-v2",
+    "version": "1.0.0",
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-web-browser"
+    ]
+  }
+}

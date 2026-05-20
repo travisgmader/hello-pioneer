@@ -1,0 +1,5 @@
+appId: com.razeandrise.app
+# TODO: complete in 01c-ui plan (dark/light mode toggle in Settings)
+
+flows:
+  - launchApp

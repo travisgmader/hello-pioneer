@@ -1,0 +1,5 @@
+appId: com.razeandrise.app
+# TODO: complete in 01c-ui plan (5-tab navigation E2E with airplane mode toggle)
+
+flows:
+  - launchApp

@@ -1,0 +1,54 @@
+{
+  "cli": {
+    "version": ">= 19.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development",
+      "ios": {
+        "simulator": false
+      },
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "PLACEHOLDER",
+        "EXPO_PUBLIC_POWERSYNC_URL": "PLACEHOLDER"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "channel": "preview",
+      "runtimeVersion": {
+        "policy": "fingerprint"
+      }
+    },
+    "production": {
+      "channel": "production",
+      "runtimeVersion": {
+        "policy": "fingerprint"
+      },
+      "ios": {
+        "resourceClass": "m-medium"
+      },
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "autoIncrement": true
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "travis.g.mader@gmail.com",
+        "ascAppId": "TBD"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./play-service-account.json"
+      }
+    }
+  }
+}

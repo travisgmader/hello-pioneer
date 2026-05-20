@@ -1,0 +1,5 @@
+appId: com.razeandrise.app
+# TODO: complete in 01d-onboarding plan
+
+flows:
+  - launchApp

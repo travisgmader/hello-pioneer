@@ -1,0 +1,5 @@
+appId: com.razeandrise.app
+# TODO: complete in 01b-auth plan (session survives kill + relaunch via MMKV)
+
+flows:
+  - launchApp
