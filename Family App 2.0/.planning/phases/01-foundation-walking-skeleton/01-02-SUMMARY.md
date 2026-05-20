@@ -3,10 +3,7 @@ phase: 01-foundation-walking-skeleton
 plan: 02
 subsystem: data-platform
 tags: [supabase, schema, rls, security-definer, realtime, allowlist]
-status: paused-at-checkpoint
-checkpoint_type: human-verify
-checkpoint_gate: blocking-human
-checkpoint_task: 2.2
+status: complete
 
 dependency_graph:
   requires:
@@ -51,13 +48,13 @@ decisions:
   - "Did NOT run `supabase db lint` because it requires a live local DB; eyeball review serves as the lint pass and Task 2.2 is the formal human review gate"
 
 metrics:
-  duration_minutes: 4
-  tasks_completed: 1
+  duration_minutes: 35
+  tasks_completed: 3
   tasks_total: 3
-  files_created: 3
-  files_modified: 0
-  commits_added: 1
-  completed: "2026-05-20T14:52:12Z"
+  files_created: 5
+  files_modified: 1
+  commits_added: 4
+  completed: "2026-05-20T15:15:00Z"
 ---
 
 # Phase 1 Plan 02: Initial Schema Migration Summary
@@ -173,13 +170,31 @@ This plan executed in a parallel worktree (wave 1, alongside Plan 01-01). Per th
 - **STATE.md and ROADMAP.md were NOT modified** — the orchestrator handles those writes after all worktree agents in wave 1 complete.
 - **REQUIREMENTS.md was NOT modified** for the same reason. The plan's `requirements: [ARCH-01, ARCH-05, ARCH-06, ARCH-11]` will be checked off centrally after the wave merges. Note that ARCH-01/05/06/11 are only artifact-complete after Task 2.1 — final completion is gated on Task 2.3's `supabase db push` succeeding, which happens after the human checkpoint clears.
 
+## Task 2.3 Results
+
+**Migration push:** Both migrations applied successfully via `supabase db push --linked`.
+
+**Pre-migration:** `20260519235959_archive_v1_tables.sql` — renamed 8 v1 tables to `v1_*` prefix (chores→v1_chores, events→v1_events, groceries→v1_groceries, notes→v1_notes, custody→v1_custody, meal_plan→v1_meal_plan, meal_recommendations→v1_meal_recommendations, grocery_requests→v1_grocery_requests). v1 data preserved.
+
+**Schema migration:** `20260520000000_initial_schema.sql` — all 13 v2 tables, helpers, RLS, realtime publication applied.
+
+**TypeScript types:** `supabase gen types typescript --linked` → `src/data/types.ts` — 1004 lines.
+
+**SQL smoke probes:**
+- `SELECT count(*) FROM allowed_emails` → 5 ✓ (5 family emails bootstrapped)
+- `SELECT count(*) FROM pg_policies WHERE schemaname='public'` → 66 ✓ (≥47 required)
+- `SELECT count(*) FROM pg_publication_tables WHERE pubname='supabase_realtime'` → 18 ✓ (≥11 required)
+
+**Note:** Used existing "Family App" Supabase project (ref: cfvqjqkqfbrgfpwukady, PG 17.6, East US Ohio) rather than creating a new project. config.toml major_version bumped to 17 to match. Old v1 migration history entries marked as reverted before push.
+
 ## Commits
 
 | Commit | Task | Type | Files |
 |---|---|---|---|
-| `255ca1c` | 2.1 | feat | `Family App 2.0/supabase/config.toml`, `Family App 2.0/supabase/.gitignore`, `Family App 2.0/supabase/migrations/20260520000000_initial_schema.sql` |
-
-A second `docs(01-02): metadata` commit will follow this Write to capture the SUMMARY in git before the orchestrator force-removes the worktree.
+| `255ca1c` | 2.1 | feat | `supabase/config.toml`, `supabase/.gitignore`, `supabase/migrations/20260520000000_initial_schema.sql` |
+| `cab03c9` | checkpoint | docs | `01-02-SUMMARY.md` (partial — at checkpoint) |
+| `33e92a5` | 2.2/fix | fix | `supabase/config.toml` (major_version 15→17) |
+| `a2964dc` | 2.3 | feat | `supabase/migrations/20260519235959_archive_v1_tables.sql`, `src/data/types.ts` |
 
 ## Self-Check
 
