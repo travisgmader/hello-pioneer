@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Plan 01-03 (auth) complete. Commits 71381c5 (TDD RED), c5dd2b5 (GREEN — auth services), faa4c4c (AuthScreen + screens + Maestro). Next: 01-onboarding plan (Wave 3 continuing)."
-last_updated: "2026-05-20T03:44:34.793Z"
-last_activity: 2026-05-20
+stopped_at: "Plan 01-05 (migration) complete. Commit 4be465d (Edge Function + client service + MigrationProgress + tests). Next: 01-skeleton-verification-PLAN.md (Wave 4 — final plan in Phase 1)."
+last_updated: "2026-05-19T22:55:00.000Z"
+last_activity: 2026-05-19
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
   percent: 0
 ---
 
@@ -26,14 +26,14 @@ See: .planning/PROJECT.md (updated 2026-05-18)
 ## Current Position
 
 Phase: 1 of 6 (Foundation)
-Plan: 8 of 9 in current phase (01-onboarding — next, Wave 3 continuing)
+Plan: 9 of 9 in current phase (01-skeleton-verification — next, Wave 4)
 Status: Ready to execute
-Last activity: 2026-05-20
+Last activity: 2026-05-19
 
-Progress: [████████░░] 78%
+Progress: [█████████░] 89%
 
 ```
-Phase 1: Foundation          [>] In progress (6/9 plans complete)
+Phase 1: Foundation          [>] In progress (8/9 plans complete)
 Phase 2: Core Session Loop   [ ] Not started
 Phase 3: Templates, Programs & Progress  [ ] Not started
 Phase 4: Premium & AI        [ ] Not started
@@ -45,7 +45,7 @@ Phase 6: Polish & Platform   [ ] Not started
 
 **Velocity:**
 
-- Total plans completed: 6
+- Total plans completed: 8
 - Average duration: 13 min
 - Total execution time: ~1.4 hours
 
@@ -53,7 +53,7 @@ Phase 6: Polish & Platform   [ ] Not started
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 — Foundation | 6/9 | 79 min | 13 min |
+| 1 — Foundation | 8/9 | 104 min | 13 min |
 | 2 — Core Session Loop | 0/? | — | — |
 | 3 — Templates, Programs & Progress | 0/? | — | — |
 | 4 — Premium & AI | 0/? | — | — |
@@ -158,5 +158,5 @@ Items carried forward from pre-v2 planning and explicitly deferred:
 
 ## Session Continuity
 
-Last session: 2026-05-20T03:44:34.782Z
-Stopped at: Plan 01-03 (auth) complete. Commits 71381c5 (TDD RED), c5dd2b5 (GREEN — auth services), faa4c4c (AuthScreen + screens + Maestro). Next: 01-onboarding plan (Wave 3 continuing).
+Last session: 2026-05-19T22:55:00.000Z
+Stopped at: Plan 01-05 (migration) complete. Commit 4be465d (Edge Function + client service + MigrationProgress + tests). Next: 01-skeleton-verification-PLAN.md (Wave 4 — final plan in Phase 1).
