@@ -9,15 +9,15 @@
 
 ### Foundation & Infrastructure (FOUND)
 
-- [ ] **FOUND-01**: App is initialized as an Expo SDK 55 bare workflow project (not managed — required for HealthKit, widgets, and RevenueCat native modules)
-- [ ] **FOUND-02**: TypeScript strict mode is enabled across the entire codebase
+- [x] **FOUND-01**: App is initialized as an Expo SDK 55 bare workflow project (not managed — required for HealthKit, widgets, and RevenueCat native modules)
+- [x] **FOUND-02**: TypeScript strict mode is enabled across the entire codebase
 - [ ] **FOUND-03**: Expo Router v3 provides file-based navigation for tabs and screens
 - [ ] **FOUND-04**: NativeWind v4 provides styling with a dark-first design token system
-- [ ] **FOUND-05**: EAS Build is configured with development, preview, and production profiles; `expo-dev-client` is the development target (not Expo Go)
+- [x] **FOUND-05**: EAS Build is configured with development, preview, and production profiles; `expo-dev-client` is the development target (not Expo Go)
 - [ ] **FOUND-06**: PowerSync is configured as the offline-first local database, syncing with Supabase via Postgres WAL
 - [ ] **FOUND-07**: Supabase normalized schema replaces the v1 single JSON blob; RLS is enabled on every table at creation time, with all four CRUD policies created in the same migration
 - [ ] **FOUND-08**: MMKV stores the Supabase session; SecureStore holds only the MMKV encryption key (solves the 2048-byte AsyncStorage truncation bug)
-- [ ] **FOUND-09**: A runtime version strategy is configured in `eas.json` to control when OTA updates require a native rebuild
+- [x] **FOUND-09**: A runtime version strategy is configured in `eas.json` to control when OTA updates require a native rebuild
 
 ### Authentication & Account (AUTH)
 
@@ -220,15 +220,15 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| FOUND-01 | Phase 1 | Pending |
-| FOUND-02 | Phase 1 | Pending |
+| FOUND-01 | Phase 1 | Complete (01a — 35db137) |
+| FOUND-02 | Phase 1 | Complete (01a — 35db137) |
 | FOUND-03 | Phase 1 | Pending |
 | FOUND-04 | Phase 1 | Pending |
-| FOUND-05 | Phase 1 | Pending |
+| FOUND-05 | Phase 1 | Complete (01a — 35db137) |
 | FOUND-06 | Phase 1 | Pending |
 | FOUND-07 | Phase 1 | Pending |
 | FOUND-08 | Phase 1 | Pending |
-| FOUND-09 | Phase 1 | Pending |
+| FOUND-09 | Phase 1 | Complete (01a — 35db137) |
 | AUTH-01 | Phase 1 | Pending |
 | AUTH-02 | Phase 1 | Pending |
 | AUTH-03 | Phase 1 | Pending |

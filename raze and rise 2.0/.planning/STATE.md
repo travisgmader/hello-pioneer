@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Roadmap created and written to disk. REQUIREMENTS.md traceability table populated. Ready to begin Phase 1 planning via `/gsd:plan-phase 1`."
-last_updated: "2026-05-20T01:31:20.334Z"
-last_activity: 2026-05-20 -- Phase 1 planning complete
+stopped_at: "Phase 1, Plan 01a (scaffold-init) complete. Plan 01b (scaffold-lib) is next."
+last_updated: "2026-05-19T20:35:00.000Z"
+last_activity: 2026-05-19 -- Plan 01a complete (scaffold + NativeWind + EAS + test infra)
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 9
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 11
 ---
 
 # Project State
@@ -26,14 +26,14 @@ See: .planning/PROJECT.md (updated 2026-05-18)
 ## Current Position
 
 Phase: 1 of 6 (Foundation)
-Plan: 0 of ? in current phase
-Status: Ready to execute
-Last activity: 2026-05-20 -- Phase 1 planning complete
+Plan: 2 of 9 in current phase (01b scaffold-lib — next)
+Status: Executing — Wave 1
+Last activity: 2026-05-19 -- Plan 01a complete (13 min)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 11%
 
 ```
-Phase 1: Foundation          [ ] Not started
+Phase 1: Foundation          [>] In progress (1/9 plans complete)
 Phase 2: Core Session Loop   [ ] Not started
 Phase 3: Templates, Programs & Progress  [ ] Not started
 Phase 4: Premium & AI        [ ] Not started
@@ -45,15 +45,15 @@ Phase 6: Polish & Platform   [ ] Not started
 
 **Velocity:**
 
-- Total plans completed: 0
-- Average duration: — min
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 13 min
+- Total execution time: 0.2 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 — Foundation | 0/? | — | — |
+| 1 — Foundation | 1/9 | 13 min | 13 min |
 | 2 — Core Session Loop | 0/? | — | — |
 | 3 — Templates, Programs & Progress | 0/? | — | — |
 | 4 — Premium & AI | 0/? | — | — |
@@ -62,8 +62,8 @@ Phase 6: Polish & Platform   [ ] Not started
 
 **Recent Trend:**
 
-- Last 5 plans: none yet
-- Trend: —
+- Last 5 plans: 01a (13 min)
+- Trend: establishing baseline
 
 *Updated after each plan completion*
 
@@ -72,7 +72,14 @@ Phase 6: Polish & Platform   [ ] Not started
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Key decisions relevant to Phase 1:
+Key decisions relevant to Phase 1 (01a additions):
+
+- **SQLite driver:** @op-engineering/op-sqlite chosen over @journeyapps/react-native-quick-sqlite (user-approved; current PowerSync recommendation)
+- **react-native version:** 0.82.1 (not 0.81.5 from template) — required by react-native-screens@4.25.1 in expo-router@55
+- **TypeScript version:** 6.x installed; ignoreDeprecations: '6.0' added to tsconfig for baseUrl compatibility
+- **Install flags:** --legacy-peer-deps required for all installs due to React 19/ecosystem peer dep gaps
+
+Key decisions relevant to Phase 1 (pre-existing):
 
 - **Billing architecture:** Use RevenueCat (`react-native-purchases`) wrapping StoreKit (iOS) and Google Play Billing (Android); Stripe for web billing only. Stripe-only on iOS violates App Store guidelines and triggers rejection. RevenueCat is the correct abstraction per PITFALLS.md.
 - **Workflow:** Expo SDK 55 managed workflow with EAS Build (not bare workflow). Bare workflow eject deferred until Apple Watch companion app phase — which is explicitly out of scope for v2.
@@ -122,5 +129,5 @@ Items carried forward from pre-v2 planning and explicitly deferred:
 
 ## Session Continuity
 
-Last session: 2026-05-18
-Stopped at: Roadmap created and written to disk. REQUIREMENTS.md traceability table populated. Ready to begin Phase 1 planning via `/gsd:plan-phase 1`.
+Last session: 2026-05-19
+Stopped at: Plan 01a (scaffold-init) complete. Commit 35db137. Next: Plan 01b (scaffold-lib) — lib layer, Supabase client, PowerSync, MMKV+SecureStore, hooks.
