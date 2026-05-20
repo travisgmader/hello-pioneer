@@ -36,11 +36,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A single `useRealtimeBridge()` hook at app root subscribes to `postgres_changes` and translates them into targeted `queryClient.invalidateQueries` (verified against a manual insert)
   4. The first signed-in parent can create a family space (sets family name + emoji avatar) and a `families` row + matching `family_settings` row with timezone are written under their `family_id`
   5. The app is installed as a PWA from Vercel, error boundaries on every route catch render failures, and writes made while offline queue in IndexedDB and flush on reconnect
-**Plans:** 7 plans
+**Plans:** 2/7 plans executed
 
 **Wave 1** *(parallel — no dependencies)*
-- [ ] 01-01-PLAN.md — Vite + React 19 + TypeScript scaffold, v1 CSS theme port, RED test stubs
-- [ ] 01-02-PLAN.md — Supabase schema + RLS + helpers + allowlist bootstrap + [BLOCKING] db push
+- [x] 01-01-PLAN.md — Vite + React 19 + TypeScript scaffold, v1 CSS theme port, RED test stubs
+- [x] 01-02-PLAN.md — Supabase schema + RLS + helpers + allowlist bootstrap + [BLOCKING] db push
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 01-03-PLAN.md — Supabase client + Google OAuth + allowlist gate + /login + /access-denied
@@ -194,7 +194,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Walking Skeleton | 0/6 | Not started | - |
+| 1. Foundation & Walking Skeleton | 2/7 | In Progress|  |
 | 2. Members, Onboarding & Billing | 0/TBD | Not started | - |
 | 3. Chores | 0/TBD | Not started | - |
 | 4. Calendar & Custody | 0/TBD | Not started | - |
