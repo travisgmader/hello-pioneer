@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Wave 1 complete (01a + 01b + 02). Wave 2 is next: scaffold-ui (01c) + scaffold-routing (01d)."
-last_updated: "2026-05-19T21:00:00.000Z"
-last_activity: 2026-05-19 -- Plan 02 complete (9-table schema + RLS + PowerSync + 36 exercises seeded)
+stopped_at: "Plan 01c (scaffold-ui) complete. Wave 2 continuing with 01d (scaffold-routing)."
+last_updated: "2026-05-20T03:20:00.000Z"
+last_activity: 2026-05-20 -- Plan 01c complete (10 design-system atom components, ~6 min)
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 9
-  completed_plans: 3
-  percent: 33
+  completed_plans: 4
+  percent: 44
 ---
 
 # Project State
@@ -26,14 +26,14 @@ See: .planning/PROJECT.md (updated 2026-05-18)
 ## Current Position
 
 Phase: 1 of 6 (Foundation)
-Plan: 4 of 9 in current phase (01c scaffold-ui — Wave 2 next)
-Status: Executing — Wave 1 complete, Wave 2 starting
-Last activity: 2026-05-19 -- Plan 02 complete (9-table schema + RLS + PowerSync, ~30 min)
+Plan: 5 of 9 in current phase (01d scaffold-routing — next)
+Status: Executing — Wave 2 partially complete (01c done, 01d remaining)
+Last activity: 2026-05-20 -- Plan 01c complete (10 design-system atom components, ~6 min)
 
-Progress: [███░░░░░░░] 33%
+Progress: [████░░░░░░] 44%
 
 ```
-Phase 1: Foundation          [>] In progress (3/9 plans complete)
+Phase 1: Foundation          [>] In progress (4/9 plans complete)
 Phase 2: Core Session Loop   [ ] Not started
 Phase 3: Templates, Programs & Progress  [ ] Not started
 Phase 4: Premium & AI        [ ] Not started
@@ -45,15 +45,15 @@ Phase 6: Polish & Platform   [ ] Not started
 
 **Velocity:**
 
-- Total plans completed: 2
-- Average duration: 19 min
-- Total execution time: 0.6 hours
+- Total plans completed: 4
+- Average duration: 16 min
+- Total execution time: 1.1 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 — Foundation | 2/9 | 38 min | 19 min |
+| 1 — Foundation | 4/9 | 64 min | 16 min |
 | 2 — Core Session Loop | 0/? | — | — |
 | 3 — Templates, Programs & Progress | 0/? | — | — |
 | 4 — Premium & AI | 0/? | — | — |
@@ -62,8 +62,8 @@ Phase 6: Polish & Platform   [ ] Not started
 
 **Recent Trend:**
 
-- Last 5 plans: 01a (13 min), 01b (25 min)
-- Trend: stabilizing — lib layer more complex than scaffold
+- Last 5 plans: 01a (13 min), 01b (25 min), 01c (6 min)
+- Trend: fast — UI atom components completed in single session with zero deviations requiring architectural changes
 
 *Updated after each plan completion*
 
@@ -78,6 +78,12 @@ Key decisions relevant to Phase 1 (01a additions):
 - **react-native version:** 0.82.1 (not 0.81.5 from template) — required by react-native-screens@4.25.1 in expo-router@55
 - **TypeScript version:** 6.x installed; ignoreDeprecations: '6.0' added to tsconfig for baseUrl compatibility
 - **Install flags:** --legacy-peer-deps required for all installs due to React 19/ecosystem peer dep gaps
+
+Key decisions relevant to Phase 1 (01c additions):
+
+- **ActivityIndicator hex exception:** #F2CA50 (accent) and #0A0A0B (bg) used only in Spinner.tsx color prop — ActivityIndicator does not accept NativeWind className on color prop. Documented in component comments.
+- **ProgressBar Animated.View style:** NativeWind cannot drive animated percentage widths — reanimated useAnimatedStyle required for withTiming interpolation on width.
+- **TextInput placeholderTextColor:** Uses #99907C (fg-muted token value) — React Native's placeholderTextColor prop does not accept NativeWind className strings.
 
 Key decisions relevant to Phase 1 (01b additions):
 
@@ -137,4 +143,4 @@ Items carried forward from pre-v2 planning and explicitly deferred:
 ## Session Continuity
 
 Last session: 2026-05-20
-Stopped at: Plan 01b (scaffold-lib) complete. Commits 7344562 (lib layer) and f59fbfa (hooks). Next: Plan 01c (scaffold-routing) — Expo Router layout files, root layout gate, tab navigator, onboarding stack.
+Stopped at: Plan 01c (scaffold-ui) complete. Commits 515d971 (Task 1 atoms) and 3bb7c74 (Task 2 atoms). Next: Plan 01d (scaffold-routing) — Expo Router layout files, root layout gate, tab navigator, onboarding stack.
