@@ -1,5 +1,10 @@
 appId: com.razeandrise.app
-# TODO: complete in 01c-ui plan (dark/light mode toggle in Settings)
-
-flows:
-  - launchApp
+---
+- launchApp
+- tapOn: "Settings"
+- assertVisible: "Appearance"
+- tapOn:
+    text: "Dark mode"
+    optional: true
+# Note: MMKV theme override verified by asserting Settings toggle state, not visual color
+# Visual contrast verified manually

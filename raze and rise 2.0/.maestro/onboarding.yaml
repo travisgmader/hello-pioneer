@@ -1,5 +1,23 @@
 appId: com.razeandrise.app
-# TODO: complete in 01d-onboarding plan
-
-flows:
-  - launchApp
+---
+- launchApp
+- assertVisible: "Sign In"
+- tapOn: "Sign Up"
+- inputText: "onboarding-test@example.com"
+- inputText: "testpass123"
+- inputText: "testpass123"
+- tapOn: "Create account"
+- assertVisible: "Set up your profile"
+- clearText
+- inputText: "TestAthlete"
+- tapOn: "Continue"
+- assertVisible: "Choose your split"
+- tapOn: "Push / Pull / Legs"
+- tapOn: "Continue"
+- assertVisible: "Pick a starter template"
+- tapOn:
+    index: 0
+- tapOn: "Continue"
+- assertVisible: "Try logging a set"
+- tapOn: "Skip for now"
+- assertVisible: "Welcome"

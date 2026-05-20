@@ -1,5 +1,15 @@
 appId: com.razeandrise.app
-# TODO: complete in 01c-ui plan (5-tab navigation E2E with airplane mode toggle)
-
-flows:
-  - launchApp
+---
+- launchApp
+- assertVisible: "Welcome"
+- tapOn: "Workouts"
+- assertVisible: "Workouts"
+- tapOn: "Split"
+- assertVisible: "Split"
+- tapOn: "Progress"
+- assertVisible: "Progress"
+- tapOn: "Settings"
+- assertVisible: "Settings"
+- tapOn: "Dashboard"
+- assertVisible: "Welcome"
+# TODO: run with airplane mode ON to verify NAV-03 offline navigation — requires device manual step

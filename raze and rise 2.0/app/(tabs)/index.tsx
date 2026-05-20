@@ -1,5 +1,5 @@
 /**
- * Dashboard tab — stub screen.
+ * Dashboard tab — Phase 1 stub screen.
  *
  * Per UI-SPEC Dashboard Stub section:
  *   - Heading: "Welcome, {displayName ?? 'athlete'}" (24px Noto Serif 700, text-fg)
@@ -14,35 +14,31 @@
 import { SafeAreaView, ScrollView, View, Text } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { useSession } from '@/hooks/useSession';
 import { powersync } from '@/lib/powersync';
 
-function useDashboardProfile() {
+function useDashboardProfile(userId: string | undefined) {
   return useQuery({
-    queryKey: ['dashboard-profile'],
+    queryKey: ['profile', userId],
     queryFn: async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) return null;
-
+      if (!userId) return null;
       const { data } = await supabase
         .from('profiles')
         .select('display_name')
-        .eq('user_id', session.user.id)
+        .eq('user_id', userId)
         .single();
-
       return data as { display_name: string | null } | null;
     },
+    enabled: !!userId,
   });
 }
 
 export default function DashboardScreen() {
-  const { data: profile } = useDashboardProfile();
+  const { session } = useSession();
+  const { data: profile } = useDashboardProfile(session?.user.id);
   const displayName = profile?.display_name ?? 'athlete';
 
   // __DEV__ PowerSync status (used by 01-skeleton-verification-PLAN.md Walking Skeleton test).
-  // SyncStatus uses `connected` / `connecting` booleans — derive a readable label.
   const devStatus = __DEV__
     ? powersync.currentStatus?.connected
       ? 'connected'
@@ -52,87 +48,48 @@ export default function DashboardScreen() {
     : null;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#0A0A0B' }}>
+    <SafeAreaView className="flex-1 bg-bg">
       <ScrollView
-        contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: 32,
-          flexGrow: 1,
-        }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 32, flexGrow: 1 }}
       >
-        {/* Heading: "Welcome, {displayName}" — 24px Noto Serif 700, text-fg */}
+        {/* Heading: "Welcome, {displayName}" — 24px Noto Serif 700, text-fg (NOT accent) */}
         <Text
-          style={{
-            fontFamily: 'Noto Serif',
-            fontSize: 24,
-            fontWeight: '700',
-            color: '#E5E2E1',
-          }}
+          className="text-fg"
+          style={{ fontFamily: 'Noto Serif', fontSize: 24, fontWeight: '700' }}
+          allowFontScaling={false}
         >
           {`Welcome, ${displayName}`}
         </Text>
 
-        {/* 8px gap */}
-        <View style={{ height: 8 }} />
+        {/* 8pt gap */}
+        <View className="h-sm" />
 
         {/* Body: "Today is a rest day." — 16px Manrope 400, text-fg-muted */}
-        <Text
-          style={{
-            fontFamily: 'Manrope',
-            fontSize: 16,
-            fontWeight: '400',
-            color: '#99907C',
-          }}
-        >
+        <Text className="text-body text-fg-muted" allowFontScaling={false}>
           Today is a rest day.
         </Text>
 
-        {/* 48px gap */}
-        <View style={{ height: 48 }} />
+        {/* 48pt gap */}
+        <View className="h-2xl" />
 
         {/* Empty state card */}
-        <View
-          style={{
-            backgroundColor: '#141416',
-            borderRadius: 8,
-            padding: 24,
-          }}
-        >
-          <Text
-            style={{
-              fontFamily: 'Manrope',
-              fontSize: 16,
-              fontWeight: '600',
-              color: '#E5E2E1',
-            }}
-          >
+        <View className="bg-bg-elevated rounded-lg p-lg">
+          <Text className="text-body font-bold text-fg" allowFontScaling={false}>
             No workout scheduled.
           </Text>
-
-          {/* 8px gap */}
-          <View style={{ height: 8 }} />
-
-          <Text
-            style={{
-              fontFamily: 'Manrope',
-              fontSize: 12,
-              fontWeight: '400',
-              color: '#99907C',
-            }}
-          >
+          <View className="h-sm" />
+          <Text className="text-caption text-fg-muted" allowFontScaling={false}>
             Real workout logging ships in Phase 2.
           </Text>
         </View>
 
         {/* __DEV__ PowerSync status indicator — stripped in production by Metro */}
         {__DEV__ && devStatus !== null && (
-          <View style={{ marginTop: 24 }}>
+          <View className="mt-lg">
             <Text
-              style={{
-                fontFamily: 'Manrope',
-                fontSize: 12,
-                color: '#5C564B',
-              }}
+              className="text-caption"
+              style={{ color: '#5C564B' }}
+              allowFontScaling={false}
             >
               {`PowerSync: ${devStatus}`}
             </Text>
