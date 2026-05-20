@@ -21,7 +21,9 @@ vi.mock('@/lib/supabase', () => ({
 import { supabase } from '@/lib/supabase';
 import { resetPassword, signUpEmail, signInEmail, changePassword } from '@/services/auth/email';
 
-const mockAuth = supabase.auth as {
+// Cast to unknown first to avoid incompatible type error between supabase client
+// and vitest mock types — safe here because the module is fully mocked above
+const mockAuth = supabase.auth as unknown as {
   resetPasswordForEmail: ReturnType<typeof vi.fn>;
   signUp: ReturnType<typeof vi.fn>;
   signInWithPassword: ReturnType<typeof vi.fn>;
