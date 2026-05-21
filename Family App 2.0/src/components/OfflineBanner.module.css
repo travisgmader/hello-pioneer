@@ -1,0 +1,39 @@
+/*
+ * OfflineBanner.module.css — fixed top banner for offline/paused-mutation state.
+ * z-index 250 — above TopNav (200), below BottomNav (300).
+ * All colors via var(--token) — no raw hex values.
+ */
+
+.banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 250;
+  height: 36px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--text);
+  animation: slideDown 200ms ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .banner {
+    height: 32px;
+  }
+}

@@ -1,0 +1,18 @@
+/*
+ * RootLayout.module.css — authenticated shell layout.
+ * All colors via var(--token) — no raw hex values.
+ */
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1;
+  padding: 24px;
+  /* Extra bottom padding on mobile so content is not obscured by the fixed
+     BottomNav bar. Matches the safe-area pattern from globals.css. */
+  padding-bottom: calc(64px + max(env(safe-area-inset-bottom, 12px), 12px));
+}

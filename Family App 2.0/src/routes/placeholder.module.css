@@ -1,0 +1,25 @@
+/*
+ * placeholder.module.css — shared styles for all six placeholder route pages.
+ * Used by dashboard.tsx, chores.tsx, calendar.tsx, meals.tsx, groceries.tsx,
+ * and notes.tsx until each section is implemented in later phases.
+ * All colors via var(--token) — no raw hex values.
+ */
+
+.placeholder {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 720px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.body {
+  font-size: 14px;
+  color: var(--text-muted);
+}

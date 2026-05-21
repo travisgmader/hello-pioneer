@@ -8,7 +8,6 @@
 import { describe, it, expect } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-// @ts-expect-error — component is created in Plan 04
 import { OfflineBanner } from '../../src/components/OfflineBanner';
 
 describe('OfflineBanner (Wave 0 RED stub — created in Plan 04)', () => {
