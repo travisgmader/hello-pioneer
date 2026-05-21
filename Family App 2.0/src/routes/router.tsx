@@ -1,26 +1,9 @@
 /**
  * React Router v7 Data-mode router (ARCH-02 + ARCH-08 + D-16).
  *
- * Route topology — final shape. 01-04b mounts the visual shell on top of
- * these declarations by replacing the `<Stub />` placeholder element
- * references with the real components; the `path`/`loader`/`errorElement`
- * properties do NOT change.
- *
- * TODO (01-04b — Visual shell):
- *   - import RootLayout from './RootLayout' and replace `element: <Stub />`
- *     on the RootLayout wrapper.
- *   - import Dashboard from './(app)/dashboard' and replace the dashboard
- *     `element: <Stub />`.
- *   - import Chores from './(app)/chores' and replace the chores
- *     `element: <Stub />`.
- *   - import Calendar from './(app)/calendar' and replace the calendar
- *     `element: <Stub />`.
- *   - import Meals from './(app)/meals' and replace the meals
- *     `element: <Stub />`.
- *   - import Groceries from './(app)/groceries' and replace the groceries
- *     `element: <Stub />`.
- *   - import Notes from './(app)/notes' and replace the notes
- *     `element: <Stub />`.
+ * Route topology — final shape. 01-04b has mounted the visual shell by
+ * replacing the `<Stub />` placeholder element references with real components
+ * for the layout and all six tab routes.
  *
  * TODO (Plan 05 — Family Creation Wizard):
  *   - import CreateFamily from './onboarding/create-family' and replace
@@ -44,12 +27,17 @@ import { requireAuthLoader } from '../auth/RequireAuth';
 import RouteErrorFallback from './RouteErrorFallback';
 import Login from './login';
 import AccessDenied from './access-denied';
+import RootLayout from './RootLayout';
+import Dashboard from './dashboard';
+import Chores from './chores';
+import Calendar from './calendar';
+import Meals from './meals';
+import Groceries from './groceries';
+import Notes from './notes';
 
 /**
- * Placeholder element used wherever 01-04b or Plan 05 will mount the real
- * component. Named `Stub` (not `RootLayout`) so 01-04b's
- * `import RootLayout from './RootLayout'` cleanly replaces the reference
- * without a name collision.
+ * Placeholder element used only for the `onboarding/create-family` route until
+ * Plan 05 Task 5.2 replaces it with `import CreateFamily from './onboarding/create-family'`.
  */
 const Stub = (): null => null;
 
@@ -75,40 +63,40 @@ export const router = createBrowserRouter([
         errorElement: <RouteErrorFallback />,
       },
       {
-        // RootLayout wrapper (01-04b replaces <Stub /> with <RootLayout />).
-        // RootLayout itself mounts <RequireFamily> internally.
-        element: <Stub />,
+        // RootLayout wraps all six tab routes. RequireFamily is mounted inside
+        // RootLayout — it redirects to /onboarding/create-family if no family.
+        element: <RootLayout />,
         errorElement: <RouteErrorFallback />,
         children: [
           { path: '', loader: () => redirect('/dashboard') },
           {
             path: 'dashboard',
-            element: <Stub />,
+            element: <Dashboard />,
             errorElement: <RouteErrorFallback />,
           },
           {
             path: 'chores',
-            element: <Stub />,
+            element: <Chores />,
             errorElement: <RouteErrorFallback />,
           },
           {
             path: 'calendar',
-            element: <Stub />,
+            element: <Calendar />,
             errorElement: <RouteErrorFallback />,
           },
           {
             path: 'meals',
-            element: <Stub />,
+            element: <Meals />,
             errorElement: <RouteErrorFallback />,
           },
           {
             path: 'groceries',
-            element: <Stub />,
+            element: <Groceries />,
             errorElement: <RouteErrorFallback />,
           },
           {
             path: 'notes',
-            element: <Stub />,
+            element: <Notes />,
             errorElement: <RouteErrorFallback />,
           },
         ],
