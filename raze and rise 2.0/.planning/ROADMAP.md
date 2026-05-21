@@ -105,6 +105,13 @@ Plans:
 **Wave 7**
 
 - [ ] 02-09-PLAN.md — Body map injury flagging + bodyweight + run exercise type + HealthKit stub (WORKOUT-10, WORKOUT-12, WORKOUT-13)
+
+**Cross-cutting constraints:**
+- FlashList recycling: SetRow + ExerciseCard must NOT use local `useState` for expanded/selection state — drive from Zustand store keyed by set UUID (all plans Wave 2+)
+- MMKV API: use `.remove(key)` not `.delete(key)` — confirmed from `src/lib/storage.ts:69` (plans 02-04, 02-07, 02-08)
+- NativeWind hex exceptions: `placeholderTextColor="#99907C"`, timer-zero `#F2CA50`, SVG fill, and `fontVariant: ['tabular-nums']` all use `style={}` not `className` (all plans)
+- PowerSync atomicity: session completion must use `writeTransaction()` — NOT multiple `execute()` calls; `rowsAffected` always returns 0 in PowerSync (plans 02-04, 02-07)
+
 **UI hint**: yes
 
 ---

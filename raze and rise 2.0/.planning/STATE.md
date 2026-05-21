@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: "Phase 1 complete (9/9 plans). All automated tests pass. Next: Phase 2 — Core Session Loop."
+status: ready_to_execute
+stopped_at: Phase 2 planned — ready to execute
 last_updated: "2026-05-20T00:00:00.000Z"
 last_activity: 2026-05-20
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 9
+  total_plans: 18
   completed_plans: 9
   percent: 17
 ---
@@ -21,20 +21,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-18)
 
 **Core value:** A workout session — from opening the app to tapping Complete — must be frictionless, accurate, and smart enough that you never need to reach for your phone clock, a separate notes app, or a calculator.
-**Current focus:** Phase 1 — Foundation
+**Current focus:** Phase 2 — Core Session Loop
 
 ## Current Position
 
 Phase: 2 of 6 (Core Session Loop)
-Plan: 0 of ? in current phase (planning not yet started)
-Status: Ready to plan
+Plan: 0 of 9 in current phase (planning complete — ready to execute)
+Status: Ready to execute
 Last activity: 2026-05-20
 
 Progress: [█░░░░░░░░░] 17%
 
 ```
 Phase 1: Foundation          [x] Complete (9/9 plans)
-Phase 2: Core Session Loop   [>] Next
+Phase 2: Core Session Loop   [>] Planned (9 plans, 8 waves — ready to execute)
 Phase 3: Templates, Programs & Progress  [ ] Not started
 Phase 4: Premium & AI        [ ] Not started
 Phase 5: Wearables & Notifications      [ ] Not started
@@ -158,5 +158,5 @@ Items carried forward from pre-v2 planning and explicitly deferred:
 
 ## Session Continuity
 
-Last session: 2026-05-20T00:00:00.000Z
-Stopped at: Phase 1 complete. 9/9 plans executed. 146 unit tests + 14 integration tests pass. 0 TS errors. VERIFICATION.md written. Next: Phase 2 — Core Session Loop (run /gsd:plan-phase 2 to begin).
+Last session: 2026-05-21T03:20:40.776Z
+Stopped at: Phase 2 context gathered
