@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A single `useRealtimeBridge()` hook at app root subscribes to `postgres_changes` and translates them into targeted `queryClient.invalidateQueries` (verified against a manual insert)
   4. The first signed-in parent can create a family space (sets family name + emoji avatar) and a `families` row + matching `family_settings` row with timezone are written under their `family_id`
   5. The app is installed as a PWA from Vercel, error boundaries on every route catch render failures, and writes made while offline queue in IndexedDB and flush on reconnect
-**Plans:** 3/7 plans executed
+**Plans:** 5/7 plans executed
 
 **Wave 1** *(parallel — no dependencies)*
 - [x] 01-01-PLAN.md — Vite + React 19 + TypeScript scaffold, v1 CSS theme port, RED test stubs
@@ -46,10 +46,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 01-03-PLAN.md — Supabase client + Google OAuth + allowlist gate + /login + /access-denied
 
 **Wave 3** *(blocked on Wave 2 completion)*
-- [ ] 01-04a-PLAN.md — TanStack Query + useCurrentFamily/useFamilySettings + useRealtimeBridge + RequireAuth/Family + router + error boundary (data + auth skeleton, ends with human checkpoint)
+- [x] 01-04a-PLAN.md — TanStack Query + useCurrentFamily/useFamilySettings + useRealtimeBridge + RequireAuth/Family + router + error boundary (data + auth skeleton, ends with human checkpoint)
 
 **Wave 4** *(blocked on Wave 3 completion)*
-- [ ] 01-04b-PLAN.md — RootLayout + nav + placeholders + OfflineBanner + ReconnectedToast + ThemeProvider + ThemeToggle (with D-15 DB persistence) + main.tsx wiring
+- [x] 01-04b-PLAN.md — RootLayout + nav + placeholders + OfflineBanner + ReconnectedToast + ThemeProvider + ThemeToggle (with D-15 DB persistence) + main.tsx wiring
 
 **Wave 5** *(blocked on Wave 4 completion)*
 - [ ] 01-05-PLAN.md — Family Creation Wizard + computeTrialEnd + Stripe Customer Edge Function + Stripe webhook
@@ -194,7 +194,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Walking Skeleton | 3/7 | In Progress|  |
+| 1. Foundation & Walking Skeleton | 5/7 | In Progress|  |
 | 2. Members, Onboarding & Billing | 0/TBD | Not started | - |
 | 3. Chores | 0/TBD | Not started | - |
 | 4. Calendar & Custody | 0/TBD | Not started | - |

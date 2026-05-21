@@ -10,14 +10,14 @@
 ### Foundation & Architecture
 
 - [ ] **ARCH-01**: Multi-tenant architecture — every family is isolated by `family_id`; all tables partitioned by RLS policy
-- [ ] **ARCH-02**: React 19 + Vite + TypeScript + React Router v7 (Data mode, `createBrowserRouter`)
+- [x] **ARCH-02**: React 19 + Vite + TypeScript + React Router v7 (Data mode, `createBrowserRouter`)
 - [ ] **ARCH-03**: TanStack Query v5 — all server state; replaces monolithic AppContext from v1
 - [ ] **ARCH-04**: vite-plugin-pwa with `strategies: 'injectManifest'` — custom service worker for push + offline
 - [ ] **ARCH-05**: New Supabase schema — UUIDs everywhere, `family_id` partition key, `updated_at` / `updated_by` audit columns on all tables, RLS enabled from day one
 - [ ] **ARCH-06**: `chore_completions` event log table separate from `chores` template table — required for streaks, history, parent alerts
-- [ ] **ARCH-07**: Realtime bridge — single `useRealtimeBridge()` hook at app root; translates `postgres_changes` into `queryClient.invalidateQueries`
+- [x] **ARCH-07**: Realtime bridge — single `useRealtimeBridge()` hook at app root; translates `postgres_changes` into `queryClient.invalidateQueries`
 - [ ] **ARCH-08**: Error boundaries on every route
-- [ ] **ARCH-09**: Offline queue and sync — writes queue locally when no connection, sync automatically on reconnect
+- [x] **ARCH-09**: Offline queue and sync — writes queue locally when no connection, sync automatically on reconnect
 - [ ] **ARCH-10**: Stripe billing integration — subscription management, free/premium tier enforcement
 - [ ] **ARCH-11**: Linked families — two separate family spaces can share a custody calendar view (co-parenting use case)
 - [ ] **ARCH-12**: Data migration script — v1 family-hub Supabase data migrated to v2 schema (dry-run on branch DB before prod cutover)
@@ -218,14 +218,14 @@ Every v1 requirement is mapped to exactly one phase below. Phases are defined in
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | ARCH-01 | Phase 1 | Pending |
-| ARCH-02 | Phase 1 | Pending |
+| ARCH-02 | Phase 1 | Complete |
 | ARCH-03 | Phase 1 | Pending |
 | ARCH-04 | Phase 1 | Pending |
 | ARCH-05 | Phase 1 | Pending |
 | ARCH-06 | Phase 1 | Pending |
-| ARCH-07 | Phase 1 | Pending |
+| ARCH-07 | Phase 1 | Complete |
 | ARCH-08 | Phase 1 | Pending |
-| ARCH-09 | Phase 1 | Pending |
+| ARCH-09 | Phase 1 | Complete |
 | ARCH-10 | Phase 1 | Pending |
 | ARCH-11 | Phase 1 | Pending |
 | ARCH-12 | Phase 10 | Pending |
