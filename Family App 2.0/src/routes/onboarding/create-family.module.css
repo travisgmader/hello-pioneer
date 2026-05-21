@@ -1,0 +1,115 @@
+/* Family Creation Wizard — ported card geometry from login.module.css.
+   All colors via var(--token); raw hex is forbidden (UI-SPEC §Color rules). */
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 24px;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 48px 40px;
+  max-width: 380px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 4px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  display: block;
+}
+
+.input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  min-height: 44px;
+  background: var(--card-bg);
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: 2px solid var(--lavender);
+  outline-offset: 2px;
+}
+
+.emojiRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.emojiChip {
+  padding: 8px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--card-bg);
+  font-size: 24px;
+  min-height: 44px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.emojiChip[data-active='true'] {
+  border-color: var(--lavender);
+  background: var(--lavender-light);
+}
+
+.helper {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.error {
+  color: var(--pink-dark);
+  font-size: 13px;
+  background: var(--pink-light);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.primary {
+  background: var(--lavender);
+  color: var(--text-on-lavender, white);
+  padding: 12px 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  min-height: 44px;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+  width: 100%;
+}
+
+.primary:hover:not(:disabled) {
+  box-shadow: var(--shadow);
+}
+
+.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

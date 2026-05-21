@@ -1,13 +1,9 @@
 /**
  * React Router v7 Data-mode router (ARCH-02 + ARCH-08 + D-16).
  *
- * Route topology — final shape. 01-04b has mounted the visual shell by
- * replacing the `<Stub />` placeholder element references with real components
- * for the layout and all six tab routes.
- *
- * TODO (Plan 05 — Family Creation Wizard):
- *   - import CreateFamily from './onboarding/create-family' and replace
- *     the onboarding/create-family `element: <Stub />`.
+ * Route topology — final shape. 01-04b mounted the visual shell by replacing
+ * `<Stub />` placeholders with real components for the layout and all six tab
+ * routes. 01-05 wires the Family Creation Wizard (ONBD-01).
  *
  * Auth boundary (D-16 + Pitfall 1):
  *   - `/` carries `requireAuthLoader` so unauthenticated traffic redirects
@@ -34,12 +30,7 @@ import Calendar from './calendar';
 import Meals from './meals';
 import Groceries from './groceries';
 import Notes from './notes';
-
-/**
- * Placeholder element used only for the `onboarding/create-family` route until
- * Plan 05 Task 5.2 replaces it with `import CreateFamily from './onboarding/create-family'`.
- */
-const Stub = (): null => null;
+import CreateFamily from './onboarding/create-family';
 
 export const router = createBrowserRouter([
   {
@@ -59,7 +50,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: 'onboarding/create-family',
-        element: <Stub />,
+        element: <CreateFamily />,
         errorElement: <RouteErrorFallback />,
       },
       {
