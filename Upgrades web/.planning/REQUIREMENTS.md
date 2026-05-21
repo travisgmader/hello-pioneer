@@ -65,8 +65,26 @@
 
 ## Traceability
 
-*Filled by roadmap phase after roadmap is created.*
-
-| REQ-ID | Phase | Success Criterion |
-|--------|-------|-------------------|
-| — | — | — |
+| REQ-ID | Phase | Status |
+|--------|-------|--------|
+| GLOB-01 | Phase 1 — Foundation | Pending |
+| GLOB-03 | Phase 1 — Foundation | Pending |
+| GLOB-04 | Phase 1 — Foundation | Pending |
+| GLOB-05 | Phase 1 — Foundation | Pending |
+| HOME-01 | Phase 2 — Home & Amenities | Pending |
+| HOME-02 | Phase 2 — Home & Amenities | Pending |
+| AMEN-01 | Phase 2 — Home & Amenities | Pending |
+| AMEN-02 | Phase 2 — Home & Amenities | Pending |
+| AMEN-03 | Phase 2 — Home & Amenities | Pending |
+| MEMB-01 | Phase 3 — Membership & Schedule | Pending |
+| MEMB-02 | Phase 3 — Membership & Schedule | Pending |
+| MEMB-03 | Phase 3 — Membership & Schedule | Pending |
+| MEMB-04 | Phase 3 — Membership & Schedule | Pending |
+| SCHED-01 | Phase 3 — Membership & Schedule | Pending |
+| SCHED-02 | Phase 3 — Membership & Schedule | Pending |
+| SCHED-03 | Phase 3 — Membership & Schedule | Pending |
+| CONT-01 | Phase 4 — Contact | Pending |
+| CONT-02 | Phase 4 — Contact | Pending |
+| CONT-03 | Phase 4 — Contact | Pending |
+| CONT-04 | Phase 4 — Contact | Pending |
+| GLOB-02 | Phase 5 — Sanity CMS | Pending |
