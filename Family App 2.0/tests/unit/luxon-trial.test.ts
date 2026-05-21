@@ -1,22 +1,34 @@
 /**
- * Wave 0 RED stub — ARCH-13 (Luxon date math keyed to family_settings.timezone).
+ * GREEN tests for computeTrialEnd (ARCH-13).
  *
- * The computeTrialEnd helper is created in Plan 05. Until then this test
- * MUST fail at import time. Asserts that adding 7 days survives the
- * America/Chicago spring DST transition without drifting to UTC.
+ * Validates DST-safe 7-calendar-day addition via Luxon.
+ * Replaced the Wave 0 RED stub that was in this file before Plan 05.
  */
 import { describe, it, expect } from 'vitest';
 import { DateTime } from 'luxon';
-// @ts-expect-error — module is created in Plan 05
 import { computeTrialEnd } from '../../src/lib/trialEnd';
 
-describe('computeTrialEnd (Wave 0 RED stub — created in Plan 05)', () => {
-  it('adds 7 days in the supplied zone, DST-safe', () => {
-    const start = DateTime.fromISO('2026-05-19T12:00:00', {
-      zone: 'America/Chicago',
-    });
-    const end = computeTrialEnd(start);
-    expect(end.zoneName).toBe('America/Chicago');
-    expect(end.diff(start, 'days').days).toBe(7);
+describe('computeTrialEnd', () => {
+  it('returns DateTime exactly 7 calendar days later', () => {
+    const input = DateTime.fromISO('2026-05-19T12:00:00', { zone: 'America/Chicago' });
+    const result = computeTrialEnd(input);
+    const expected = DateTime.fromISO('2026-05-26T12:00:00', { zone: 'America/Chicago' });
+    expect(result.toISO()).toEqual(expected.toISO());
+  });
+
+  it('is DST-safe across spring forward (America/Chicago 2026-03-08)', () => {
+    // Spring forward: clocks move from 2:00 AM → 3:00 AM on 2026-03-08.
+    // 7 × 24 h would give 2026-03-15T13:00:00 (one hour drift).
+    // Calendar-day arithmetic gives 2026-03-15T12:00:00 (correct).
+    const input = DateTime.fromISO('2026-03-08T12:00:00', { zone: 'America/Chicago' });
+    const result = computeTrialEnd(input);
+    expect(result.day).toEqual(15);
+    expect(result.hour).toEqual(12);
+  });
+
+  it('preserves the input timezone', () => {
+    const input = DateTime.fromISO('2026-06-01T10:00:00', { zone: 'Europe/Berlin' });
+    const result = computeTrialEnd(input);
+    expect(result.zoneName).toEqual('Europe/Berlin');
   });
 });
