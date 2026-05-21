@@ -1,0 +1,39 @@
+/*
+ * ThemeToggle.module.css — inline Lavender / Midnight chip pair.
+ * All colors via var(--token) — no raw hex values.
+ */
+
+.chipPair {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.chip {
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  min-height: 36px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.chip:hover:not(:disabled) {
+  background: var(--lavender-light);
+  color: var(--text);
+}
+
+.chip[data-active='true'] {
+  background: var(--lavender);
+  color: white;
+  border-color: var(--lavender);
+}
+
+.chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

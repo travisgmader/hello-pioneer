@@ -1,0 +1,52 @@
+/*
+ * BottomNav.module.css — fixed mobile bottom-tab bar.
+ * Ported from v1 Nav.module.css bottomBar section.
+ * All colors via var(--token) — no raw hex values.
+ */
+
+.bottomBar {
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 300;
+  background: var(--card-bg);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+  padding-bottom: max(env(safe-area-inset-bottom, 12px), 12px);
+}
+
+.bottomTab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  font-size: 24px;
+  padding: 10px 0;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  border-radius: 0;
+  line-height: 1;
+  min-height: 44px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.bottomTab:hover {
+  background: var(--lavender-light);
+}
+
+.bottomTabActive {
+  background: var(--lavender-light);
+  transform: translateY(-2px);
+}
+
+/* Desktop: hide the bottom bar */
+@media (min-width: 769px) {
+  .bottomBar {
+    display: none;
+  }
+}
