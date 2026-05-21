@@ -18,14 +18,14 @@
 - [x] **ARCH-07**: Realtime bridge — single `useRealtimeBridge()` hook at app root; translates `postgres_changes` into `queryClient.invalidateQueries`
 - [ ] **ARCH-08**: Error boundaries on every route
 - [x] **ARCH-09**: Offline queue and sync — writes queue locally when no connection, sync automatically on reconnect
-- [ ] **ARCH-10**: Stripe billing integration — subscription management, free/premium tier enforcement
+- [x] **ARCH-10**: Stripe billing integration — subscription management, free/premium tier enforcement
 - [ ] **ARCH-11**: Linked families — two separate family spaces can share a custody calendar view (co-parenting use case)
 - [ ] **ARCH-12**: Data migration script — v1 family-hub Supabase data migrated to v2 schema (dry-run on branch DB before prod cutover)
-- [ ] **ARCH-13**: Luxon for all date/time math — DST-safe streak and recurrence logic keyed to `family_settings.timezone`
+- [x] **ARCH-13**: Luxon for all date/time math — DST-safe streak and recurrence logic keyed to `family_settings.timezone`
 
 ### Onboarding & Family Setup
 
-- [ ] **ONBD-01**: Parent creates a new family space — sets family name and emoji avatar
+- [x] **ONBD-01**: Parent creates a new family space — sets family name and emoji avatar
 - [ ] **ONBD-02**: Invite family members by email link
 - [ ] **ONBD-03**: Join a family via 6-digit code
 - [ ] **ONBD-04**: COPPA parental consent flow — parent creates account on behalf of child under 13
@@ -226,11 +226,11 @@ Every v1 requirement is mapped to exactly one phase below. Phases are defined in
 | ARCH-07 | Phase 1 | Complete |
 | ARCH-08 | Phase 1 | Pending |
 | ARCH-09 | Phase 1 | Complete |
-| ARCH-10 | Phase 1 | Pending |
+| ARCH-10 | Phase 1 | Complete |
 | ARCH-11 | Phase 1 | Pending |
 | ARCH-12 | Phase 10 | Pending |
-| ARCH-13 | Phase 1 | Pending |
-| ONBD-01 | Phase 1 | Pending |
+| ARCH-13 | Phase 1 | Complete |
+| ONBD-01 | Phase 1 | Complete |
 | ONBD-02 | Phase 2 | Pending |
 | ONBD-03 | Phase 2 | Pending |
 | ONBD-04 | Phase 2 | Pending |
