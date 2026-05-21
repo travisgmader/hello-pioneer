@@ -12,7 +12,7 @@
 - [ ] **ARCH-01**: Multi-tenant architecture — every family is isolated by `family_id`; all tables partitioned by RLS policy
 - [x] **ARCH-02**: React 19 + Vite + TypeScript + React Router v7 (Data mode, `createBrowserRouter`)
 - [ ] **ARCH-03**: TanStack Query v5 — all server state; replaces monolithic AppContext from v1
-- [ ] **ARCH-04**: vite-plugin-pwa with `strategies: 'injectManifest'` — custom service worker for push + offline
+- [x] **ARCH-04**: vite-plugin-pwa with `strategies: 'injectManifest'` — custom service worker for push + offline
 - [ ] **ARCH-05**: New Supabase schema — UUIDs everywhere, `family_id` partition key, `updated_at` / `updated_by` audit columns on all tables, RLS enabled from day one
 - [ ] **ARCH-06**: `chore_completions` event log table separate from `chores` template table — required for streaks, history, parent alerts
 - [x] **ARCH-07**: Realtime bridge — single `useRealtimeBridge()` hook at app root; translates `postgres_changes` into `queryClient.invalidateQueries`
@@ -220,7 +220,7 @@ Every v1 requirement is mapped to exactly one phase below. Phases are defined in
 | ARCH-01 | Phase 1 | Pending |
 | ARCH-02 | Phase 1 | Complete |
 | ARCH-03 | Phase 1 | Pending |
-| ARCH-04 | Phase 1 | Pending |
+| ARCH-04 | Phase 1 | Complete |
 | ARCH-05 | Phase 1 | Pending |
 | ARCH-06 | Phase 1 | Pending |
 | ARCH-07 | Phase 1 | Complete |

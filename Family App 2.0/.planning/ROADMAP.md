@@ -12,7 +12,7 @@ Family Hub 2.0 is a mobile-first multi-tenant PWA for shared household managemen
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation & Walking Skeleton** - Multi-tenant schema with RLS, realtime bridge, auth, routing, error boundaries, and an empty but deployable PWA shell
+- [x] **Phase 1: Foundation & Walking Skeleton** - Multi-tenant schema with RLS, realtime bridge, auth, routing, error boundaries, and an empty but deployable PWA shell (completed 2026-05-21)
 - [ ] **Phase 2: Members, Onboarding & Billing** - Family creation, member CRUD (real + virtual), invitations, Stripe billing infrastructure, and trial enrollment
 - [ ] **Phase 3: Chores** - Templates + `chore_completions` event log + Duolingo-style streaks with freezes
 - [ ] **Phase 4: Calendar & Custody** - Month grid with layer toggles, RRULE events, iCal export, custody pattern + overrides model, linked family view
@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A single `useRealtimeBridge()` hook at app root subscribes to `postgres_changes` and translates them into targeted `queryClient.invalidateQueries` (verified against a manual insert)
   4. The first signed-in parent can create a family space (sets family name + emoji avatar) and a `families` row + matching `family_settings` row with timezone are written under their `family_id`
   5. The app is installed as a PWA from Vercel, error boundaries on every route catch render failures, and writes made while offline queue in IndexedDB and flush on reconnect
-**Plans:** 6/7 plans executed
+**Plans:** 7/7 plans complete
 
 **Wave 1** *(parallel — no dependencies)*
 - [x] 01-01-PLAN.md — Vite + React 19 + TypeScript scaffold, v1 CSS theme port, RED test stubs
@@ -55,7 +55,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 01-05-PLAN.md — Family Creation Wizard + computeTrialEnd + Stripe Customer Edge Function + Stripe webhook
 
 **Wave 6** *(blocked on Wave 5 completion)*
-- [ ] 01-06-PLAN.md — vite-plugin-pwa + custom service worker + Vercel preview deploy + E2E smoke
+- [x] 01-06-PLAN.md — vite-plugin-pwa + custom service worker + Vercel preview deploy + E2E smoke
 
 **Cross-cutting constraints:**
 - All plans: RLS policies in private schema with `SECURITY DEFINER` and `set search_path = ''` — never callable from PostgREST
@@ -194,7 +194,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Walking Skeleton | 6/7 | In Progress|  |
+| 1. Foundation & Walking Skeleton | 7/7 | Complete   | 2026-05-21 |
 | 2. Members, Onboarding & Billing | 0/TBD | Not started | - |
 | 3. Chores | 0/TBD | Not started | - |
 | 4. Calendar & Custody | 0/TBD | Not started | - |
