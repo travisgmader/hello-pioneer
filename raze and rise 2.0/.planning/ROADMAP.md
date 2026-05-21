@@ -71,7 +71,40 @@ Plans:
 4. Two exercises can be paired as a superset: completing a set on exercise A auto-scrolls to exercise B; the rest timer fires only after both exercises in the round are marked; then scrolls back to A
 5. Completing a workout triggers the Anubis loading animation, commits the session to history in PowerSync, and advances the split rotation pointer — even if the device loses network before or during completion
 
-**Plans:** TBD
+**Plans:** 9 plans
+Plans:
+**Wave 0**
+
+- [ ] 02-01-PLAN.md — Dependencies + assets (Anubis, timer tone) + Wave 0 test stubs + notification channel
+
+**Wave 1** *(parallel)*
+
+- [ ] 02-02-PLAN.md — useSetResult hook + 5 atoms (SetResultButton, WeightInput, NumericText, LeftEdgeBar, PrevPerformanceLink) + Phase 2 tokens
+- [ ] 02-03-PLAN.md — useRestTimer hook + RestTimerPill with background notification + audio tone (WORKOUT-06, WORKOUT-07)
+
+**Wave 2**
+
+- [ ] 02-04-PLAN.md — Session screen scaffold + FlashList + SetRow + ExerciseCard + Zustand store + MMKV persistence (WORKOUT-01, WORKOUT-02, WORKOUT-18)
+
+**Wave 3**
+
+- [ ] 02-05-PLAN.md — Secondary set actions (RPE, warm-up, notes, quick tags) + ExpandedSetForm + go-rate stat (WORKOUT-04, WORKOUT-05, WORKOUT-08)
+
+**Wave 4**
+
+- [ ] 02-06-PLAN.md — Superset pairing + auto-scroll + deferred rest timer (WORKOUT-11)
+
+**Wave 5**
+
+- [ ] 02-07-PLAN.md — completeSession writeTransaction + AnubisOverlay + Android back handler (WORKOUT-17, DESIGN-03)
+
+**Wave 6**
+
+- [ ] 02-08-PLAN.md — Session notes + progressive overload + exercise swap modal + skip day (WORKOUT-09, WORKOUT-14, WORKOUT-15, WORKOUT-16)
+
+**Wave 7**
+
+- [ ] 02-09-PLAN.md — Body map injury flagging + bodyweight + run exercise type + HealthKit stub (WORKOUT-10, WORKOUT-12, WORKOUT-13)
 **UI hint**: yes
 
 ---
@@ -156,7 +189,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 8/9 | In Progress|  |
-| 2. Core Session Loop | 0/? | Not started | - |
+| 2. Core Session Loop | 0/9 | In Progress | - |
 | 3. Templates, Programs & Progress | 0/? | Not started | - |
 | 4. Premium & AI | 0/? | Not started | - |
 | 5. Wearables & Notifications | 0/? | Not started | - |
