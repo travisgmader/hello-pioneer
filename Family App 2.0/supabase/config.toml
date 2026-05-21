@@ -406,17 +406,10 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
 
 # ── Edge Functions ────────────────────────────────────────────────
-# Phase 1 Plan 02 declares the auth posture of the two Stripe-facing functions that Plan 05
-# will implement. `verify_jwt = false` is required because:
-#   - `stripe-create-customer` is invoked by a Supabase database webhook on `families` INSERT
-#     (Pattern: Postgres → webhook → Edge Function). The webhook sends no user JWT.
-#   - `stripe-webhook` receives signed events from Stripe and validates them via the Stripe
-#     webhook signing secret, not the Supabase JWT.
-# Both functions perform their own authentication (DB webhook secret + Stripe signature
-# verification respectively).
+# Phase 1 Plan 05 (RevenueCat variant) declares the auth posture for the
+# RevenueCat webhook function. `verify_jwt = false` is required because
+# RevenueCat sends its own Authorization header (REVENUECAT_WEBHOOK_AUTH_HEADER),
+# not a Supabase user JWT. The function validates the header itself.
 
-[functions.stripe-create-customer]
-verify_jwt = false
-
-[functions.stripe-webhook]
+[functions.revenuecat-webhook]
 verify_jwt = false
