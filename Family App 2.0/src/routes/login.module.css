@@ -49,6 +49,7 @@
   width: 100%;
 }
 
+.appleBtn,
 .googleBtn {
   display: flex;
   align-items: center;
@@ -68,11 +69,13 @@
   min-height: 44px;
 }
 
+.appleBtn:hover:not(:disabled),
 .googleBtn:hover:not(:disabled) {
   border-color: var(--lavender);
   box-shadow: var(--shadow);
 }
 
+.appleBtn:disabled,
 .googleBtn:disabled {
   opacity: 0.6;
   cursor: not-allowed;

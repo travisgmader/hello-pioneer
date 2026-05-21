@@ -63,3 +63,24 @@ export async function signInWithGoogle(): Promise<void> {
   });
   if (error) throw error;
 }
+
+/**
+ * Kick off the Sign in with Apple PKCE flow.
+ *
+ * Required by App Store Review Guidelines §4.8: if you offer any third-party
+ * social sign-in (Google), you must also offer Sign in with Apple and it must
+ * be at least as prominent in the UI.
+ *
+ * Supabase Apple OAuth must be enabled in the Supabase Dashboard →
+ * Authentication → Providers → Apple, with an Apple Service ID configured
+ * in the Apple Developer portal.
+ */
+export async function signInWithApple(): Promise<void> {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'apple',
+    options: {
+      redirectTo: `${window.location.origin}/`,
+    },
+  });
+  if (error) throw error;
+}

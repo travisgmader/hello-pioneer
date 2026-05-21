@@ -1,57 +1,78 @@
 /**
- * /login route — Google OAuth sign-in card.
+ * /login route — Sign in with Apple + Google.
  *
- * UI-SPEC contract (verbatim copy required by the checker):
- *   - Title:    "Family Plan"
- *   - Subtitle: "Sign in to access your family's dashboard"
- *   - CTA:      "Sign in with Google"  /  loading state: "Redirecting…"
+ * Apple Sign-In is first per App Store Review Guidelines §4.8: if you offer
+ * any third-party social sign-in (Google), Sign in with Apple must be offered
+ * and at least as prominent.
  *
- * Interaction contract:
- *   - Clicking the button calls signInWithGoogle(); the browser navigates
- *     away on the success path, so we don't clear `loading` on success.
- *   - If signInWithGoogle throws, the error pill renders below the subtitle
- *     and the button re-enables. Clicking again clears the error first so
- *     a retry shows a clean state.
- *
- * The route is mounted at `/login` by Plan 04's router; this file only owns
- * the component, not the route table.
+ * Both buttons share the same interaction contract:
+ *   - Click calls the respective signIn helper; browser navigates away on
+ *     success, so loading state is not cleared on success.
+ *   - On error the error pill renders and the button re-enables.
+ *   - A second click clears the error first so retries show a clean state.
  */
 import { useState } from 'react';
-import { signInWithGoogle } from '../data/supabase';
+import { signInWithApple, signInWithGoogle } from '../data/supabase';
+import AppleIcon from '../components/AppleIcon';
 import GoogleIcon from '../components/GoogleIcon';
 import styles from './login.module.css';
 
 export default function Login() {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<'apple' | 'google' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const handleApple = async () => {
+    setLoading('apple');
+    setError(null);
+    try {
+      await signInWithApple();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setLoading(null);
+    }
+  };
+
   const handleGoogle = async () => {
-    setLoading(true);
+    setLoading('google');
     setError(null);
     try {
       await signInWithGoogle();
-      // On success the browser navigates to Google; we do not clear `loading`
-      // here so the disabled state persists until the navigation happens.
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
-      setLoading(false);
+      setLoading(null);
     }
   };
 
   return (
     <div className={styles.wrapper}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Family Plan</h1>
+        <h1 className={styles.title}>Family Hub</h1>
         <p className={styles.subtitle}>Sign in to access your family&apos;s dashboard</p>
         {error && <p className={styles.error}>{error}</p>}
         <button
           type="button"
+          className={styles.appleBtn}
+          onClick={handleApple}
+          disabled={loading !== null}
+          aria-busy={loading === 'apple'}
+        >
+          {loading === 'apple' ? (
+            'Redirecting…'
+          ) : (
+            <>
+              <AppleIcon />
+              Sign in with Apple
+            </>
+          )}
+        </button>
+        <button
+          type="button"
           className={styles.googleBtn}
           onClick={handleGoogle}
-          disabled={loading}
-          aria-busy={loading}
+          disabled={loading !== null}
+          aria-busy={loading === 'google'}
         >
-          {loading ? (
+          {loading === 'google' ? (
             'Redirecting…'
           ) : (
             <>
