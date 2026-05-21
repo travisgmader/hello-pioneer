@@ -1,7 +1,8 @@
 ---
 phase: 2
 slug: core-session-loop
-status: draft
+status: approved
+reviewed_at: 2026-05-20
 shadcn_initialized: false
 preset: none
 created: 2026-05-20
@@ -75,21 +76,20 @@ All exceptions are declared. None are arbitrary; each maps to either iOS HIG (44
 
 ## Typography
 
-**Phase 2 adds ONE new role: `numeric`.** All other roles carry from Phase 1 unchanged.
+**Phase 2 active type scale: 4 sizes (12 / 16 / 24 / 28).** Display (32px) is a Phase 1 carry token declared in `tailwind.config.js` but NOT used in Phase 2 screens — excluded from the active count. One new role added (`numeric-large`).
 
 | Role | Size | Weight | Line Height | Font | Phase 2 Usage |
 |------|------|--------|-------------|------|---------------|
 | Caption (carry) | 12px | 400 | 1.4 (17px) | Manrope | Previous performance text "185 lbs · ✓✓✓✗", set index "Set 1 / 3", RPE label "RPE", warm-up flag label, quick-tag chip labels, body map muscle name on tap, set count "5 sets" in card header |
 | Body (carry) | 16px | 400 | 1.5 (24px) | Manrope | Session-level note text, exercise name in ExerciseCard header, expanded-set form labels (RPE, Warm-up, Note), free-text note input |
-| Body emphasis (carry) | 16px | 700 | 1.5 (24px) | Manrope | "Complete Workout" button label, exercise name when current/in-progress, selected quick-tag chip label |
-| Heading (carry) | 24px | 700 | 1.25 (30px) | Noto Serif | Session header day label ("Push", "Pull", "Legs", "AF PT Prep") — single brand moment per session, no other Noto Serif in the session screen |
-| **Numeric (NEW)** | 20px | 700 | 1.2 (24px) | System monospace (`fontVariant: ['tabular-nums']` on Manrope) | Weight input value display (when not focused), RPE selected value, rest timer countdown digits when ≤ 60s |
-| **Numeric large (NEW)** | 28px | 700 | 1.1 (31px) | System monospace (`fontVariant: ['tabular-nums']`) | Rest timer countdown digits in RestTimerPill (`2:45`, `0:30`, `0:00`) — must read at arm's length |
-| Display (carry — Phase 2 unused) | 32px | 700 | 1.2 (38px) | Noto Serif | Not used in active session. Anubis overlay does NOT use Display (Lottie renders the visual). |
+| Body emphasis (carry) + tabular-nums | 16px | 700 | 1.5 (24px) | Manrope + `fontVariant: ['tabular-nums']` | "Complete Workout" button label, exercise name when current/in-progress, selected quick-tag chip label. **Also used for all numeric values in set rows** (weight input display, RPE selected value, set count) — same 16px/700 size with `tabular-nums` applied via `NumericText` component. |
+| Heading (carry) | 24px | 700 | 1.25 (30px) | Noto Serif | Session header day label ("Push", "Pull", "Legs", "AF PT Prep") — single brand moment per session |
+| **Numeric large (NEW)** | 28px | 700 | 1.1 (31px) | Manrope + `fontVariant: ['tabular-nums']` | Rest timer countdown digits in RestTimerPill ONLY (`2:45`, `0:30`, `0:00`) — must read at arm's length across the gym. No other 28px usage in Phase 2. |
+| Display (carry — Phase 2 unused) | 32px | 700 | 1.2 (38px) | Noto Serif | **Not used in Phase 2.** Declared in `tailwind.config.js` for Phase 1 parity; excluded from the 4-size active count. Anubis overlay does not use Display (Lottie renders the visual). |
 
-**Numeric role policy:** Use `fontVariant: ['tabular-nums']` on any Text component displaying weight, reps, time, RPE, or set count. Prevents 1/2/3/4/5/6/7/8/9/0 widths from drifting in a list of stacked rows (Manrope's proportional numerals are noticeably jittery when stacked). No new font file loaded — `fontVariant` is a React Native Text prop that uses the system's tabular numeral set.
+**Tabular-nums policy:** Apply `fontVariant: ['tabular-nums']` via the `NumericText` component on ANY Text displaying weight, reps, time, RPE, or set count. Prevents digit-width jitter in stacked set rows. All numeric values use Body emphasis size (16px/700) except the timer pill countdown which uses Numeric large (28px/700). No 20px intermediate size — consolidating to 16px for dense set-row data keeps the scale tight and consistent with the Whoop/Strong data-dense aesthetic.
 
-**No new font family in Phase 2.** A third font (e.g., JetBrains Mono) was considered and rejected — `fontVariant: ['tabular-nums']` gets the same vertical alignment for free without a 200KB asset and a startup load step. Documented for the executor: do NOT add JetBrains Mono.
+**No new font family in Phase 2.** JetBrains Mono was considered and rejected — `fontVariant: ['tabular-nums']` achieves column alignment without a 200KB font asset. Documented for the executor: do NOT add JetBrains Mono.
 
 **`allowFontScaling={false}` policy continues** from Phase 1 for parity with the walking skeleton. Dynamic Type lands in Phase 6.
 
@@ -643,7 +643,7 @@ All copy below is the SHIPPED COPY. Executor does not paraphrase.
 |---------|------|
 | Complete button | `Complete` |
 | Confirmation on Android hardware back | `End workout? Your logged sets will be saved.` |
-| Confirmation Cancel button | `Cancel` |
+| Confirmation Cancel button | `Keep going` |
 | Confirmation Confirm button | `End workout` |
 | Anubis screen | (no copy — Lottie animation is the entire visual) |
 | Dashboard greeting after Anubis | `Nice work, {displayName}.` (replaces Phase 1's `Welcome, {displayName}` for the post-workout return — Phase 1 copy still applies on cold-app open) |
