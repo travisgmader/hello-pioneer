@@ -1,3 +1,4 @@
+Initialising login role...
 export type Json =
   | string
   | number
@@ -39,35 +40,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      allowed_emails: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          email: string
-          family_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          email: string
-          family_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          email?: string
-          family_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "allowed_emails_family_id_fkey"
-            columns: ["family_id"]
-            isOneToOne: false
-            referencedRelation: "families"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       chore_completions: {
         Row: {
           approved_by: string | null
@@ -265,7 +237,7 @@ export type Database = {
           emoji: string
           id: string
           name: string
-          stripe_customer_id: string | null
+          rc_app_user_id: string | null
           updated_at: string
           updated_by: string | null
         }
@@ -275,7 +247,7 @@ export type Database = {
           emoji?: string
           id?: string
           name: string
-          stripe_customer_id?: string | null
+          rc_app_user_id?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -285,7 +257,7 @@ export type Database = {
           emoji?: string
           id?: string
           name?: string
-          stripe_customer_id?: string | null
+          rc_app_user_id?: string | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -330,7 +302,7 @@ export type Database = {
       family_settings: {
         Row: {
           family_id: string
-          stripe_subscription_status: string | null
+          subscription_status: string | null
           theme: string
           timezone: string
           trial_ends_at: string | null
@@ -339,7 +311,7 @@ export type Database = {
         }
         Insert: {
           family_id: string
-          stripe_subscription_status?: string | null
+          subscription_status?: string | null
           theme?: string
           timezone: string
           trial_ends_at?: string | null
@@ -348,7 +320,7 @@ export type Database = {
         }
         Update: {
           family_id?: string
-          stripe_subscription_status?: string | null
+          subscription_status?: string | null
           theme?: string
           timezone?: string
           trial_ends_at?: string | null
@@ -1002,3 +974,5 @@ export const Constants = {
     Enums: {},
   },
 } as const
+A new version of Supabase CLI is available: v2.100.1 (currently installed v2.90.0)
+We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
