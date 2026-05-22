@@ -64,6 +64,10 @@ export interface SetState {
   rpe: number | null;
   isWarmup: boolean;
   notes: string | null;
+  /** Run exercise distance in meters (WORKOUT-13 — null for non-run or not yet recorded) */
+  distanceMeters: number | null;
+  /** Run exercise duration in seconds (WORKOUT-13 — null for non-run or not yet recorded) */
+  durationSeconds: number | null;
 }
 
 export interface ExerciseState {
@@ -149,6 +153,10 @@ interface SessionState {
   closeNoteSheet: () => void;
   /** Update the session-level notes string */
   setSessionNotes: (notes: string) => void;
+  /** Set the run distance in meters for a specific set (WORKOUT-13) */
+  setSetDistance: (setId: string, meters: number) => void;
+  /** Set the run duration in seconds for a specific set (WORKOUT-13) */
+  setSetDuration: (setId: string, seconds: number) => void;
   /**
    * Toggle a muscle ID in soreMuscles.
    * If the ID is already present → remove it. If absent → add it.
@@ -267,6 +275,8 @@ export const useSessionStore = create<SessionState>((set, get) => ({
           rpe: null,
           isWarmup: false,
           notes: null,
+          distanceMeters: null,
+          durationSeconds: null,
         };
         return { ...ex, sets: [...ex.sets, newSet] };
       });
@@ -311,6 +321,18 @@ export const useSessionStore = create<SessionState>((set, get) => ({
 
   // Update the session-level notes string
   setSessionNotes: (notes) => set({ sessionNotes: notes }),
+
+  // Set run distance in meters for a specific set (WORKOUT-13)
+  setSetDistance: (setId, meters) =>
+    set((state) => ({
+      exercises: mutateSets(state.exercises, setId, (s) => ({ ...s, distanceMeters: meters })),
+    })),
+
+  // Set run duration in seconds for a specific set (WORKOUT-13)
+  setSetDuration: (setId, seconds) =>
+    set((state) => ({
+      exercises: mutateSets(state.exercises, setId, (s) => ({ ...s, durationSeconds: seconds })),
+    })),
 
   // Toggle a muscle ID in soreMuscles (Plan 09 — WORKOUT-10)
   // Adds if absent, removes if present. Immutable update.

@@ -118,6 +118,9 @@ export default function SessionScreen() {
   const sessionNotes = useSessionStore((s) => s.sessionNotes);
   const setSessionNotes = useSessionStore((s) => s.setSessionNotes);
 
+  // Body map sore muscles (Plan 09 — WORKOUT-10)
+  const soreMuscles = useSessionStore((s) => s.soreMuscles);
+
   // Track whether we've initialized the session (avoid double-init on re-renders)
   const initialized = useRef(false);
 
@@ -210,14 +213,20 @@ export default function SessionScreen() {
 
     // 4. Atomic PowerSync commit during Lottie playback
     try {
+      // Serialize session notes + sore muscles into a single JSON blob (Plan 09 — WORKOUT-10)
+      // Shape: { text: string, soreMuscles: string[] }
+      const notesPayload = sessionNotes || soreMuscles.length > 0
+        ? JSON.stringify({ text: sessionNotes || '', soreMuscles })
+        : null;
+
       await completeSession({
         sessionId: sessionId ?? '',
         userId,
         templateId: template?.id ?? '',
         dayLabel: template?.day_label ?? template?.name ?? '',
         startedAt: startedAt ?? new Date().toISOString(),
-        // Pass session notes from store (WORKOUT-09 — Plan 08 wires this from SessionNoteSheet)
-        sessionNotes: sessionNotes || null,
+        // Merged notes: free text + sore muscle IDs (Plan 09 extension of Plan 08 shape)
+        sessionNotes: notesPayload,
       });
     } catch (err) {
       // completeSession failed — log but do NOT block navigation.
@@ -310,6 +319,7 @@ export default function SessionScreen() {
         <ExerciseCard
           exercise={exercise}
           sessionId={sessionId ?? ''}
+          userId={userId}
           unit={unit}
           globalRestSeconds={globalRestSeconds}
           isActive={exercise.id === currentExerciseId}
@@ -337,6 +347,7 @@ export default function SessionScreen() {
         exerciseA={exerciseA}
         exerciseB={exerciseB}
         sessionId={sessionId ?? ''}
+        userId={userId}
         unit={unit}
         globalRestSeconds={globalRestSeconds}
         activeArm={activeArm}
@@ -347,15 +358,21 @@ export default function SessionScreen() {
     );
   }, [exerciseById, sessionId, unit, globalRestSeconds, currentExerciseId, openSwapModal]);
 
+  // ── Body map handler — opens body-map in mid-session mode ─────────────────
+  const handleOpenBodyMap = useCallback(() => {
+    router.push('/(session)/body-map?mode=mid' as never);
+  }, []);
+
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <SafeAreaView className="flex-1 bg-bg">
-      {/* Session header — elapsed timer + day label + Complete button + Note button */}
+      {/* Session header — elapsed timer + day label + Complete button + Note button + Body map button */}
       <SessionHeader
         dayLabel={template?.day_label ?? template?.name ?? 'Workout'}
         startedAt={startedAt ?? new Date().toISOString()}
         onComplete={handleComplete}
         onOpenNote={openNoteSheet}
+        onOpenBodyMap={handleOpenBodyMap}
       />
 
       {/* Exercise list — FlashList v2 (no estimatedItemSize per Pattern 1) */}

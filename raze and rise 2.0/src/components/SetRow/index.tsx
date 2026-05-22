@@ -51,6 +51,9 @@ import { SetResultButton } from '@/components/SetResultButton';
 import { PrevPerformanceLink } from '@/components/PrevPerformanceLink';
 import { ExpandChevron } from '@/components/ExpandChevron';
 import { ExpandedSetForm } from '@/components/SetRow/ExpandedSetForm';
+import { BodyweightOffsetInput } from '@/components/BodyweightOffsetInput';
+import { RunExerciseRow } from '@/components/RunExerciseRow';
+import { readLastRunDistance } from '@/lib/healthkit';
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -94,6 +97,18 @@ export interface SetRowProps {
   partnerDefaultRestSeconds?: number | null;
   /** Called when the rest timer starts so SessionScreen can update lastRestSeconds */
   onRestStart?: (seconds: number) => void;
+  /**
+   * Exercise type determines which input widget is rendered.
+   *   'standard'   — WeightInput (default, barbell/dumbbell)
+   *   'bodyweight' — BodyweightOffsetInput (WORKOUT-12)
+   *   'run'        — RunExerciseRow (WORKOUT-13)
+   */
+  exerciseType?: 'standard' | 'bodyweight' | 'run';
+  /**
+   * User's latest body weight (kg) from measurements table.
+   * Required when exerciseType === 'bodyweight'. Null if not yet recorded.
+   */
+  bodyweightKg?: number | null;
 }
 
 // ── Weight validation helper ──────────────────────────────────────────────────
@@ -123,6 +138,8 @@ export function SetRow({
   supersetFirstArmId = null,
   partnerDefaultRestSeconds = null,
   onRestStart,
+  exerciseType = 'standard',
+  bodyweightKg = null,
 }: SetRowProps) {
   // ── Zustand state ─────────────────────────────────────────────────────────
 
@@ -155,6 +172,30 @@ export function SetRow({
   const setSetWeight = useSessionStore((s) => s.setSetWeight);
   const setSetResult = useSessionStore((s) => s.setSetResult);
   const setExpanded = useSessionStore((s) => s.setExpanded);
+  const setSetDistance = useSessionStore((s) => s.setSetDistance);
+  const setSetDuration = useSessionStore((s) => s.setSetDuration);
+
+  // Run exercise fields — only non-null for exerciseType === 'run'
+  const distanceMeters = useSessionStore((s) => {
+    for (const ex of s.exercises) {
+      const set = ex.sets.find((st) => st.id === setId);
+      if (set) return set.distanceMeters;
+    }
+    return null;
+  });
+
+  const durationSeconds = useSessionStore((s) => {
+    for (const ex of s.exercises) {
+      const set = ex.sets.find((st) => st.id === setId);
+      if (set) return set.durationSeconds;
+    }
+    return null;
+  });
+
+  // Bodyweight offset state — local ephemeral (like weightInput for standard)
+  // The store's weightKg holds the TOTAL (bodyweight + offset) for bodyweight exercises.
+  // We compute the displayed offset from total - bodyweightKg.
+  const [offsetKg, setOffsetKg] = useState<number>(0);
 
   // ── Rest timer ────────────────────────────────────────────────────────────
   const { start: startTimer } = useRestTimer();
@@ -364,6 +405,39 @@ export function SetRow({
     }
   }, [previousPerformance.weightKg, setId, setSetWeight]);
 
+  // ── Run exercise: pull from Apple Health ─────────────────────────────────
+
+  const handlePullFromHealth = useCallback(async () => {
+    const sample = await readLastRunDistance();
+    if (sample) {
+      setSetDistance(setId, sample.distanceMeters);
+      setSetDuration(setId, sample.durationSeconds);
+      // Also commit the set with the new data via notes JSON path (no schema migration)
+      await commitSet({
+        setId,
+        sessionId,
+        exerciseId,
+        exerciseName,
+        setNumber,
+        weightKg: null,
+        repsTarget,
+        result,
+        rpe: null,
+        isWarmup,
+        notes: JSON.stringify({ run: { distanceMeters: sample.distanceMeters, durationSeconds: sample.durationSeconds } }),
+      });
+    }
+    // Silently no-op if sample is null (Phase 2 stub — see healthkit.ts)
+  }, [setId, sessionId, exerciseId, exerciseName, setNumber, repsTarget, result, isWarmup, setSetDistance, setSetDuration]);
+
+  // ── Bodyweight offset handler ─────────────────────────────────────────────
+
+  const handleOffsetChange = useCallback((newOffset: number) => {
+    const total = (bodyweightKg ?? 0) + newOffset;
+    setOffsetKg(newOffset);
+    setSetWeight(setId, total);
+  }, [bodyweightKg, setId, setSetWeight]);
+
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
@@ -378,15 +452,33 @@ export function SetRow({
           Set {setNumber}
         </Text>
 
-        {/* Weight input */}
-        <WeightInput
-          value={weightInput}
-          onChangeText={handleWeightChange}
-          onBlur={handleWeightBlur}
-          error={weightError}
-          placeholder="0"
-          style={{ flex: 1 }}
-        />
+        {/* Input widget — branches on exerciseType (WORKOUT-12, WORKOUT-13) */}
+        {exerciseType === 'bodyweight' ? (
+          /* Bodyweight: BodyweightOffsetInput replaces WeightInput (WORKOUT-12) */
+          <BodyweightOffsetInput
+            bodyweightKg={bodyweightKg}
+            offsetKg={offsetKg}
+            onOffsetChange={handleOffsetChange}
+          />
+        ) : exerciseType === 'run' ? (
+          /* Run: RunExerciseRow with distance/time + Apple Health pull (WORKOUT-13) */
+          <RunExerciseRow
+            setId={setId}
+            distanceMeters={distanceMeters}
+            durationSeconds={durationSeconds}
+            onPullFromHealth={handlePullFromHealth}
+          />
+        ) : (
+          /* Standard: existing WeightInput */
+          <WeightInput
+            value={weightInput}
+            onChangeText={handleWeightChange}
+            onBlur={handleWeightBlur}
+            error={weightError}
+            placeholder="0"
+            style={{ flex: 1 }}
+          />
+        )}
 
         {/* Go button */}
         <SetResultButton
@@ -411,15 +503,17 @@ export function SetRow({
         />
       </View>
 
-      {/* Previous performance link — tap-to-fill (D-09) */}
-      <View className="pl-[2px] pb-xs">
-        <PrevPerformanceLink
-          weightKg={previousPerformance.weightKg}
-          unit={unit}
-          results={previousPerformance.results}
-          onAutoFill={handleAutoFill}
-        />
-      </View>
+      {/* Previous performance link — tap-to-fill (D-09) — only for standard exercises */}
+      {exerciseType === 'standard' && (
+        <View className="pl-[2px] pb-xs">
+          <PrevPerformanceLink
+            weightKg={previousPerformance.weightKg}
+            unit={unit}
+            results={previousPerformance.results}
+            onAutoFill={handleAutoFill}
+          />
+        </View>
+      )}
 
       {/* Expanded section — inline RPE/warmup/notes form (Plan 05) */}
       {isExpanded && (

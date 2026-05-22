@@ -35,6 +35,8 @@ export interface SupersetPairProps {
   exerciseA: ExerciseState;
   exerciseB: ExerciseState;
   sessionId: string;
+  /** Authenticated user ID — passed through to ExerciseCard for bodyweight hook (WORKOUT-12) */
+  userId: string;
   unit: 'lbs' | 'kg';
   globalRestSeconds: number;
   /** Which arm is currently "active" (first with unlogged sets). null = neither. */
@@ -59,6 +61,7 @@ export function SupersetPair({
   exerciseA,
   exerciseB,
   sessionId,
+  userId,
   unit,
   globalRestSeconds,
   activeArm,
@@ -72,6 +75,7 @@ export function SupersetPair({
       <ExerciseCard
         exercise={exerciseA}
         sessionId={sessionId}
+        userId={userId}
         unit={unit}
         globalRestSeconds={globalRestSeconds}
         isActive={activeArm === 'A'}
@@ -98,6 +102,7 @@ export function SupersetPair({
       <ExerciseCard
         exercise={exerciseB}
         sessionId={sessionId}
+        userId={userId}
         unit={unit}
         globalRestSeconds={globalRestSeconds}
         isActive={activeArm === 'B'}

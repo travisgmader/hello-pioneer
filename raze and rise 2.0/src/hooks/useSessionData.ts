@@ -145,6 +145,8 @@ export function useTodaysTemplate(userId: string): UseTodaysTemplateResult {
       rpe: null,
       isWarmup: false,
       notes: null,
+      distanceMeters: null,
+      durationSeconds: null,
     }));
 
     return {
@@ -167,6 +169,39 @@ export function useTodaysTemplate(userId: string): UseTodaysTemplateResult {
     splitSettings,
     globalRestSeconds,
     loading: !splitRows || !allTemplates || !exerciseRows,
+  };
+}
+
+// ── useLatestBodyweight ───────────────────────────────────────────────────────
+
+interface MeasurementRow {
+  weight_kg: number | null;
+}
+
+/**
+ * useLatestBodyweight — reads the user's most recent body weight from PowerSync.
+ *
+ * Queries: SELECT weight_kg FROM measurements WHERE user_id = ? ORDER BY logged_at DESC LIMIT 1
+ * Returns: { weightKg: number | null; loading: boolean }
+ *
+ * Used by BodyweightOffsetInput (WORKOUT-12) to display the user's bodyweight
+ * and compute the total weight for bodyweight exercises.
+ *
+ * RLS: measurements is scoped to user_id (Phase 1 schema) — no cross-user risk (T-02-16 context).
+ */
+export function useLatestBodyweight(userId: string): { weightKg: number | null; loading: boolean } {
+  const { data } = usePowerSyncQuery<MeasurementRow>(
+    `SELECT weight_kg FROM measurements WHERE user_id = ? ORDER BY logged_at DESC LIMIT 1`,
+    [userId]
+  );
+
+  if (data === undefined) {
+    return { weightKg: null, loading: true };
+  }
+
+  return {
+    weightKg: data[0]?.weight_kg ?? null,
+    loading: false,
   };
 }
 
