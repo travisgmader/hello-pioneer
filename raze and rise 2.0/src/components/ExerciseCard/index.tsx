@@ -8,13 +8,16 @@
  *   isActive=true:  bg-accent-dim + border-border-strong + 2px accent LeftEdgeBar on card
  *   isActive=false: bg-bg-elevated + border-border (standard elevated card)
  *
- * Header row: exercise name + set count caption + Shuffle icon (Plan 08 wires swap)
+ * Header row: exercise name + set count caption + Shuffle icon (wires swap modal via store)
  * Body: array of SetRow components as plain View children
  * Footer: AddSetButton (appends a new set to the exercise in Zustand)
- * Stub: progressive overload hint placeholder View (Plan 08 fills it)
+ * Progressive overload hint: renders below AddSetButton when shouldShowOverloadHint() returns
+ *   true AND the user hasn't dismissed it for this exercise this session (Plan 08 — WORKOUT-14)
  *
  * Per RESEARCH.md Pitfall 1: ExerciseCard MUST NOT use local useState for any
  * cross-render state. isActive is computed from props (safe — changes on re-render).
+ * Swap modal state lives in Zustand (swapModalForExerciseId) — NOT local useState,
+ * since FlashList recycling would lose local state on scroll.
  *
  * All Text uses allowFontScaling={false} per Phase 2 policy.
  */
@@ -26,11 +29,13 @@ import { Shuffle } from 'lucide-react-native';
 import { ExerciseState } from '@/stores/sessionStore';
 import { useSessionStore } from '@/stores/sessionStore';
 import { usePreviousPerformance } from '@/hooks/useSessionData';
+import { shouldShowOverloadHint } from '@/lib/progressiveOverload';
 
 import { LeftEdgeBar } from '@/components/LeftEdgeBar';
 import { IconButton } from '@/components/IconButton';
 import { SetRow } from '@/components/SetRow';
 import { AddSetButton } from '@/components/AddSetButton';
+import { ProgressiveOverloadHint } from '@/components/ProgressiveOverloadHint';
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -41,7 +46,7 @@ interface ExerciseCardProps {
   globalRestSeconds: number;
   /** True when this exercise is the next one to log (first with unlogged sets) */
   isActive: boolean;
-  /** Called when user taps Shuffle to swap the exercise (Plan 08 wires the modal) */
+  /** Called when user taps Shuffle to swap the exercise — opens the modal via store */
   onSwap: () => void;
   /** Called when a set's expand chevron is tapped */
   onExpandSet: (setId: string) => void;
@@ -58,10 +63,13 @@ export function ExerciseCard({
   onSwap,
   onExpandSet,
 }: ExerciseCardProps) {
-  // Get expandedSetId from store to pass to SetRow
+  // Get expandedSetId and dismissedOverloadHints from store
   const expandedSetId = useSessionStore((s) => s.expandedSetId);
+  const dismissedOverloadHints = useSessionStore((s) => s.dismissedOverloadHints);
+  const dismissOverloadHint = useSessionStore((s) => s.dismissOverloadHint);
 
   // Previous performance — loaded from PowerSync for the exercise
+  // includes: set_number, weight_kg, result, is_warmup (added Plan 08 for overload hint)
   const prevPerformanceRows = usePreviousPerformance(exercise.exerciseId, sessionId);
 
   // Build a map: set_number → { weightKg, results[] } for previous performance
@@ -85,6 +93,25 @@ export function ExerciseCard({
 
     return map;
   }, [prevPerformanceRows]);
+
+  // ── Progressive overload hint logic ────────────────────────────────────────
+  // "current weight" = weight_kg from the first non-warmup, non-completed set
+  const firstWorkingSet = exercise.sets.find((s) => !s.isWarmup && s.result === null);
+  const currentWeightKg = firstWorkingSet?.weightKg ?? null;
+
+  // Map PreviousPerformanceRow[] to SetRowWithWeight[] for the overload predicate
+  const prevSetsForOverload = React.useMemo(() => {
+    return prevPerformanceRows.map((row) => ({
+      result: (row.result as 'go' | 'no-go' | null) ?? null,
+      is_warmup: row.is_warmup === 1, // SQLite INTEGER 0/1 → boolean
+      weight_kg: row.weight_kg,
+    }));
+  }, [prevPerformanceRows]);
+
+  const showOverloadHint =
+    currentWeightKg !== null &&
+    !dismissedOverloadHints[exercise.exerciseId] &&
+    shouldShowOverloadHint(prevSetsForOverload, currentWeightKg);
 
   // Set count label: "5 sets" / "1 set"
   const setCountLabel = `${exercise.sets.length} ${exercise.sets.length === 1 ? 'set' : 'sets'}`;
@@ -119,7 +146,7 @@ export function ExerciseCard({
           </Text>
         </View>
 
-        {/* Shuffle icon — Plan 08 wires exercise swap modal */}
+        {/* Shuffle icon — opens exercise swap modal via onSwap (wired in SessionScreen) */}
         <IconButton
           icon={<Shuffle size={20} color="#99907C" />}
           onPress={onSwap}
@@ -192,8 +219,13 @@ export function ExerciseCard({
         onPress={() => useSessionStore.getState().addSet(exercise.id)}
       />
 
-      {/* Progressive overload hint stub — Plan 08 fills this */}
-      <View />
+      {/* Progressive overload hint — renders when shouldShowOverloadHint() is true
+          and user hasn't dismissed it for this exercise this session (WORKOUT-14) */}
+      {showOverloadHint && (
+        <ProgressiveOverloadHint
+          onDismiss={() => dismissOverloadHint(exercise.exerciseId)}
+        />
+      )}
     </View>
   );
 }

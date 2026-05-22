@@ -59,6 +59,7 @@ export interface PreviousPerformanceRow {
   set_number: number;
   weight_kg: number | null;
   result: string | null;
+  is_warmup: number; // 0 or 1 from SQLite (boolean stored as INTEGER)
 }
 
 // ── useTodaysTemplate ─────────────────────────────────────────────────────────
@@ -191,7 +192,7 @@ export function usePreviousPerformance(
   const excludeSessionId = currentSessionId ?? '00000000-0000-0000-0000-000000000000';
 
   const { data } = usePowerSyncQuery<PreviousPerformanceRow>(
-    `SELECT ss.set_number, ss.weight_kg, ss.result
+    `SELECT ss.set_number, ss.weight_kg, ss.result, ss.is_warmup
      FROM session_sets ss
      JOIN sessions s ON s.id = ss.session_id
      WHERE ss.exercise_id = ?

@@ -9,26 +9,36 @@
  * item. Keying all per-set state by set UUID in Zustand prevents ghost states.
  *
  * State shape:
- *   exercises[]      — ordered array of ExerciseState (loaded from today's template)
- *   expandedSetId    — only ONE set can be expanded at a time (UI-SPEC.md rule)
- *   focusedSetId     — which set has keyboard focus (WeightInput)
- *   flashListRef     — ref to the FlashList for superset auto-scroll (Plan 06)
- *   supersetCursor   — tracks which arm/set is active in a superset (Plan 06)
+ *   exercises[]              — ordered array of ExerciseState (loaded from today's template)
+ *   expandedSetId            — only ONE set can be expanded at a time (UI-SPEC.md rule)
+ *   focusedSetId             — which set has keyboard focus (WeightInput)
+ *   flashListRef             — ref to the FlashList for superset auto-scroll (Plan 06)
+ *   supersetCursor           — tracks which arm/set is active in a superset (Plan 06)
+ *   dismissedOverloadHints   — Record<exerciseId, boolean> for per-session overload hint dismissal (Plan 08)
+ *   swapModalForExerciseId   — exerciseId currently showing the swap modal, or null (Plan 08)
+ *   noteSheetOpen            — whether the session note sheet is visible (Plan 08)
+ *   sessionNotes             — session-level free text note, persisted to MMKV (Plan 08)
  *
  * Actions:
- *   loadExercises       — replace the exercises array (called once on session init)
- *   setSetResult        — mark a set go / no-go / null
- *   setSetWeight        — update weight for a set
- *   setSetRpe           — update RPE (1-10) for a set
- *   setSetWarmup        — toggle warm-up flag for a set
- *   setSetNotes         — update notes for a set
- *   setExpanded         — expand one set row, collapsing any previously expanded one
- *   setFocused          — mark which set has keyboard focus
- *   addSet              — append a new set to an exercise (pre-fills weight from last set)
- *   swapExercise        — replace an exercise at a given slot index (Plan 08 wires the UI)
- *   setListRef          — register the FlashList ref for superset scroll (Plan 06)
- *   scrollToExerciseId  — scroll FlashList to the item containing exerciseId (Pitfall 8)
- *   advanceSupersetCursor — update the superset cursor after a set commit (Plan 06)
+ *   loadExercises           — replace the exercises array (called once on session init)
+ *   setSetResult            — mark a set go / no-go / null
+ *   setSetWeight            — update weight for a set
+ *   setSetRpe               — update RPE (1-10) for a set
+ *   setSetWarmup            — toggle warm-up flag for a set
+ *   setSetNotes             — update notes for a set
+ *   setExpanded             — expand one set row, collapsing any previously expanded one
+ *   setFocused              — mark which set has keyboard focus
+ *   addSet                  — append a new set to an exercise (pre-fills weight from last set)
+ *   swapExercise            — replace exercise at a given slot index (Plan 08 wires the UI)
+ *   dismissOverloadHint     — mark an exercise's overload hint as dismissed for this session (Plan 08)
+ *   openSwapModal           — open the exercise swap modal for an exerciseId (Plan 08)
+ *   closeSwapModal          — close the exercise swap modal (Plan 08)
+ *   openNoteSheet           — open the session note sheet (Plan 08)
+ *   closeNoteSheet          — close the session note sheet (Plan 08)
+ *   setSessionNotes         — update the session notes string (Plan 08)
+ *   setListRef              — register the FlashList ref for superset scroll (Plan 06)
+ *   scrollToExerciseId      — scroll FlashList to the item containing exerciseId (Pitfall 8)
+ *   advanceSupersetCursor   — update the superset cursor after a set commit (Plan 06)
  */
 
 import { create } from 'zustand';
@@ -84,6 +94,20 @@ interface SessionState {
   /** Current superset cursor — tracks which arm/set is active */
   supersetCursor: SupersetCursor | null;
 
+  // ── Plan 08: Progressive overload hint dismissal ──────────────────────
+  /** Record<exerciseId, boolean> — tracks which exercise overload hints have been dismissed this session */
+  dismissedOverloadHints: Record<string, boolean>;
+
+  // ── Plan 08: Exercise swap modal ──────────────────────────────────────
+  /** exerciseId for which the swap modal is currently open, or null if closed */
+  swapModalForExerciseId: string | null;
+
+  // ── Plan 08: Session note sheet ───────────────────────────────────────
+  /** Whether the session note bottom sheet is open */
+  noteSheetOpen: boolean;
+  /** Free-text session notes, persisted to MMKV via useSessionPersistence (Plan 08) */
+  sessionNotes: string;
+
   // ── Actions ─────────────────────────────────────────────────────────────
   loadExercises: (exercises: ExerciseState[]) => void;
   setSetResult: (setId: string, result: SetResult) => void;
@@ -94,7 +118,30 @@ interface SessionState {
   setExpanded: (setId: string | null) => void;
   setFocused: (setId: string | null) => void;
   addSet: (exerciseId: string) => void;
-  swapExercise: (slotIndex: number, newExercise: ExerciseState) => void;
+  /**
+   * swapExercise — replace the exercise at slotIndex with a new exercise.
+   *
+   * Preserves the existing sets array so previously-entered weight/result data
+   * is retained under the new exercise. Only exerciseId and exerciseName are updated.
+   * This is a Zustand-only action — no write to template_exercises table (T-02-12).
+   * completeSession will write session_sets rows with the swapped exerciseId.
+   *
+   * @param slotIndex - 0-based index in the exercises array
+   * @param newExercise - { id, name } of the replacement exercise from the library
+   */
+  swapExercise: (slotIndex: number, newExercise: { id: string; name: string }) => void;
+  /** Dismiss the progressive overload hint for a specific exercise (per-session) */
+  dismissOverloadHint: (exerciseId: string) => void;
+  /** Open the exercise swap modal for a specific exerciseId */
+  openSwapModal: (exerciseId: string) => void;
+  /** Close the exercise swap modal */
+  closeSwapModal: () => void;
+  /** Open the session note bottom sheet */
+  openNoteSheet: () => void;
+  /** Close the session note bottom sheet */
+  closeNoteSheet: () => void;
+  /** Update the session-level notes string */
+  setSessionNotes: (notes: string) => void;
   /** Register the FlashList ref for superset auto-scroll (called from SessionScreen) */
   setListRef: (ref: FlashListRef<FlashListItem> | null) => void;
   /**
@@ -145,6 +192,10 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   focusedSetId: null,
   flashListRef: null,
   supersetCursor: null,
+  dismissedOverloadHints: {},
+  swapModalForExerciseId: null,
+  noteSheetOpen: false,
+  sessionNotes: '',
 
   // Replace the entire exercises array (called on session init or rehydration)
   loadExercises: (exercises) => set({ exercises }),
@@ -206,15 +257,44 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       return { exercises };
     }),
 
-  // Swap an exercise at a specific slot index (Plan 08 wires the UI; stub for Plan 04)
+  // Swap an exercise at a specific slot index (Plan 08).
+  // Preserves existing sets — only exerciseId and exerciseName are updated.
+  // This is a Zustand-only action: never writes to template_exercises (T-02-12).
   swapExercise: (slotIndex, newExercise) =>
     set((state) => {
       const exercises = [...state.exercises];
       if (slotIndex >= 0 && slotIndex < exercises.length) {
-        exercises[slotIndex] = newExercise;
+        const current = exercises[slotIndex];
+        exercises[slotIndex] = {
+          ...current,
+          exerciseId: newExercise.id,
+          exerciseName: newExercise.name,
+          // sets array preserved — user keeps previously-entered weight/result entries
+        };
       }
       return { exercises };
     }),
+
+  // Dismiss the progressive overload hint for this exercise (per-session)
+  dismissOverloadHint: (exerciseId) =>
+    set((state) => ({
+      dismissedOverloadHints: { ...state.dismissedOverloadHints, [exerciseId]: true },
+    })),
+
+  // Open the exercise swap modal for a specific exerciseId
+  openSwapModal: (exerciseId) => set({ swapModalForExerciseId: exerciseId }),
+
+  // Close the exercise swap modal
+  closeSwapModal: () => set({ swapModalForExerciseId: null }),
+
+  // Open the session note bottom sheet
+  openNoteSheet: () => set({ noteSheetOpen: true }),
+
+  // Close the session note bottom sheet
+  closeNoteSheet: () => set({ noteSheetOpen: false }),
+
+  // Update the session-level notes string
+  setSessionNotes: (notes) => set({ sessionNotes: notes }),
 
   // ── Plan 06: Superset auto-scroll ─────────────────────────────────────
 
