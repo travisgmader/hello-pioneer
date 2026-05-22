@@ -15,6 +15,7 @@
  */
 import React, { useState } from 'react';
 import { SafeAreaView, ScrollView, View, Text, Pressable, Alert, Switch } from 'react-native';
+import { MMKV } from 'react-native-mmkv';
 import { useTheme } from '@/hooks/useTheme';
 import { signOut } from '@/services/auth/signOut';
 import { changePassword } from '@/services/auth/email';
@@ -22,6 +23,13 @@ import { TextInput } from '@/components/TextInput';
 import { Button } from '@/components/Button';
 import { HelperText } from '@/components/HelperText';
 import { Label } from '@/components/Label';
+
+// ── Settings MMKV instance ────────────────────────────────────────────────────
+// Separate from 'active-session' instance — uses 'settings' id.
+const settingsStorage = new MMKV({ id: 'settings' });
+
+/** MMKV key for the device GPS for runs preference (WORKOUT-13) */
+const GPS_KEY = 'settings.useDeviceGpsForRun';
 
 /**
  * __DEV__ only — logs a test set directly via PowerSync SQL for Walking Skeleton verification.
@@ -89,6 +97,16 @@ function DevOfflineSetLogger() {
 
 export default function SettingsScreen() {
   const { theme, setTheme } = useTheme();
+
+  // ── Workout settings (WORKOUT-13) ─────────────────────────────────────────
+  const [useDeviceGpsForRun, setUseDeviceGpsForRun] = useState<boolean>(
+    () => settingsStorage.getBoolean(GPS_KEY) ?? false
+  );
+
+  const handleGpsToggle = (value: boolean) => {
+    settingsStorage.set(GPS_KEY, value);
+    setUseDeviceGpsForRun(value);
+  };
 
   // ── Change password form ──────────────────────────────────────────────────
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -320,6 +338,66 @@ export default function SettingsScreen() {
             thumbColor="#E5E2E1"
           />
         </View>
+
+        <View style={{ height: 32 }} />
+
+        {/* ── Workout section (WORKOUT-13 — GPS toggle) ────────────────────── */}
+        <Text
+          style={{
+            fontFamily: 'NotoSerif-Bold',
+            fontSize: 24,
+            fontWeight: '700',
+            color: '#E5E2E1',
+          }}
+          allowFontScaling={false}
+        >
+          Workout
+        </Text>
+
+        <View style={{ height: 16 }} />
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Text
+            style={{
+              fontFamily: 'Manrope',
+              fontSize: 16,
+              fontWeight: '400',
+              color: '#E5E2E1',
+              flex: 1,
+              marginRight: 12,
+            }}
+            allowFontScaling={false}
+          >
+            Use device GPS for runs
+          </Text>
+          <Switch
+            value={useDeviceGpsForRun}
+            onValueChange={handleGpsToggle}
+            trackColor={{ false: '#5C564B', true: '#F2CA50' }}
+            thumbColor="#E5E2E1"
+            accessibilityLabel="Use device GPS for runs"
+          />
+        </View>
+
+        <View style={{ height: 8 }} />
+
+        <Text
+          style={{
+            fontFamily: 'Manrope',
+            fontSize: 12,
+            fontWeight: '400',
+            color: '#99907C',
+          }}
+          allowFontScaling={false}
+        >
+          Apple Health is the default source. Device GPS fallback coming in a future update.
+        </Text>
 
         <View style={{ height: 32 }} />
 
