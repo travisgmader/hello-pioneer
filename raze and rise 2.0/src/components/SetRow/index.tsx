@@ -19,7 +19,14 @@
  * the Zustand store — enforced by the store, not by SetRow.
  *
  * PowerSync write: on Go/No-Go tap, calls commitSet() immediately (no batching).
- * Rest timer: fires on Go tap if !isWarmup via useRestTimer().start(resolveRestSeconds(...)).
+ * Rest timer: fires on Go tap if !isWarmup AND superset round is complete (Plan 06).
+ *
+ * Superset behavior (WORKOUT-11, Plan 06):
+ *   - If exercise belongs to a superset (supersetGroup != null), do NOT fire rest timer
+ *     until BOTH arms at this setNumber have a non-null result (supersetRoundComplete).
+ *   - Instead, scrollToExerciseId(partnerExerciseId) to jump to the paired exercise.
+ *   - When the round is complete (this tap completes it): start rest timer, then on
+ *     timer skip/expire scroll back to the first arm for the next set pair.
  *
  * Weight validation (T-02-03 mitigation):
  *   - parseFloat on input; if NaN or out of [0, 999.9] → set error=true, do NOT commitSet
@@ -36,6 +43,7 @@ import { useSessionStore } from '@/stores/sessionStore';
 import { SetResult } from '@/hooks/useSetResult';
 import { useRestTimer, resolveRestSeconds } from '@/hooks/useRestTimer';
 import { commitSet } from '@/services/sessionService';
+import { supersetRoundComplete, SetRowState } from '@/lib/supersetLogic';
 
 import { LeftEdgeBar } from '@/components/LeftEdgeBar';
 import { WeightInput } from '@/components/WeightInput';
@@ -61,6 +69,31 @@ export interface SetRowProps {
     weightKg: number | null;
     results: ('go' | 'no-go' | null)[];
   };
+  /**
+   * Superset group id (template_exercises.superset_group).
+   * null = standard exercise (not in a superset).
+   * non-null = paired exercise; rest timer deferred until BOTH arms complete.
+   */
+  supersetGroup?: number | null;
+  /**
+   * The partner exercise id in the superset (the other arm).
+   * When provided alongside supersetGroup, SetRow uses scrollToExerciseId
+   * to jump to the partner after this set is committed.
+   */
+  partnerExerciseId?: string | null;
+  /**
+   * The id of the first arm (A) in the superset — used to scroll back after rest.
+   * Typically the exerciseId of exercise A in the pair.
+   */
+  supersetFirstArmId?: string | null;
+  /**
+   * default_rest_seconds of the partner exercise.
+   * SetRow uses the longer of the two arms' rest seconds when starting the timer
+   * (conventional superset rest is the slower side).
+   */
+  partnerDefaultRestSeconds?: number | null;
+  /** Called when the rest timer starts so SessionScreen can update lastRestSeconds */
+  onRestStart?: (seconds: number) => void;
 }
 
 // ── Weight validation helper ──────────────────────────────────────────────────
@@ -85,6 +118,11 @@ export function SetRow({
   defaultRestSeconds,
   globalRestSeconds,
   previousPerformance,
+  supersetGroup = null,
+  partnerExerciseId = null,
+  supersetFirstArmId = null,
+  partnerDefaultRestSeconds = null,
+  onRestStart,
 }: SetRowProps) {
   // ── Zustand state ─────────────────────────────────────────────────────────
 
@@ -130,6 +168,11 @@ export function SetRow({
   );
   const [weightError, setWeightError] = useState<boolean>(false);
 
+  // ── Superset: look up partner exercise sets from the store ────────────────
+
+  // We read partner sets lazily in the handler (getState()) to avoid over-subscribing.
+  // This is correct: we only need the partner's set results at the moment of the tap.
+
   // ── Go/No-Go handlers ─────────────────────────────────────────────────────
 
   const handleGo = useCallback(async () => {
@@ -156,12 +199,65 @@ export function SetRow({
       });
     }
 
-    // Start rest timer only on Go transition AND not a warmup (UI-SPEC.md step 5)
+    // ── Rest timer / superset scroll logic ──────────────────────────────────
     if (newResult === 'go' && !isWarmup) {
-      const restSeconds = resolveRestSeconds(defaultRestSeconds, globalRestSeconds);
-      await startTimer(restSeconds);
+      if (supersetGroup != null && partnerExerciseId) {
+        // Superset: check whether this tap completes the round (both arms done)
+        const storeState = useSessionStore.getState();
+        const exercises = storeState.exercises;
+
+        // Build partner sets as SetRowState[] for supersetRoundComplete
+        const partnerExercise = exercises.find(
+          (ex) => ex.exerciseId === partnerExerciseId || ex.id === partnerExerciseId,
+        );
+        const partnerSets: SetRowState[] = (partnerExercise?.sets ?? []).map((s) => ({
+          setNumber: s.setNumber,
+          result: s.result,
+        }));
+
+        // This exercise's current sets — include the new result we just set
+        const thisExercise = exercises.find(
+          (ex) => ex.sets.some((s) => s.id === setId),
+        );
+        const thisSets: SetRowState[] = (thisExercise?.sets ?? []).map((s) => ({
+          setNumber: s.setNumber,
+          result: s.id === setId ? newResult : s.result,
+        }));
+
+        const roundComplete = supersetRoundComplete(thisSets, partnerSets, setNumber);
+
+        if (!roundComplete) {
+          // Round not yet complete — scroll to partner; do NOT start rest timer
+          storeState.scrollToExerciseId(partnerExerciseId);
+        } else {
+          // Both arms done — resolve rest seconds (use the longer of the two arms)
+          const thisRest = resolveRestSeconds(defaultRestSeconds, globalRestSeconds);
+          const partnerRest = resolveRestSeconds(partnerDefaultRestSeconds, globalRestSeconds);
+          const restSeconds = Math.max(thisRest, partnerRest);
+          onRestStart?.(restSeconds);
+          await startTimer(restSeconds);
+          // After timer ends/skips, scroll back to the first arm for the next set pair
+          // This is handled by the RestTimerPill onSkip wired in SessionScreen (Plan 06)
+          // which calls scrollToExerciseId(supersetFirstArmId) after cancel().
+          // We store the firstArmId in the superset cursor for that callback to use.
+          storeState.advanceSupersetCursor(
+            supersetFirstArmId
+              ? {
+                  groupId: supersetGroup,
+                  arm: 'A',
+                  setNumber: setNumber + 1,
+                }
+              : null,
+          );
+        }
+      } else {
+        // Standard (non-superset) exercise — existing behavior
+        const restSeconds = resolveRestSeconds(defaultRestSeconds, globalRestSeconds);
+        onRestStart?.(restSeconds);
+        await startTimer(restSeconds);
+      }
     }
-  }, [result, setId, sessionId, exerciseId, exerciseName, setNumber, weightInput, repsTarget, isWarmup, defaultRestSeconds, globalRestSeconds, setSetResult, startTimer]);
+  }, [result, setId, sessionId, exerciseId, exerciseName, setNumber, weightInput, repsTarget, isWarmup, defaultRestSeconds, globalRestSeconds, supersetGroup, partnerExerciseId, supersetFirstArmId, partnerDefaultRestSeconds, setSetResult, startTimer, onRestStart]);
 
   const handleNoGo = useCallback(async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -185,8 +281,38 @@ export function SetRow({
         notes: null,
       });
     }
-    // No rest timer on No-Go
-  }, [result, setId, sessionId, exerciseId, exerciseName, setNumber, weightInput, repsTarget, isWarmup, setSetResult]);
+
+    // Superset No-Go: treat the same as Go for the scroll logic —
+    // No-Go is a valid result; the round can still be "complete" if the other arm is done.
+    if (newResult === 'no-go' && !isWarmup && supersetGroup != null && partnerExerciseId) {
+      const storeState = useSessionStore.getState();
+      const exercises = storeState.exercises;
+
+      const partnerExercise = exercises.find(
+        (ex) => ex.exerciseId === partnerExerciseId || ex.id === partnerExerciseId,
+      );
+      const partnerSets: SetRowState[] = (partnerExercise?.sets ?? []).map((s) => ({
+        setNumber: s.setNumber,
+        result: s.result,
+      }));
+
+      const thisExercise = exercises.find(
+        (ex) => ex.sets.some((s) => s.id === setId),
+      );
+      const thisSets: SetRowState[] = (thisExercise?.sets ?? []).map((s) => ({
+        setNumber: s.setNumber,
+        result: s.id === setId ? newResult : s.result,
+      }));
+
+      const roundComplete = supersetRoundComplete(thisSets, partnerSets, setNumber);
+
+      if (!roundComplete) {
+        storeState.scrollToExerciseId(partnerExerciseId);
+      }
+      // If round complete on No-Go: no rest timer on No-Go (existing behavior)
+    }
+    // Standard No-Go: no rest timer
+  }, [result, setId, sessionId, exerciseId, exerciseName, setNumber, weightInput, repsTarget, isWarmup, supersetGroup, partnerExerciseId, setSetResult]);
 
   // ── Weight input handlers ─────────────────────────────────────────────────
 

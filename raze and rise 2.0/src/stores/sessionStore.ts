@@ -12,22 +12,33 @@
  *   exercises[]      — ordered array of ExerciseState (loaded from today's template)
  *   expandedSetId    — only ONE set can be expanded at a time (UI-SPEC.md rule)
  *   focusedSetId     — which set has keyboard focus (WeightInput)
+ *   flashListRef     — ref to the FlashList for superset auto-scroll (Plan 06)
+ *   supersetCursor   — tracks which arm/set is active in a superset (Plan 06)
  *
  * Actions:
- *   loadExercises    — replace the exercises array (called once on session init)
- *   setSetResult     — mark a set go / no-go / null
- *   setSetWeight     — update weight for a set
- *   setSetRpe        — update RPE (1-10) for a set
- *   setSetWarmup     — toggle warm-up flag for a set
- *   setSetNotes      — update notes for a set
- *   setExpanded      — expand one set row, collapsing any previously expanded one
- *   setFocused       — mark which set has keyboard focus
- *   addSet           — append a new set to an exercise (pre-fills weight from last set)
- *   swapExercise     — replace an exercise at a given slot index (Plan 08 wires the UI)
+ *   loadExercises       — replace the exercises array (called once on session init)
+ *   setSetResult        — mark a set go / no-go / null
+ *   setSetWeight        — update weight for a set
+ *   setSetRpe           — update RPE (1-10) for a set
+ *   setSetWarmup        — toggle warm-up flag for a set
+ *   setSetNotes         — update notes for a set
+ *   setExpanded         — expand one set row, collapsing any previously expanded one
+ *   setFocused          — mark which set has keyboard focus
+ *   addSet              — append a new set to an exercise (pre-fills weight from last set)
+ *   swapExercise        — replace an exercise at a given slot index (Plan 08 wires the UI)
+ *   setListRef          — register the FlashList ref for superset scroll (Plan 06)
+ *   scrollToExerciseId  — scroll FlashList to the item containing exerciseId (Pitfall 8)
+ *   advanceSupersetCursor — update the superset cursor after a set commit (Plan 06)
  */
 
 import { create } from 'zustand';
+import { FlashListRef } from '@shopify/flash-list';
 import { SetResult } from '@/hooks/useSetResult';
+import {
+  buildFlashListData,
+  findFlashListIndexForExercise,
+  FlashListItem,
+} from '@/lib/supersetLogic';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -57,10 +68,21 @@ export interface ExerciseState {
   sets: SetState[];
 }
 
+/** Tracks which arm + set is currently active during a superset (Plan 06) */
+export interface SupersetCursor {
+  groupId: number;
+  arm: 'A' | 'B';
+  setNumber: number;
+}
+
 interface SessionState {
   exercises: ExerciseState[];
   expandedSetId: string | null;
   focusedSetId: string | null;
+  /** FlashList ref for superset auto-scroll (Plan 06) — stored at module scope to avoid Zustand serialization issues */
+  flashListRef: FlashListRef<FlashListItem> | null;
+  /** Current superset cursor — tracks which arm/set is active */
+  supersetCursor: SupersetCursor | null;
 
   // ── Actions ─────────────────────────────────────────────────────────────
   loadExercises: (exercises: ExerciseState[]) => void;
@@ -73,6 +95,16 @@ interface SessionState {
   setFocused: (setId: string | null) => void;
   addSet: (exerciseId: string) => void;
   swapExercise: (slotIndex: number, newExercise: ExerciseState) => void;
+  /** Register the FlashList ref for superset auto-scroll (called from SessionScreen) */
+  setListRef: (ref: FlashListRef<FlashListItem> | null) => void;
+  /**
+   * Scroll the FlashList to the item containing exerciseId.
+   * Uses findFlashListIndexForExercise (Pitfall 8 — never uses raw exercise array index).
+   * Guards against -1 (T-02-09).
+   */
+  scrollToExerciseId: (exerciseId: string) => void;
+  /** Update the superset cursor after a set commit */
+  advanceSupersetCursor: (cursor: SupersetCursor | null) => void;
 }
 
 // ── Helper — mutate a single set by id across all exercises ──────────────────
@@ -111,6 +143,8 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   exercises: [],
   expandedSetId: null,
   focusedSetId: null,
+  flashListRef: null,
+  supersetCursor: null,
 
   // Replace the entire exercises array (called on session init or rehydration)
   loadExercises: (exercises) => set({ exercises }),
@@ -181,6 +215,28 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       }
       return { exercises };
     }),
+
+  // ── Plan 06: Superset auto-scroll ─────────────────────────────────────
+
+  // Register the FlashList ref — called from SessionScreen after FlashList mounts
+  setListRef: (ref) => set({ flashListRef: ref }),
+
+  // Scroll FlashList to the item containing exerciseId.
+  // Uses findFlashListIndexForExercise (RESEARCH.md Pitfall 8 — never raw array index).
+  // Guards against -1 return value (T-02-09 — unknown exerciseId is a no-op).
+  scrollToExerciseId: (exerciseId) => {
+    const state = get();
+    const data = buildFlashListData(state.exercises);
+    const index = findFlashListIndexForExercise(data, exerciseId);
+    if (index < 0) {
+      // Unknown exerciseId — no-op (T-02-09 mitigation)
+      return;
+    }
+    state.flashListRef?.scrollToIndex({ index, animated: true });
+  },
+
+  // Update the superset cursor (or clear it with null when superset is finished)
+  advanceSupersetCursor: (cursor) => set({ supersetCursor: cursor }),
 
   // Return current state accessor (useful for service layer without subscribing)
   // getState() is provided by Zustand automatically

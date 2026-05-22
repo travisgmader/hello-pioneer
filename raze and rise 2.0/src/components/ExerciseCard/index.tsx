@@ -134,6 +134,29 @@ export function ExerciseCard({
           results: [],
         };
 
+        // Superset support (Plan 06): find the partner exercise if this exercise is in a superset
+        let partnerExerciseId: string | null = null;
+        let supersetFirstArmId: string | null = null;
+        let partnerDefaultRestSeconds: number | null = null;
+
+        if (exercise.supersetGroup != null) {
+          const storeExercises = useSessionStore.getState().exercises;
+          // Partner = the other exercise in the same superset group
+          const partner = storeExercises.find(
+            (ex) => ex.id !== exercise.id && ex.supersetGroup === exercise.supersetGroup,
+          );
+          if (partner) {
+            partnerExerciseId = partner.exerciseId;
+            partnerDefaultRestSeconds = partner.defaultRestSeconds;
+            // First arm = the exercise that comes first in the array (index is lower)
+            const thisIndex = storeExercises.findIndex((ex) => ex.id === exercise.id);
+            const partnerIndex = storeExercises.findIndex((ex) => ex.id === partner.id);
+            supersetFirstArmId = thisIndex < partnerIndex
+              ? exercise.exerciseId
+              : partner.exerciseId;
+          }
+        }
+
         return (
           <SetRow
             key={set.id}
@@ -147,6 +170,10 @@ export function ExerciseCard({
             defaultRestSeconds={exercise.defaultRestSeconds}
             globalRestSeconds={globalRestSeconds}
             previousPerformance={prevPerf}
+            supersetGroup={exercise.supersetGroup}
+            partnerExerciseId={partnerExerciseId}
+            supersetFirstArmId={supersetFirstArmId}
+            partnerDefaultRestSeconds={partnerDefaultRestSeconds}
             onExpand={() => {
               // Toggle: if already expanded, collapse; otherwise expand
               if (expandedSetId === set.id) {
