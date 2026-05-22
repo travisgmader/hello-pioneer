@@ -2,8 +2,10 @@
  * sessionService — PowerSync write helpers for the active workout session.
  *
  * Exports:
- *   startSession  — generates client-side UUID, writes session metadata to MMKV
- *   commitSet     — INSERT OR REPLACE into session_sets immediately on Go/No-Go tap
+ *   startSession      — generates client-side UUID, writes session metadata to MMKV
+ *   commitSet         — INSERT OR REPLACE into session_sets immediately on Go/No-Go tap
+ *   serializeSetNotes — JSON-serialize { tags, text } → string for storage
+ *   parseSetNotes     — JSON-parse notes string with graceful fallback (T-02-05)
  *
  * Architecture decisions:
  *   - Session UUID is generated BEFORE the first write (DATA-02, T-02-04)
@@ -21,6 +23,11 @@
  * Security: T-02-01 — sessionId is pulled from MMKV (derived from the user's auth
  * session startup) so session_sets rows are always scoped to the correct user via
  * the sessions.user_id RLS chain.
+ *
+ * Notes JSON shape (Plan 05):
+ *   { tags: ('easy' | 'hard' | 'good form' | 'bad form' | 'pain')[], text: string }
+ * Stored as JSON.stringify(...) in session_sets.notes.
+ * T-02-05: parseSetNotes wraps JSON.parse in try/catch and falls back gracefully.
  */
 
 import * as Crypto from 'expo-crypto';
@@ -55,6 +62,49 @@ export interface CommitSetOpts {
   rpe: number | null;
   isWarmup: boolean;
   notes: string | null;
+}
+
+/** Notes JSON shape stored in session_sets.notes */
+export interface SetNotes {
+  tags: ('easy' | 'hard' | 'good form' | 'bad form' | 'pain')[];
+  text: string;
+}
+
+// ── Notes helpers ─────────────────────────────────────────────────────────────
+
+/**
+ * serializeSetNotes — JSON-serialize tags + free-text into a single notes string.
+ *
+ * Result is stored in session_sets.notes (TEXT column).
+ * Empty tags + empty text → still serialized as JSON for consistency.
+ */
+export function serializeSetNotes(tags: string[], text: string): string {
+  return JSON.stringify({ tags, text });
+}
+
+/**
+ * parseSetNotes — parse the JSON notes string from session_sets.notes.
+ *
+ * T-02-05 mitigation: wraps JSON.parse in try/catch.
+ *   - If raw is null or empty → { tags: [], text: '' }
+ *   - If JSON is valid with expected shape → { tags: string[], text: string }
+ *   - If parse fails (malformed / legacy plain string) → { tags: [], text: raw }
+ *
+ * This ensures the UI never crashes on a row that was manually edited in the DB
+ * or written by an older version of the app.
+ */
+export function parseSetNotes(raw: string | null): { tags: string[]; text: string } {
+  if (!raw) return { tags: [], text: '' };
+  try {
+    const parsed = JSON.parse(raw);
+    return {
+      tags: Array.isArray(parsed.tags) ? parsed.tags : [],
+      text: typeof parsed.text === 'string' ? parsed.text : '',
+    };
+  } catch {
+    // Legacy or malformed value — treat the entire string as free text (T-02-05)
+    return { tags: [], text: raw };
+  }
 }
 
 // ── startSession ──────────────────────────────────────────────────────────────

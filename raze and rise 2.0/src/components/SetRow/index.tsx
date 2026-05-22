@@ -7,12 +7,16 @@
  *   - WeightInput (decimal-pad, pre-filled from previous performance)
  *   - SetResultButton Go
  *   - SetResultButton No-Go
- *   - ExpandChevron (ChevronDown/Up 20px, 44×44pt hit area)
+ *   - ExpandChevron (ChevronDown/Up 20px, 44×44pt hit area, 150ms rotation animation)
  *   - PrevPerformanceLink below the row (tap-to-fill D-09)
+ *   - ExpandedSetForm below (rendered when expandedSetId === setId)
  *
  * Cross-render state (result, weightKg, isWarmup, expanded, focused) lives in
  * Zustand sessionStore — NEVER in local useState — to survive FlashList recycling
  * (RESEARCH.md Pitfall 1).
+ *
+ * One-at-a-time expansion: setExpanded(setId) replaces any prior expandedSetId in
+ * the Zustand store — enforced by the store, not by SetRow.
  *
  * PowerSync write: on Go/No-Go tap, calls commitSet() immediately (no batching).
  * Rest timer: fires on Go tap if !isWarmup via useRestTimer().start(resolveRestSeconds(...)).
@@ -26,7 +30,6 @@
 
 import React, { useCallback, useState } from 'react';
 import { View, Text } from 'react-native';
-import { ChevronDown, ChevronUp } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 
 import { useSessionStore } from '@/stores/sessionStore';
@@ -38,7 +41,8 @@ import { LeftEdgeBar } from '@/components/LeftEdgeBar';
 import { WeightInput } from '@/components/WeightInput';
 import { SetResultButton } from '@/components/SetResultButton';
 import { PrevPerformanceLink } from '@/components/PrevPerformanceLink';
-import { IconButton } from '@/components/IconButton';
+import { ExpandChevron } from '@/components/ExpandChevron';
+import { ExpandedSetForm } from '@/components/SetRow/ExpandedSetForm';
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -57,7 +61,6 @@ export interface SetRowProps {
     weightKg: number | null;
     results: ('go' | 'no-go' | null)[];
   };
-  onExpand: () => void;
 }
 
 // ── Weight validation helper ──────────────────────────────────────────────────
@@ -82,9 +85,9 @@ export function SetRow({
   defaultRestSeconds,
   globalRestSeconds,
   previousPerformance,
-  onExpand,
 }: SetRowProps) {
   // ── Zustand state ─────────────────────────────────────────────────────────
+
   const result = useSessionStore((s) => {
     for (const ex of s.exercises) {
       const set = ex.sets.find((st) => st.id === setId);
@@ -113,6 +116,7 @@ export function SetRow({
 
   const setSetWeight = useSessionStore((s) => s.setSetWeight);
   const setSetResult = useSessionStore((s) => s.setSetResult);
+  const setExpanded = useSessionStore((s) => s.setExpanded);
 
   // ── Rest timer ────────────────────────────────────────────────────────────
   const { start: startTimer } = useRestTimer();
@@ -205,12 +209,13 @@ export function SetRow({
     }
   }, [weightError, weightKg]);
 
-  // ── Expand chevron handler ────────────────────────────────────────────────
+  // ── Expand chevron handler (one-at-a-time: store enforces single expanded) ─
 
-  const handleExpand = useCallback(async () => {
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onExpand();
-  }, [onExpand]);
+  const handleExpand = useCallback(() => {
+    // If already expanded → collapse (pass null). Otherwise expand this row.
+    // The store replaces any prior expandedSetId, enforcing one-at-a-time.
+    setExpanded(isExpanded ? null : setId);
+  }, [isExpanded, setId, setExpanded]);
 
   // ── LeftEdgeBar variant ───────────────────────────────────────────────────
 
@@ -273,14 +278,10 @@ export function SetRow({
           setNumber={setNumber}
         />
 
-        {/* Expand chevron — 44×44pt hit area — Plan 05 fills the expanded form */}
-        <IconButton
-          icon={isExpanded
-            ? <ChevronUp size={20} color="#99907C" />
-            : <ChevronDown size={20} color="#99907C" />
-          }
+        {/* Expand chevron — 44×44pt, 150ms rotation animation */}
+        <ExpandChevron
+          expanded={isExpanded}
           onPress={handleExpand}
-          accessibilityLabel={isExpanded ? 'Collapse set details' : 'Expand set details'}
         />
       </View>
 
@@ -294,8 +295,19 @@ export function SetRow({
         />
       </View>
 
-      {/* Expanded section — Plan 05 fills the inline RPE/warmup/notes form */}
-      {isExpanded && <View />}
+      {/* Expanded section — inline RPE/warmup/notes form (Plan 05) */}
+      {isExpanded && (
+        <ExpandedSetForm
+          setId={setId}
+          sessionId={sessionId}
+          exerciseId={exerciseId}
+          exerciseName={exerciseName}
+          setNumber={setNumber}
+          weightKg={weightKg}
+          repsTarget={repsTarget}
+          result={result}
+        />
+      )}
     </View>
   );
 }
