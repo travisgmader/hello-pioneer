@@ -90,7 +90,11 @@ export default function CreateFamily() {
       return familyId;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['current-family'] });
+      // removeQueries clears the stale null from cache so RequireFamily sees
+      // isLoading=true (not a silent background refetch returning null) while
+      // the fresh fetch completes. invalidateQueries alone leaves the old null
+      // in cache and RequireFamily immediately redirects back to this wizard.
+      qc.removeQueries({ queryKey: ['current-family'] });
       navigate('/dashboard', { replace: true });
     },
   });
