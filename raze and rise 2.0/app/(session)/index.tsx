@@ -69,6 +69,8 @@ import { ExerciseCard } from '@/components/ExerciseCard';
 import { SupersetPair } from '@/components/SupersetPair';
 import { RestTimerPill } from '@/components/RestTimerPill';
 import { AnubisOverlay } from '@/components/AnubisOverlay';
+import { ExerciseSwapModal } from '@/components/ExerciseSwapModal';
+import { SessionNoteSheet } from '@/components/SessionNoteSheet';
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -102,6 +104,19 @@ export default function SessionScreen() {
   const setListRef = useSessionStore((s) => s.setListRef);
   const supersetCursor = useSessionStore((s) => s.supersetCursor);
   const scrollToExerciseId = useSessionStore((s) => s.scrollToExerciseId);
+
+  // Swap modal state (Plan 08 — WORKOUT-15)
+  const swapModalForExerciseId = useSessionStore((s) => s.swapModalForExerciseId);
+  const openSwapModal = useSessionStore((s) => s.openSwapModal);
+  const closeSwapModal = useSessionStore((s) => s.closeSwapModal);
+  const swapExercise = useSessionStore((s) => s.swapExercise);
+
+  // Note sheet state (Plan 08 — WORKOUT-09)
+  const noteSheetOpen = useSessionStore((s) => s.noteSheetOpen);
+  const openNoteSheet = useSessionStore((s) => s.openNoteSheet);
+  const closeNoteSheet = useSessionStore((s) => s.closeNoteSheet);
+  const sessionNotes = useSessionStore((s) => s.sessionNotes);
+  const setSessionNotes = useSessionStore((s) => s.setSessionNotes);
 
   // Track whether we've initialized the session (avoid double-init on re-renders)
   const initialized = useRef(false);
@@ -201,7 +216,8 @@ export default function SessionScreen() {
         templateId: template?.id ?? '',
         dayLabel: template?.day_label ?? template?.name ?? '',
         startedAt: startedAt ?? new Date().toISOString(),
-        sessionNotes: null,
+        // Pass session notes from store (WORKOUT-09 — Plan 08 wires this from SessionNoteSheet)
+        sessionNotes: sessionNotes || null,
       });
     } catch (err) {
       // completeSession failed — log but do NOT block navigation.
@@ -212,7 +228,7 @@ export default function SessionScreen() {
       console.warn('[SessionScreen] completeSession failed — navigating anyway:', err);
     }
     // Navigation happens via AnubisOverlay.onFadeOutComplete below
-  }, [sessionId, userId, template, startedAt, cancel]);
+  }, [sessionId, userId, template, startedAt, cancel, sessionNotes]);
 
   // ── Android hardware back handler (UI-SPEC.md Back / Cancel) ─────────────
   // BackHandler only fires on Android — safe to register on iOS (no-op there).
@@ -261,6 +277,30 @@ export default function SessionScreen() {
   // ── Unit preference — derived from profiles (default lbs for Phase 2) ──────
   const unit = 'lbs' as const;
 
+  // ── Swap modal: look up exercise name for the current swap target ──────────
+  // The modal needs the current exercise name to display in the header
+  const swapModalExercise = swapModalForExerciseId
+    ? exercises.find((ex) => ex.exerciseId === swapModalForExerciseId) ??
+      exercises.find((ex) => ex.id === swapModalForExerciseId) ??
+      null
+    : null;
+
+  // ── Swap modal: handle selection ──────────────────────────────────────────
+  const handleSwapSelect = useCallback(
+    (newExercise: { id: string; name: string; primaryMuscle: string }) => {
+      if (!swapModalForExerciseId) return;
+      // Find the slot index for the exercise being swapped
+      const slotIndex = exercises.findIndex(
+        (ex) => ex.exerciseId === swapModalForExerciseId || ex.id === swapModalForExerciseId
+      );
+      if (slotIndex >= 0) {
+        swapExercise(slotIndex, { id: newExercise.id, name: newExercise.name });
+      }
+      closeSwapModal();
+    },
+    [swapModalForExerciseId, exercises, swapExercise, closeSwapModal]
+  );
+
   // ── renderItem helper ─────────────────────────────────────────────────────
   const renderItem = useCallback(({ item }: { item: FlashListItem }) => {
     if (item.type === 'single') {
@@ -273,7 +313,7 @@ export default function SessionScreen() {
           unit={unit}
           globalRestSeconds={globalRestSeconds}
           isActive={exercise.id === currentExerciseId}
-          onSwap={() => {/* Plan 08 wires exercise swap modal */}}
+          onSwap={() => openSwapModal(exercise.exerciseId)}
           onExpandSet={(setId) => useSessionStore.getState().setExpanded(setId)}
         />
       );
@@ -300,21 +340,22 @@ export default function SessionScreen() {
         unit={unit}
         globalRestSeconds={globalRestSeconds}
         activeArm={activeArm}
-        onSwapA={() => {/* Plan 08 */}}
-        onSwapB={() => {/* Plan 08 */}}
+        onSwapA={() => openSwapModal(exerciseA.exerciseId)}
+        onSwapB={() => openSwapModal(exerciseB.exerciseId)}
         onExpandSet={(setId) => useSessionStore.getState().setExpanded(setId)}
       />
     );
-  }, [exerciseById, sessionId, unit, globalRestSeconds, currentExerciseId]);
+  }, [exerciseById, sessionId, unit, globalRestSeconds, currentExerciseId, openSwapModal]);
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <SafeAreaView className="flex-1 bg-bg">
-      {/* Session header — elapsed timer + day label + Complete button */}
+      {/* Session header — elapsed timer + day label + Complete button + Note button */}
       <SessionHeader
         dayLabel={template?.day_label ?? template?.name ?? 'Workout'}
         startedAt={startedAt ?? new Date().toISOString()}
         onComplete={handleComplete}
+        onOpenNote={openNoteSheet}
       />
 
       {/* Exercise list — FlashList v2 (no estimatedItemSize per Pattern 1) */}
@@ -346,6 +387,23 @@ export default function SessionScreen() {
         onFadeOutComplete={() => {
           router.replace('/(tabs)/' as never);
         }}
+      />
+
+      {/* Exercise swap modal (Plan 08 — WORKOUT-15) */}
+      {/* Rendered once at the session screen level (not per-card) — avoids mounting one Modal per FlashList item */}
+      <ExerciseSwapModal
+        visible={swapModalForExerciseId !== null}
+        currentExerciseName={swapModalExercise?.exerciseName ?? ''}
+        onSelect={handleSwapSelect}
+        onClose={closeSwapModal}
+      />
+
+      {/* Session note sheet (Plan 08 — WORKOUT-09) */}
+      <SessionNoteSheet
+        visible={noteSheetOpen}
+        initialValue={sessionNotes}
+        onSave={setSessionNotes}
+        onClose={closeNoteSheet}
       />
     </SafeAreaView>
   );
