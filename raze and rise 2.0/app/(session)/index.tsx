@@ -10,7 +10,7 @@
  *      - Exists → rehydrate: load template, restore exercises into Zustand store
  *      - Absent → startSession(): generate UUID, save to MMKV, load exercises into store
  *   3. If no template for today → route back to workouts (Plan 08 handles skip-day flow)
- *   4. Render: SafeAreaView → SessionHeader → FlashList<FlashListItem> → RestTimerPill
+ *   4. Render: SafeAreaView → SessionHeader → FlashList<FlashListItem> → RestTimerPill → AnubisOverlay
  *   5. Unmount: deactivate keep-awake
  *
  * FlashList v2 specifics (RESEARCH.md Pattern 1):
@@ -25,7 +25,22 @@
  *   - listRef registered in sessionStore via setListRef() for superset auto-scroll
  *   - RestTimerPill onSkip callback scrolls back to the first superset arm after rest
  *
- * handleComplete (Plan 04 stub): router.replace('/(tabs)') — Plan 07 wires the Anubis flow.
+ * Complete Workout flow (Plan 07 — WORKOUT-17 + DESIGN-03):
+ *   1. handleComplete fires Haptics.notificationAsync(Success)
+ *   2. setAnubisVisible(true) — overlay fades in
+ *   3. cancelRestTimer() in parallel (fire-and-forget)
+ *   4. completeSession() runs during Lottie playback (atomic writeTransaction)
+ *   5. AnubisOverlay.onFadeOutComplete → router.replace('/(tabs)/')
+ *   On completeSession failure: logs warn; navigation still proceeds (UI-SPEC.md Lottie fail fallback)
+ *
+ * Android hardware back (UI-SPEC.md Back / Cancel):
+ *   BackHandler.addEventListener — shows Alert.alert:
+ *   - Title: "End workout?"
+ *   - Body: "Your logged sets will be saved."
+ *   - "Keep going" (cancel) → stay on screen
+ *   - "End workout" (destructive) → handleComplete()
+ *   Returns true to consume the event (suppress default OS back behavior).
+ *   iOS swipe-back is disabled via gestureEnabled: false in (session)/_layout.tsx.
  *
  * RestTimerPill: always rendered (returns null when remaining===null — no placeholder space).
  * RestTimerPill needs lastStartedRestSeconds to compute the drain bar. We track it in
@@ -33,18 +48,19 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { View, Alert, BackHandler } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FlashList, FlashListRef } from '@shopify/flash-list';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
+import * as Haptics from 'expo-haptics';
 
 import { useSession } from '@/hooks/useSession';
 import { useSessionPersistence } from '@/hooks/useSessionPersistence';
 import { useTodaysTemplate } from '@/hooks/useSessionData';
 import { useSessionStore, ExerciseState } from '@/stores/sessionStore';
 import { useRestTimer } from '@/hooks/useRestTimer';
-import { startSession } from '@/services/sessionService';
+import { startSession, completeSession } from '@/services/sessionService';
 import { initAudioMode } from '@/lib/audio';
 import { buildFlashListData, FlashListItem } from '@/lib/supersetLogic';
 
@@ -52,6 +68,7 @@ import { SessionHeader } from '@/components/SessionHeader';
 import { ExerciseCard } from '@/components/ExerciseCard';
 import { SupersetPair } from '@/components/SupersetPair';
 import { RestTimerPill } from '@/components/RestTimerPill';
+import { AnubisOverlay } from '@/components/AnubisOverlay';
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -74,6 +91,9 @@ export default function SessionScreen() {
 
   // Track the last started rest duration for the pill drain bar
   const [lastRestSeconds, setLastRestSeconds] = useState<number>(90);
+
+  // Anubis overlay visibility — set to true when handleComplete fires
+  const [anubisVisible, setAnubisVisible] = useState(false);
 
   // FlashList ref — registered in sessionStore for superset auto-scroll (Plan 06, Pitfall 8)
   const listRef = useRef<FlashListRef<FlashListItem>>(null);
@@ -155,10 +175,72 @@ export default function SessionScreen() {
     ex.sets.some((s) => s.result === null)
   )?.id ?? null;
 
-  // ── Complete handler (Plan 04 stub — Plan 07 wires the Anubis flow) ──────
-  const handleComplete = () => {
-    router.replace('/(tabs)' as never);
-  };
+  // ── Complete handler — wires Anubis flow + PowerSync atomic commit (Plan 07) ──
+  // Sequence per UI-SPEC.md Motion — Anubis:
+  //   1. Haptic feedback (Success) — must fire before any async work
+  //   2. setAnubisVisible(true) — overlay fade-in STARTS (not awaited)
+  //   3. cancelRestTimer() — fire-and-forget; clears any pending rest notification
+  //   4. completeSession() — runs DURING Lottie playback (atomic writeTransaction)
+  //   5. onFadeOutComplete (in AnubisOverlay) — navigates to Dashboard
+  // On completeSession failure: log warn; navigation still proceeds (Lottie fail fallback)
+  const handleComplete = useCallback(async () => {
+    // 1. Success haptic — fires immediately before any async work (UI-SPEC.md haptic table)
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+    // 2. Fade-in starts — setAnubisVisible is synchronous; overlay begins rendering
+    setAnubisVisible(true);
+
+    // 3. Cancel any pending rest timer notification (fire-and-forget)
+    cancel().catch(() => {});
+
+    // 4. Atomic PowerSync commit during Lottie playback
+    try {
+      await completeSession({
+        sessionId: sessionId ?? '',
+        userId,
+        templateId: template?.id ?? '',
+        dayLabel: template?.day_label ?? template?.name ?? '',
+        startedAt: startedAt ?? new Date().toISOString(),
+        sessionNotes: null,
+      });
+    } catch (err) {
+      // completeSession failed — log but do NOT block navigation.
+      // The Anubis animation continues to play; onFadeOutComplete will navigate
+      // to Dashboard regardless. PowerSync will retry the write when sync resumes.
+      // UI-SPEC.md: "Anubis Lottie fails to load → Fallback: 600ms blank bg-colored
+      // overlay, then proceed to Dashboard." Same fallback applies to write failures.
+      console.warn('[SessionScreen] completeSession failed — navigating anyway:', err);
+    }
+    // Navigation happens via AnubisOverlay.onFadeOutComplete below
+  }, [sessionId, userId, template, startedAt, cancel]);
+
+  // ── Android hardware back handler (UI-SPEC.md Back / Cancel) ─────────────
+  // BackHandler only fires on Android — safe to register on iOS (no-op there).
+  // iOS swipe-back is already disabled via gestureEnabled:false in _layout.tsx.
+  // Returns true to consume the event (suppresses default OS back behavior).
+  // Alert copy from UI-SPEC.md: single Phase 2 exception to no-alerts rule.
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      Alert.alert(
+        'End workout?',
+        'Your logged sets will be saved.',
+        [
+          {
+            text: 'Keep going',
+            style: 'cancel',
+          },
+          {
+            text: 'End workout',
+            style: 'destructive',
+            onPress: () => { void handleComplete(); },
+          },
+        ],
+      );
+      return true; // Consume the event — suppress default OS back behavior (T-02-11)
+    });
+
+    return () => { subscription.remove(); };
+  }, [handleComplete]);
 
   // ── Rest timer skip/expire → scroll back to superset first arm (Plan 06) ─
   const handleRestSkip = useCallback(async () => {
@@ -255,6 +337,15 @@ export default function SessionScreen() {
         totalSeconds={lastRestSeconds}
         onSkip={handleRestSkip}
         onAddSeconds={addSeconds}
+      />
+
+      {/* Anubis completion overlay (Plan 07 — DESIGN-03) */}
+      {/* Fades in when handleComplete fires; fades out and navigates after Lottie plays */}
+      <AnubisOverlay
+        visible={anubisVisible}
+        onFadeOutComplete={() => {
+          router.replace('/(tabs)/' as never);
+        }}
       />
     </SafeAreaView>
   );
