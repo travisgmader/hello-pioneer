@@ -22,6 +22,7 @@ import { useEffect } from 'react';
 import { Alert } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as Linking from 'expo-linking';
+import * as Notifications from 'expo-notifications';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useSession } from '@/hooks/useSession';
@@ -45,6 +46,18 @@ function RootLayoutNav() {
   const { migrationStatus, loading: migrationLoading } = useMigrationStatus(
     session?.user?.id,
   );
+
+  // ── Android notification channel registration (once on mount, before powersync.init) ──
+  useEffect(() => {
+    Notifications.setNotificationChannelAsync('rest-timer', {
+      name: 'Rest Timer',
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 250, 250],
+      sound: null,
+    }).catch(() => {
+      // No-op on iOS; channel registration failure must not block app startup.
+    });
+  }, []);
 
   // ── PowerSync init (once on mount) ──────────────────────────────────────────
   useEffect(() => {
