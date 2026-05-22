@@ -23,7 +23,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable } from 'react-native';
-import { StickyNote } from 'lucide-react-native';
+import { StickyNote, Activity } from 'lucide-react-native';
 import { NumericText } from '@/components/NumericText';
 import { IconButton } from '@/components/IconButton';
 
@@ -63,6 +63,7 @@ export function SessionHeader({
   startedAt,
   onComplete,
   onOpenNote,
+  onOpenBodyMap,
 }: SessionHeaderProps) {
   // Elapsed timer — safe to use useState here since SessionHeader is NOT inside FlashList
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(() => {
@@ -116,14 +117,23 @@ export function SessionHeader({
         </Pressable>
       </View>
 
-      {/* Session note button — positioned just below the day label (UI-SPEC.md, Plan 08 — WORKOUT-09) */}
-      {onOpenNote && (
-        <View className="flex-row">
-          <IconButton
-            icon={<StickyNote size={20} color="#99907C" />}
-            onPress={onOpenNote}
-            accessibilityLabel="Add session note"
-          />
+      {/* Action buttons row — note + body map — positioned just below the day label (UI-SPEC.md, Plan 08/09) */}
+      {(onOpenNote || onOpenBodyMap) && (
+        <View className="flex-row gap-xs">
+          {onOpenNote && (
+            <IconButton
+              icon={<StickyNote size={20} color="#99907C" />}
+              onPress={onOpenNote}
+              accessibilityLabel="Add session note"
+            />
+          )}
+          {onOpenBodyMap && (
+            <IconButton
+              icon={<Activity size={20} color="#99907C" />}
+              onPress={onOpenBodyMap}
+              accessibilityLabel="Flag sore muscles"
+            />
+          )}
         </View>
       )}
     </View>
