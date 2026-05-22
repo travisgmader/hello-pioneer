@@ -31,8 +31,9 @@
  */
 
 import * as Crypto from 'expo-crypto';
+import { createMMKV } from 'react-native-mmkv';
 import { getPowerSync } from '@/lib/powersync';
-import { saveSession } from '@/hooks/useSessionPersistence';
+import { saveSession, SESSION_KEYS } from '@/hooks/useSessionPersistence';
 import { ExerciseState } from '@/stores/sessionStore';
 import { SetResult } from '@/hooks/useSetResult';
 
@@ -62,6 +63,25 @@ export interface CommitSetOpts {
   rpe: number | null;
   isWarmup: boolean;
   notes: string | null;
+}
+
+/**
+ * CompleteSessionArgs — parameters for the atomic session completion write.
+ * All fields required — validated by caller before invoking completeSession.
+ */
+export interface CompleteSessionArgs {
+  /** Session UUID generated at session start (client-side, see startSession) */
+  sessionId: string;
+  /** Authenticated user ID from Supabase session (T-02-01 — RLS enforcement) */
+  userId: string;
+  /** Template ID for the completed workout */
+  templateId: string;
+  /** Day label (e.g. "Push", "Pull", "Legs") */
+  dayLabel: string;
+  /** ISO string of when the session started (from MMKV active_session_started_at) */
+  startedAt: string;
+  /** Session-level free text notes, or null if none */
+  sessionNotes: string | null;
 }
 
 /** Notes JSON shape stored in session_sets.notes */
@@ -194,4 +214,61 @@ export async function commitSet(opts: CommitSetOpts): Promise<void> {
     // The user's in-flight set data is still in the Zustand store.
     console.warn('[sessionService] commitSet failed — local SQLite error:', _err);
   }
+}
+
+// ── completeSession ───────────────────────────────────────────────────────────
+
+/**
+ * Atomically commit the session completion via PowerSync writeTransaction.
+ *
+ * Implements WORKOUT-17 + DATA-02 atomic completion:
+ *   1. INSERT OR REPLACE sessions row (idempotent by sessionId UUID — DATA-02)
+ *   2. UPDATE split_settings rotation_pointer + 1 (advances to next day)
+ *
+ * Both writes are inside a single writeTransaction so they succeed or fail together.
+ * This prevents the state where the session row exists but the rotation pointer
+ * was not advanced (or vice versa) — T-02-10 mitigation.
+ *
+ * MMKV cleanup (active_session_id + active_session_started_at) is performed ONLY
+ * after the transaction commits successfully. If writeTransaction throws, the
+ * MMKV keys are preserved so the session can be recovered on next app open.
+ *
+ * Security: T-02-01 — userId is the authenticated user's ID from useSession();
+ * the sessions row's user_id column is enforced by PowerSync RLS on sync upload.
+ *
+ * Note on rowsAffected: NOT checked — PowerSync JSON view system returns 0 on
+ * success (RESEARCH.md Pitfall 4). INSERT OR REPLACE idempotency handles duplicates.
+ *
+ * Note on .remove() vs .delete(): MMKV v4 API uses .remove(key). Confirmed from
+ * storage.ts line 69 and node_modules types (see useSessionPersistence.ts).
+ */
+export async function completeSession(args: CompleteSessionArgs): Promise<void> {
+  const { sessionId, userId, templateId, dayLabel, startedAt, sessionNotes } = args;
+
+  const ps = getPowerSync();
+
+  // Atomic write: sessions upsert + rotation pointer increment (T-02-10)
+  await ps.writeTransaction(async (tx) => {
+    // 1. Upsert the session row — idempotent by UUID (DATA-02)
+    await tx.execute(
+      `INSERT OR REPLACE INTO sessions
+       (id, user_id, template_id, day_label, started_at, completed_at, notes, is_deleted)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 0)`,
+      [sessionId, userId, templateId, dayLabel, startedAt, new Date().toISOString(), sessionNotes],
+    );
+
+    // 2. Advance the rotation pointer to the next day's template (D-13)
+    await tx.execute(
+      `UPDATE split_settings SET rotation_pointer = rotation_pointer + 1 WHERE user_id = ?`,
+      [userId],
+    );
+    // Do NOT check rowsAffected — PowerSync JSON view returns 0 on success (Pitfall 4)
+  });
+
+  // Clear MMKV session metadata ONLY after successful commit (crash-safety)
+  // Uses the same MMKV instance as useSessionPersistence ('active-session')
+  // Uses .remove() — confirmed v4 MMKV API (not .delete())
+  const store = createMMKV({ id: 'active-session' });
+  store.remove(SESSION_KEYS.id);
+  store.remove(SESSION_KEYS.startedAt);
 }
