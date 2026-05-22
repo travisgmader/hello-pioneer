@@ -216,6 +216,39 @@ export async function commitSet(opts: CommitSetOpts): Promise<void> {
   }
 }
 
+// ── skipDay ───────────────────────────────────────────────────────────────────
+
+/**
+ * skipDay — advance rotation_pointer by 1 without creating a session row.
+ *
+ * Implements WORKOUT-16: when no template exists for today (or the user explicitly
+ * skips), the split rotation advances without logging a completed workout.
+ *
+ * Uses a focused PowerSync execute() (single-row UPDATE) — no writeTransaction
+ * needed for a single atomic statement.
+ *
+ * Security: userId comes from the authenticated useSession() — only the current
+ * user's split_settings row is updated via the WHERE user_id = ? clause.
+ * PowerSync RLS enforces this on sync upload.
+ *
+ * T-02-13 mitigation: SkipDayButton disables itself for 500ms after tap to
+ * prevent double-tap advancing the pointer twice (see SkipDayButton component).
+ */
+export async function skipDay(userId: string): Promise<void> {
+  try {
+    const ps = getPowerSync();
+    await ps.execute(
+      `UPDATE split_settings SET rotation_pointer = rotation_pointer + 1 WHERE user_id = ?`,
+      [userId],
+    );
+    // Do NOT check rowsAffected — PowerSync JSON view returns 0 on success (Pitfall 4)
+  } catch (err) {
+    // PowerSync local SQLite writes should not fail in normal operation.
+    // Log and continue — the UI will remain on the same day.
+    console.warn('[sessionService] skipDay failed — local SQLite error:', err);
+  }
+}
+
 // ── completeSession ───────────────────────────────────────────────────────────
 
 /**
