@@ -28,7 +28,7 @@ import { Shuffle } from 'lucide-react-native';
 
 import { ExerciseState } from '@/stores/sessionStore';
 import { useSessionStore } from '@/stores/sessionStore';
-import { usePreviousPerformance } from '@/hooks/useSessionData';
+import { usePreviousPerformance, useLatestBodyweight } from '@/hooks/useSessionData';
 import { shouldShowOverloadHint } from '@/lib/progressiveOverload';
 
 import { LeftEdgeBar } from '@/components/LeftEdgeBar';
@@ -42,6 +42,8 @@ import { ProgressiveOverloadHint } from '@/components/ProgressiveOverloadHint';
 interface ExerciseCardProps {
   exercise: ExerciseState;
   sessionId: string;
+  /** Authenticated user ID — used to fetch bodyweight for bodyweight exercises (WORKOUT-12) */
+  userId: string;
   unit: 'lbs' | 'kg';
   globalRestSeconds: number;
   /** True when this exercise is the next one to log (first with unlogged sets) */
@@ -57,6 +59,7 @@ interface ExerciseCardProps {
 export function ExerciseCard({
   exercise,
   sessionId,
+  userId,
   unit,
   globalRestSeconds,
   isActive,
@@ -67,6 +70,9 @@ export function ExerciseCard({
   const expandedSetId = useSessionStore((s) => s.expandedSetId);
   const dismissedOverloadHints = useSessionStore((s) => s.dismissedOverloadHints);
   const dismissOverloadHint = useSessionStore((s) => s.dismissOverloadHint);
+
+  // Latest bodyweight — used only when exercise.exerciseType === 'bodyweight' (WORKOUT-12)
+  const { weightKg: latestBodyweightKg } = useLatestBodyweight(userId);
 
   // Previous performance — loaded from PowerSync for the exercise
   // includes: set_number, weight_kg, result, is_warmup (added Plan 08 for overload hint)
@@ -201,6 +207,8 @@ export function ExerciseCard({
             partnerExerciseId={partnerExerciseId}
             supersetFirstArmId={supersetFirstArmId}
             partnerDefaultRestSeconds={partnerDefaultRestSeconds}
+            exerciseType={exercise.exerciseType}
+            bodyweightKg={exercise.exerciseType === 'bodyweight' ? latestBodyweightKg : null}
             onExpand={() => {
               // Toggle: if already expanded, collapse; otherwise expand
               if (expandedSetId === set.id) {

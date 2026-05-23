@@ -61,7 +61,7 @@ export default function WorkoutsScreen() {
             <Button
               label="Start workout"
               variant="primary"
-              onPress={() => router.push('/(session)/' as never)}
+              onPress={() => router.push('/(session)/body-map' as never)}
             />
           </>
         ) : (

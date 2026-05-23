@@ -18,6 +18,7 @@
  *   swapModalForExerciseId   — exerciseId currently showing the swap modal, or null (Plan 08)
  *   noteSheetOpen            — whether the session note sheet is visible (Plan 08)
  *   sessionNotes             — session-level free text note, persisted to MMKV (Plan 08)
+ *   soreMuscles              — array of muscle IDs flagged as sore on the body map (Plan 09)
  *
  * Actions:
  *   loadExercises           — replace the exercises array (called once on session init)
@@ -36,6 +37,8 @@
  *   openNoteSheet           — open the session note sheet (Plan 08)
  *   closeNoteSheet          — close the session note sheet (Plan 08)
  *   setSessionNotes         — update the session notes string (Plan 08)
+ *   toggleMuscle            — toggle a muscle ID in soreMuscles (Plan 09)
+ *   setSoreMuscles          — replace the entire soreMuscles array (Plan 09)
  *   setListRef              — register the FlashList ref for superset scroll (Plan 06)
  *   scrollToExerciseId      — scroll FlashList to the item containing exerciseId (Pitfall 8)
  *   advanceSupersetCursor   — update the superset cursor after a set commit (Plan 06)
@@ -61,6 +64,10 @@ export interface SetState {
   rpe: number | null;
   isWarmup: boolean;
   notes: string | null;
+  /** Run exercise distance in meters (WORKOUT-13 — null for non-run or not yet recorded) */
+  distanceMeters: number | null;
+  /** Run exercise duration in seconds (WORKOUT-13 — null for non-run or not yet recorded) */
+  durationSeconds: number | null;
 }
 
 export interface ExerciseState {
@@ -108,6 +115,10 @@ interface SessionState {
   /** Free-text session notes, persisted to MMKV via useSessionPersistence (Plan 08) */
   sessionNotes: string;
 
+  // ── Plan 09: Body map sore muscle tracking ────────────────────────────
+  /** Array of muscle IDs flagged as sore on the body map (Plan 09 — WORKOUT-10) */
+  soreMuscles: string[];
+
   // ── Actions ─────────────────────────────────────────────────────────────
   loadExercises: (exercises: ExerciseState[]) => void;
   setSetResult: (setId: string, result: SetResult) => void;
@@ -142,6 +153,18 @@ interface SessionState {
   closeNoteSheet: () => void;
   /** Update the session-level notes string */
   setSessionNotes: (notes: string) => void;
+  /** Set the run distance in meters for a specific set (WORKOUT-13) */
+  setSetDistance: (setId: string, meters: number) => void;
+  /** Set the run duration in seconds for a specific set (WORKOUT-13) */
+  setSetDuration: (setId: string, seconds: number) => void;
+  /**
+   * Toggle a muscle ID in soreMuscles.
+   * If the ID is already present → remove it. If absent → add it.
+   * Fires from BodyMap taps (Plan 09 — WORKOUT-10).
+   */
+  toggleMuscle: (muscleId: string) => void;
+  /** Replace the entire soreMuscles array (e.g. on session init) */
+  setSoreMuscles: (ids: string[]) => void;
   /** Register the FlashList ref for superset auto-scroll (called from SessionScreen) */
   setListRef: (ref: FlashListRef<FlashListItem> | null) => void;
   /**
@@ -196,6 +219,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   swapModalForExerciseId: null,
   noteSheetOpen: false,
   sessionNotes: '',
+  soreMuscles: [],
 
   // Replace the entire exercises array (called on session init or rehydration)
   loadExercises: (exercises) => set({ exercises }),
@@ -251,6 +275,8 @@ export const useSessionStore = create<SessionState>((set, get) => ({
           rpe: null,
           isWarmup: false,
           notes: null,
+          distanceMeters: null,
+          durationSeconds: null,
         };
         return { ...ex, sets: [...ex.sets, newSet] };
       });
@@ -295,6 +321,33 @@ export const useSessionStore = create<SessionState>((set, get) => ({
 
   // Update the session-level notes string
   setSessionNotes: (notes) => set({ sessionNotes: notes }),
+
+  // Set run distance in meters for a specific set (WORKOUT-13)
+  setSetDistance: (setId, meters) =>
+    set((state) => ({
+      exercises: mutateSets(state.exercises, setId, (s) => ({ ...s, distanceMeters: meters })),
+    })),
+
+  // Set run duration in seconds for a specific set (WORKOUT-13)
+  setSetDuration: (setId, seconds) =>
+    set((state) => ({
+      exercises: mutateSets(state.exercises, setId, (s) => ({ ...s, durationSeconds: seconds })),
+    })),
+
+  // Toggle a muscle ID in soreMuscles (Plan 09 — WORKOUT-10)
+  // Adds if absent, removes if present. Immutable update.
+  toggleMuscle: (muscleId) =>
+    set((state) => {
+      const already = state.soreMuscles.includes(muscleId);
+      return {
+        soreMuscles: already
+          ? state.soreMuscles.filter((id) => id !== muscleId)
+          : [...state.soreMuscles, muscleId],
+      };
+    }),
+
+  // Replace the entire soreMuscles array
+  setSoreMuscles: (ids) => set({ soreMuscles: ids }),
 
   // ── Plan 06: Superset auto-scroll ─────────────────────────────────────
 

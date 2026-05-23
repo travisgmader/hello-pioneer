@@ -18,6 +18,7 @@ export default function SessionLayout() {
   return (
     <Stack screenOptions={{ headerShown: false, gestureEnabled: false, animation: 'fade' }}>
       <Stack.Screen name="index" />
+      <Stack.Screen name="body-map" options={{ animation: 'slide_from_bottom' }} />
     </Stack>
   );
 }
