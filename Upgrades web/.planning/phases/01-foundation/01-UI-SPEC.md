@@ -23,7 +23,7 @@ created: 2026-05-27
 | Preset | not applicable | CONTEXT.md D-04 |
 | Component library | none — bespoke components only | DESIGN.md |
 | Icon library | Inline SVG components (no icon font or library) | CONTEXT.md D-13 |
-| Fonts | Anton (400), Barlow Condensed (600, 700), Hanken Grotesk (400, 500) via next/font/google | DESIGN.md + RESEARCH.md Pattern 2 |
+| Fonts | Anton (400), Barlow Condensed (700), Hanken Grotesk (400) via next/font/google | DESIGN.md + RESEARCH.md Pattern 2 |
 
 **Rationale for no shadcn:** DESIGN.md defines a bespoke Modern Brutalism system with 40+ named color tokens, custom type scale, and strict component rules (hard-geometric radius, no soft shadows, red-only CTA). shadcn presets would conflict with this contract. CONTEXT.md D-04 mandates a single-source-of-truth @theme block as the design system mechanism.
 
@@ -62,34 +62,43 @@ Source: DESIGN.md Type Scale section. CONTEXT.md D-06 mandates all sizes in @the
 | Family | Variable | Role |
 |--------|----------|------|
 | Anton | `--font-anton` | All display headings. Always uppercase. Single weight (400). |
-| Barlow Condensed | `--font-barlow-condensed` | Sub-headers, labels, nav links, button text. Weights 600 and 700. |
-| Hanken Grotesk | `--font-hanken-grotesk` | Body text, footer utility text. Weights 400 and 500. |
+| Barlow Condensed | `--font-barlow-condensed` | Sub-headers, labels, nav links, button text. Weight 700 only. |
+| Hanken Grotesk | `--font-hanken-grotesk` | Body text, footer utility text. Weight 400 only. |
 
-### Type Scale (Phase 1 active styles)
+### Font Weights
+
+Exactly 2 weights are used across the entire design system:
+
+| Weight | Usage |
+|--------|-------|
+| 400 | Anton (all display/heading), Hanken Grotesk (all body/utility text) |
+| 700 | Barlow Condensed (all nav links, labels, button text, section headings) |
+
+### Type Scale (Phase 1 active styles — exactly 4 sizes)
 
 | Role | Token | Font | Size (mobile) | Size (desktop) | Weight | Line Height | Letter Spacing |
 |------|-------|------|--------------|----------------|--------|-------------|----------------|
 | Display | `display-xl` | Anton | 64px | 96px (md:text-[6rem]) | 400 | 100% (1.0) | — |
 | Headline | `headline-lg` | Anton | 32px | 48px (md:text-5xl) | 400 | 110% (1.1) | 0.02em |
-| Title | `title-md` | Barlow Condensed | 24px | 24px | 700 | 120% (1.2) | 0.05em |
-| Body Large | `body-lg` | Hanken Grotesk | 18px | 18px | 400 | 160% (1.6) | — |
 | Body | `body-md` | Hanken Grotesk | 16px | 16px | 400 | 150% (1.5) | — |
-| Label | `label-sm` | Barlow Condensed | 12px | 12px | 600 | 100% (1.0) | 0.1em |
+| Label | `label-sm` | Barlow Condensed | 12px | 12px | 700 | 100% (1.0) | 0.1em |
 
 **Phase 1 active contexts:**
-- TopNav logo: Anton, uppercase, `title-md` size (24px) — compact identity mark in the bar
-- TopNav desktop links: Barlow Condensed 600 (`label-sm` / `title-md` hybrid), uppercase, `tracking-title` (0.05em)
+- TopNav logo/wordmark: Anton uppercase, `headline-lg` size (32px mobile / 48px desktop) — scaled down via responsive usage, not a separate token
+- TopNav desktop links: Barlow Condensed 700, uppercase, `label-sm` (12px), `tracking-label` (0.1em)
 - Mobile overlay nav links: Anton uppercase, `headline-lg` (32px mobile). Large, hard-left, full-bleed
-- Footer brand name: Anton uppercase, `title-md` or `headline-lg` depending on visual balance
+- Footer brand name: Anton uppercase, `headline-lg`
 - Footer tagline: Hanken Grotesk 400, `body-md` (16px)
-- Footer navigation links: Barlow Condensed 600, `label-sm` (12px), uppercase, `tracking-label` (0.1em)
+- Footer navigation links: Barlow Condensed 700, `label-sm` (12px), uppercase, `tracking-label` (0.1em)
 - Footer address/hours text: Hanken Grotesk 400, `body-md` (16px)
-- Mobile CTA button text (both nav and overlay): Anton uppercase, `label-sm` to `title-md`
+- Mobile CTA button text (both nav and overlay): Barlow Condensed 700, `label-sm` uppercase with `tracking-label`
 
 **Rules (from DESIGN.md):**
 - Anton text must always be uppercase — never sentence case or mixed case
 - Hard-left text alignment on all elements except hero display (Phase 2)
 - Italics only on action words to imply speed; use sparingly
+- `body-lg` (18px) does not exist in Phase 1 — all body/utility text uses `body-md` (16px)
+- `title-md` (24px) does not exist in Phase 1 — any element previously described at 24px uses `headline-lg` at application-level sizing or `label-sm` with letter-spacing
 
 ---
 
@@ -155,10 +164,10 @@ All tokens must be declared verbatim per CONTEXT.md D-05:
 **Shell:** Fixed, `top-0 inset-x-0 z-50`. Height 64px. Background `surface-container-low` (`#1b1b1b`). Bottom border: `1px solid outline-variant` (`#5f3f3a`).
 
 **Desktop layout (≥ 768px / `md:` breakpoint):**
-- Left: Kinetic Power wordmark — Anton uppercase, `on-surface` (`#e2e2e2`)
+- Left: Kinetic Power wordmark — Anton uppercase, `on-surface` (`#e2e2e2`), `headline-lg` size
 - Right cluster: nav links + Primary button
-  - Nav links: Barlow Condensed 600, uppercase, `on-surface`, `tracking-title` (0.05em), 14px. Hover: color transitions to `on-surface-variant` (`#e9bcb5`) — 150ms ease
-  - "Book a Session" button: Anton uppercase, `primary-container` bg (`#e60000`), `on-primary-container` text (`#fff7f5`), 4px radius, px-5 py-2. No shadow.
+  - Nav links: Barlow Condensed 700, uppercase, `on-surface`, `tracking-label` (0.1em), `label-sm` (12px). Hover: color transitions to `on-surface-variant` (`#e9bcb5`) — 150ms ease
+  - "Book a Session" button: Barlow Condensed 700 uppercase, `primary-container` bg (`#e60000`), `on-primary-container` text (`#fff7f5`), 4px radius, px-5 py-2. No shadow.
 - Arrangement: logo far-left, nav links + CTA right-aligned (Claude discretion — right cluster reads most cleanly for a gym brand that wants logo dominance)
 
 **Mobile layout (< 768px):**
@@ -171,7 +180,7 @@ All tokens must be declared verbatim per CONTEXT.md D-05:
 - Animation: Motion `AnimatePresence` — `initial={{ opacity: 0, y: 20 }}` → `animate={{ opacity: 1, y: 0 }}` → `exit={{ opacity: 0, y: 20 }}`. Duration: 200ms.
 - X close button: top-right, 24×24px SVG cross icon, `min-h-[44px] min-w-[44px]`
 - Nav links: Anton uppercase, `text-4xl` (36px), `on-surface`, hard-left, `gap-8` between items. Each link closes overlay on tap.
-- Pinned CTA: "Book a Session" — full-width, `mt-auto`, same Primary button style as desktop. Anton uppercase, `text-xl`, `primary-container` bg. Links to `/schedule`.
+- Pinned CTA: "Book a Session" — full-width, `mt-auto`, same Primary button style as desktop. Barlow Condensed 700 uppercase, `primary-container` bg. Links to `/schedule`.
 - Close behavior: X button OR backdrop tap closes overlay
 
 ### Footer
@@ -179,8 +188,8 @@ All tokens must be declared verbatim per CONTEXT.md D-05:
 **Shell:** Static Server Component. Background `surface-container` (`#1f1f1f`). Top border: `1px solid outline-variant` (`#5f3f3a`).
 
 **Desktop layout (≥ 768px):** 3-column grid, `gap-[var(--spacing-gutter)]` (24px).
-- **Col 1:** Brand column — "KINETIC POWER" in Anton uppercase + tagline in Hanken Grotesk 400 `body-md`
-- **Col 2:** Navigation — heading "NAVIGATE" in Barlow Condensed 600 `label-sm` uppercase. Links: Home, Amenities, Membership, Schedule, Contact — Barlow Condensed 600 `label-sm` uppercase. Hover: `on-surface-variant` (`#e9bcb5`)
+- **Col 1:** Brand column — "KINETIC POWER" in Anton uppercase `headline-lg` + tagline in Hanken Grotesk 400 `body-md`
+- **Col 2:** Navigation — heading "NAVIGATE" in Barlow Condensed 700 `label-sm` uppercase. Links: Home, Amenities, Membership, Schedule, Contact — Barlow Condensed 700 `label-sm` uppercase. Hover: `on-surface-variant` (`#e9bcb5`)
 - **Col 3:** Contact column — address, hours, social icons. Hanken Grotesk 400 `body-md`. Social icons: Instagram, Facebook, TikTok as inline SVG, `on-surface`, 20×20px, `gap-4` horizontal. Hover: `on-surface-variant`.
 
 **Mobile layout (< 768px):** Single column stacked. Same order: brand → nav → contact.
@@ -329,15 +338,11 @@ The following must be declared verbatim in `app/globals.css` per CONTEXT.md D-04
     --font-hanken-grotesk: var(--font-hanken-grotesk-loaded);
   }
 
-  /* TYPOGRAPHY: Type scale — mobile-first defaults, scale at md: */
+  /* TYPOGRAPHY: Type scale — 4 sizes, mobile-first defaults, scale at md: */
   --text-display-xl: 4rem;            /* 64px mobile */
   --text-display-xl--line-height: 1;
   --text-headline-lg: 2rem;           /* 32px mobile */
   --text-headline-lg--line-height: 1.1;
-  --text-title-md: 1.5rem;            /* 24px */
-  --text-title-md--line-height: 1.2;
-  --text-body-lg: 1.125rem;           /* 18px */
-  --text-body-lg--line-height: 1.6;
   --text-body-md: 1rem;               /* 16px */
   --text-body-md--line-height: 1.5;
   --text-label-sm: 0.75rem;           /* 12px */
@@ -345,7 +350,6 @@ The following must be declared verbatim in `app/globals.css` per CONTEXT.md D-04
 
   /* TYPOGRAPHY: Letter spacing */
   --tracking-headline: 0.02em;
-  --tracking-title: 0.05em;
   --tracking-label: 0.1em;
 
   /* SPACING */
@@ -373,6 +377,11 @@ The following must be declared verbatim in `app/globals.css` per CONTEXT.md D-04
 **Desktop type overrides (applied inline in component, not as separate tokens — per CONTEXT.md D-07):**
 - `display-xl` at `md:`: `md:text-[6rem]` (96px)
 - `headline-lg` at `md:`: `md:text-5xl` (48px)
+
+**Removed from @theme (not used in Phase 1):**
+- `--text-title-md` (1.5rem / 24px) — removed; nav logo uses `headline-lg`, section labels use `label-sm`
+- `--text-body-lg` (1.125rem / 18px) — removed; all body/utility text uses `body-md` (16px)
+- `--tracking-title` (0.05em) — removed; only `tracking-headline` (0.02em) and `tracking-label` (0.1em) are used
 
 ---
 
@@ -404,6 +413,9 @@ The following must be declared verbatim in `app/globals.css` per CONTEXT.md D-04
 | `motion/react` import path (not `framer-motion`) | Import from `framer-motion` |
 | Inline SVG for social icons | Use react-icons or icon font libraries |
 | 4px border-radius on Primary button | Use more than 4px radius on buttons |
+| Use weight 400 for all Anton and Hanken Grotesk text | Use Hanken Grotesk 500 — collapsed to 400 |
+| Use weight 700 for all Barlow Condensed text | Use Barlow Condensed 600 — collapsed to 700 |
+| Use exactly 4 type sizes: display-xl, headline-lg, body-md, label-sm | Use title-md (24px) or body-lg (18px) — removed |
 
 ---
 
