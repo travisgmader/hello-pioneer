@@ -39,7 +39,7 @@ export default function Calendar({
   const [month, setMonth] = useState(now.getMonth());
   const [selected, setSelected] = useState(null);
   const [showEventForm, setShowEventForm] = useState(false);
-  const [newEvent, setNewEvent] = useState({ title: '', memberId: '', time: '09:00', endTime: '', color: 'peach', repeat: 'none', repeatUntil: '' });
+  const [newEvent, setNewEvent] = useState({ title: '', memberId: '', time: '09:00', endTime: '', endDate: '', color: 'peach', repeat: 'none', repeatUntil: '' });
   const [editingId, setEditingId] = useState(null);
   const [editFields, setEditFields] = useState({});
   const [editingMealSlot, setEditingMealSlot] = useState(null);
@@ -55,7 +55,7 @@ export default function Calendar({
 
   const startEdit = (ev) => {
     setEditingId(ev.id);
-    setEditFields({ title: ev.title, time: ev.time || '', endTime: ev.endTime || '', memberId: ev.memberId || '', color: ev.color || 'peach' });
+    setEditFields({ title: ev.title, time: ev.time || '', endTime: ev.endTime || '', endDate: ev.endDate || '', memberId: ev.memberId || '', color: ev.color || 'peach' });
   };
 
   const handleSaveEdit = (evId) => {
@@ -73,7 +73,10 @@ export default function Calendar({
   };
 
   const eventsForDate = (dateStr) => {
-    const evs = events.filter(e => e.date === dateStr);
+    const evs = events.filter(e => {
+      const end = e.endDate || e.date;
+      return dateStr >= e.date && dateStr <= end;
+    });
     const choreEvs = chores.filter(c => c.dueDate === dateStr).map(c => ({
       id: c.id,
       title: c.title,
@@ -110,10 +113,11 @@ export default function Calendar({
     e.preventDefault();
     if (!newEvent.title.trim() || !selected) return;
     const startDate = fmt(year, month, selected);
-    const { repeat, repeatUntil, ...eventBase } = newEvent;
+    const { repeat, repeatUntil, endDate, ...eventBase } = newEvent;
     const until = repeat !== 'none' && repeatUntil ? repeatUntil : startDate;
-    generateRepeatDates(startDate, repeat, until).forEach(date => onAddEvent?.({ ...eventBase, date }));
-    setNewEvent({ title: '', memberId: '', time: '09:00', endTime: '', color: 'peach', repeat: 'none', repeatUntil: '' });
+    const resolvedEndDate = endDate && endDate > startDate ? endDate : null;
+    generateRepeatDates(startDate, repeat, until).forEach(date => onAddEvent?.({ ...eventBase, date, endDate: resolvedEndDate }));
+    setNewEvent({ title: '', memberId: '', time: '09:00', endTime: '', endDate: '', color: 'peach', repeat: 'none', repeatUntil: '' });
     setShowEventForm(false);
   };
 
@@ -227,13 +231,16 @@ export default function Calendar({
                     borderLeft:  `4px solid ${dropCol ? dropCol.accent : col.accent}`,
                     borderRight: pickCol ? `4px solid ${pickCol.accent}` : undefined,
                   };
+                  const isMultiDay = ev.endDate && ev.endDate !== ev.date;
+                  const continuesAfter = isMultiDay && dateStr < ev.endDate;
+                  const startedBefore = isMultiDay && dateStr > ev.date;
                   return (
                     <span
                       key={ev.id}
                       className={`${styles.evtChip} ${ev.isChore && ev.completed ? styles.evtChipDone : ''}`}
                       style={chipStyle}
                     >
-                      {mem ? `${mem.emoji} ` : ''}{ev.isChore ? '✅ ' : ''}{ev.title}
+                      {startedBefore ? '‹ ' : ''}{mem ? `${mem.emoji} ` : ''}{ev.isChore ? '✅ ' : ''}{ev.title}{continuesAfter ? ' ›' : ''}
                     </span>
                   );
                 })}
@@ -296,10 +303,20 @@ export default function Calendar({
                   <input type="time" className={styles.evtInput} value={newEvent.time} onChange={e => setNewEvent(f => ({ ...f, time: e.target.value }))} />
                 </label>
                 <label className={styles.timeLabel}>
-                  End
+                  End time
                   <input type="time" className={styles.evtInput} value={newEvent.endTime} onChange={e => setNewEvent(f => ({ ...f, endTime: e.target.value }))} />
                 </label>
               </div>
+              <label className={styles.timeLabel} style={{ width: '100%' }}>
+                End date <span className={styles.repeatLabel}>(leave blank for single-day)</span>
+                <input
+                  type="date"
+                  className={styles.evtInput}
+                  value={newEvent.endDate}
+                  min={fmt(year, month, selected)}
+                  onChange={e => setNewEvent(f => ({ ...f, endDate: e.target.value }))}
+                />
+              </label>
               {members.length > 0 && (
                 <select
                   className={styles.evtInput}
@@ -438,7 +455,7 @@ export default function Calendar({
                             />
                           </label>
                           <label className={styles.timeLabel}>
-                            End
+                            End time
                             <input
                               type="time"
                               className={styles.evtInput}
@@ -447,6 +464,16 @@ export default function Calendar({
                             />
                           </label>
                         </div>
+                        <label className={styles.timeLabel} style={{ width: '100%' }}>
+                          End date
+                          <input
+                            type="date"
+                            className={styles.evtInput}
+                            value={editFields.endDate}
+                            min={ev.date}
+                            onChange={e => setEditFields(f => ({ ...f, endDate: e.target.value }))}
+                          />
+                        </label>
                         {members.length > 0 && (
                           <select
                             className={styles.evtInput}
@@ -485,6 +512,9 @@ export default function Calendar({
                             {ev.title}
                             {ev.time && !ev.isChore && (
                               <span className={styles.evtTime}>{formatTimeRange(ev.time, ev.endTime)}</span>
+                            )}
+                            {ev.endDate && ev.endDate !== ev.date && (
+                              <span className={styles.evtTime}>thru {ev.endDate}</span>
                             )}
                           </span>
                           {member && <span className={styles.evtMember}>{member.emoji}</span>}

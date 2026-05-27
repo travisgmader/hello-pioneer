@@ -34,12 +34,14 @@ const normalizeTime = (t) => {
 
 const eventFromRow = (r) => ({
   id: r.id, title: r.title, memberId: r.member_id,
-  date: r.date, time: normalizeTime(r.time), endTime: normalizeTime(r.end_time),
+  date: r.date, endDate: r.end_date ?? null,
+  time: normalizeTime(r.time), endTime: normalizeTime(r.end_time),
   color: r.color, dropoffParent: r.dropoff_parent ?? null, pickupParent: r.pickup_parent ?? null,
 });
 const eventToRow = (e) => ({
   id: e.id, title: e.title, member_id: e.memberId,
-  date: e.date, time: e.time, end_time: e.endTime,
+  date: e.date, end_date: e.endDate ?? null,
+  time: e.time, end_time: e.endTime,
   color: e.color, dropoff_parent: e.dropoffParent ?? null, pickup_parent: e.pickupParent ?? null,
 });
 
