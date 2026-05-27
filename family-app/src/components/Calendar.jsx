@@ -39,7 +39,7 @@ export default function Calendar({
   const [month, setMonth] = useState(now.getMonth());
   const [selected, setSelected] = useState(null);
   const [showEventForm, setShowEventForm] = useState(false);
-  const [newEvent, setNewEvent] = useState({ title: '', memberId: '', time: '09:00', endTime: '', endDate: '', color: 'peach', repeat: 'none', repeatUntil: '' });
+  const [newEvent, setNewEvent] = useState({ title: '', memberId: '', time: '', endTime: '', startDate: '', endDate: '', color: 'peach', repeat: 'none', repeatUntil: '' });
   const [editingId, setEditingId] = useState(null);
   const [editFields, setEditFields] = useState({});
   const [editingMealSlot, setEditingMealSlot] = useState(null);
@@ -112,12 +112,12 @@ export default function Calendar({
   const handleAddEvent = (e) => {
     e.preventDefault();
     if (!newEvent.title.trim() || !selected) return;
-    const startDate = fmt(year, month, selected);
-    const { repeat, repeatUntil, endDate, ...eventBase } = newEvent;
+    const startDate = newEvent.startDate || fmt(year, month, selected);
+    const { repeat, repeatUntil, startDate: _sd, endDate, ...eventBase } = newEvent;
     const until = repeat !== 'none' && repeatUntil ? repeatUntil : startDate;
     const resolvedEndDate = endDate && endDate > startDate ? endDate : null;
     generateRepeatDates(startDate, repeat, until).forEach(date => onAddEvent?.({ ...eventBase, date, endDate: resolvedEndDate }));
-    setNewEvent({ title: '', memberId: '', time: '09:00', endTime: '', endDate: '', color: 'peach', repeat: 'none', repeatUntil: '' });
+    setNewEvent({ title: '', memberId: '', time: '', endTime: '', startDate: '', endDate: '', color: 'peach', repeat: 'none', repeatUntil: '' });
     setShowEventForm(false);
   };
 
@@ -300,23 +300,25 @@ export default function Calendar({
               <div className={styles.timeRow}>
                 <label className={styles.timeLabel}>
                   Start
-                  <input type="time" className={styles.evtInput} value={newEvent.time} onChange={e => setNewEvent(f => ({ ...f, time: e.target.value }))} />
+                  <input
+                    type="date"
+                    className={styles.evtInput}
+                    value={newEvent.startDate || fmt(year, month, selected)}
+                    onChange={e => setNewEvent(f => ({ ...f, startDate: e.target.value }))}
+                    required
+                  />
                 </label>
                 <label className={styles.timeLabel}>
-                  End time
-                  <input type="time" className={styles.evtInput} value={newEvent.endTime} onChange={e => setNewEvent(f => ({ ...f, endTime: e.target.value }))} />
+                  End
+                  <input
+                    type="date"
+                    className={styles.evtInput}
+                    value={newEvent.endDate}
+                    min={newEvent.startDate || fmt(year, month, selected)}
+                    onChange={e => setNewEvent(f => ({ ...f, endDate: e.target.value }))}
+                  />
                 </label>
               </div>
-              <label className={styles.timeLabel} style={{ width: '100%' }}>
-                End date <span className={styles.repeatLabel}>(leave blank for single-day)</span>
-                <input
-                  type="date"
-                  className={styles.evtInput}
-                  value={newEvent.endDate}
-                  min={fmt(year, month, selected)}
-                  onChange={e => setNewEvent(f => ({ ...f, endDate: e.target.value }))}
-                />
-              </label>
               {members.length > 0 && (
                 <select
                   className={styles.evtInput}
@@ -339,7 +341,8 @@ export default function Calendar({
                   value={newEvent.repeat}
                   onChange={e => {
                     const repeat = e.target.value;
-                    const d = new Date(fmt(selected) + 'T00:00:00');
+                    const base = newEvent.startDate || fmt(year, month, selected);
+                    const d = new Date(base + 'T00:00:00');
                     d.setDate(d.getDate() + (repeat === 'daily' || repeat === 'weekdays' ? 14 : repeat === 'weekly' ? 28 : 90));
                     setNewEvent(f => ({ ...f, repeat, repeatUntil: repeat !== 'none' ? localDateStr(d) : '' }));
                   }}
@@ -358,7 +361,7 @@ export default function Calendar({
                       className={styles.evtInput}
                       style={{ flex: 'none', minWidth: 0 }}
                       value={newEvent.repeatUntil}
-                      min={fmt(selected)}
+                      min={newEvent.startDate || fmt(year, month, selected)}
                       onChange={e => setNewEvent(f => ({ ...f, repeatUntil: e.target.value }))}
                       required
                     />
