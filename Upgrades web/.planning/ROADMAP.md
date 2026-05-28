@@ -31,7 +31,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. The nav collapses to a hamburger menu on mobile and expands on tap
   4. The footer displays address, hours, social links, and quick page navigation on every page
   5. Lighthouse mobile performance score meets the under-3-second load target on the deployed preview URL
-**Plans:** TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 01-01-PLAN.md — Walking Skeleton: Next.js scaffold, Tailwind v4 @theme tokens, fonts, 5 route shells, GitHub + Vercel deploy
+- [ ] 01-02-PLAN.md — TopNav with mobile overlay (Motion animation), Playwright nav E2E tests
+- [ ] 01-03-PLAN.md — Footer (3-col desktop / 1-col mobile), Playwright footer + smoke tests, Lighthouse mobile verification
 **UI hint:** yes
 
 ### Phase 2: Home & Amenities
@@ -97,7 +101,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/? | Not started | - |
+| 1. Foundation | 0/3 | Not started | - |
 | 2. Home & Amenities | 0/? | Not started | - |
 | 3. Membership & Schedule | 0/? | Not started | - |
 | 4. Contact | 0/? | Not started | - |
