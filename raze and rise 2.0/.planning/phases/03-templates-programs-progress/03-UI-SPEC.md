@@ -76,7 +76,7 @@ All exceptions are declared. None are arbitrary.
 
 ## Typography
 
-**Phase 3 active type scale: 5 sizes (12 / 16 / 20 / 24 / 28).** One new size added: `numeric-display` at 28px/700 for the stats row large numbers (same size as Phase 2's `numeric-large` for timer, but a distinct semantic role). Active 28px usage: timer pill (Phase 2, `numeric-large`) + stats row numbers (Phase 3, `numeric-display`).
+**Phase 3 active type scale: 4 sizes (12 / 16 / 24 / 28).** The 20px `numeric` size from Phase 2's `NumericText` component is a Phase 2 carry token — inherited and in use, but not re-declared as a new Phase 3 size. `numeric-display` at 28px/700 for the stats row large numbers reuses the same `numeric-large` token from Phase 2 (same size, new semantic alias). Active 28px usage: timer pill (Phase 2, `numeric-large`) + stats row numbers (Phase 3, `numeric-display`).
 
 | Role | Size | Weight | Line Height | Font | Phase 3 Usage |
 |------|------|--------|-------------|------|---------------|
@@ -109,7 +109,7 @@ export const COLOR_CHART_GRID = 'rgba(92, 86, 75, 0.30)'
 
 ## Color
 
-Phase 3 introduces SIX NEW semantic color tokens. All Phase 1 and Phase 2 tokens carry unchanged.
+Phase 3 introduces SIX NEW semantic color tokens. All Phase 1 and Phase 2 tokens carry unchanged. The 60/30/10 color split ratio (dominant surface 60% / secondary surface 30% / accent 10%) is established in Phase 1 UI-SPEC.md and carries unchanged — see Phase 1 Color section for the ratio declaration.
 
 ### Carry from Phase 1/2 (unchanged)
 
@@ -313,7 +313,7 @@ All Phase 1 and Phase 2 components remain available unchanged. Phase 3 adds the 
 | **Composition** | Screen header (back + template name input + Save button) + `ExerciseSearchBar` + muscle group Chip filter row + exercise results `FlashList` (conditional on search active) + template exercise list `FlashList` (when search inactive) |
 | **Variants** | `new` (creating a new template), `edit` (editing existing) |
 | **States** | search-inactive (shows template exercise list), search-active (shows exercise results) |
-| **Notes** | Full-screen route; tab bar hidden (same pattern as session screen). No modal/sheet — single scrollable screen per D-03. Screen header: back `IconButton` (Lucide `ChevronLeft`) + inline `TextInput` for template name (placeholder "Template name", 24px Manrope 700, `bg-input` border, `border-strong` on focus) + "Save" primary `Button` (36pt height, compact — header density justified). When `ExerciseSearchBar` has focus, the template exercise list slides out and exercise results slide in (instant swap — no animation). When search is cleared or loses focus, template exercise list returns. `SetRow`/`ExpandedSetForm` pattern from Phase 2 reused for per-exercise set configuration in the template (sets, rep range low/high, rest override, exercise type). `SupersetPair` from Phase 2 reused for superset pairing. |
+| **Notes** | Full-screen route; tab bar hidden (same pattern as session screen). No modal/sheet — single scrollable screen per D-03. Screen header: back `IconButton` (Lucide `ChevronLeft`) + inline `TextInput` for template name (placeholder "Template name", 24px Manrope 700, `bg-input` border, `border-strong` on focus) + "Save template" primary `Button` (36pt height, compact — header density justified). When `ExerciseSearchBar` has focus, the template exercise list slides out and exercise results slide in (instant swap — no animation). When search is cleared or loses focus, template exercise list returns. `SetRow`/`ExpandedSetForm` pattern from Phase 2 reused for per-exercise set configuration in the template (sets, rep range low/high, rest override, exercise type). `SupersetPair` from Phase 2 reused for superset pairing. |
 
 ---
 
@@ -406,10 +406,10 @@ All Phase 1 and Phase 2 components remain available unchanged. Phase 3 adds the 
 | Property | Value |
 |----------|-------|
 | **Path** | `src/components/HistoryEditView/index.tsx` (or `app/history/[sessionId].tsx`) |
-| **Composition** | Screen header (back + session date heading + "Save" primary Button) + FlashList of `ExerciseCard` (Phase 2) with editable `SetRow` (Phase 2) + "Add exercise" ghost Button at bottom |
+| **Composition** | Screen header (back + session date heading + "Save session" primary Button) + FlashList of `ExerciseCard` (Phase 2) with editable `SetRow` (Phase 2) + "Add exercise" ghost Button at bottom |
 | **Variants** | — |
 | **States** | default (view mode, all fields editable), saving (save button loading state), saved (brief success indicator then dismiss) |
-| **Notes** | Edits completed sessions. Reuses Phase 2 `ExerciseCard` + `SetRow` + `ExpandedSetForm` exactly — same visual as the active session but no rest timer, no complete workout button. Weight fields are editable (same `WeightInput` from Phase 2). Go/No-go is toggleable (same `SetResultButton`). RPE, warm-up, notes all editable. "Save" button commits writes via `writeTransaction()` to PowerSync (HISTORY-03 requirement: reflected in charts immediately). Destructive: "Delete session" in overflow menu — `Alert.alert` confirmation (same exception pattern as Phase 2 hardware back). Full-screen route (not a sheet) — history editing is complex enough to warrant full-screen per D-08. |
+| **Notes** | Edits completed sessions. Reuses Phase 2 `ExerciseCard` + `SetRow` + `ExpandedSetForm` exactly — same visual as the active session but no rest timer, no complete workout button. Weight fields are editable (same `WeightInput` from Phase 2). Go/No-go is toggleable (same `SetResultButton`). RPE, warm-up, notes all editable. "Save session" button commits writes via `writeTransaction()` to PowerSync (HISTORY-03 requirement: reflected in charts immediately). Destructive: "Delete session" in overflow menu — `Alert.alert` confirmation (same exception pattern as Phase 2 hardware back). Full-screen route (not a sheet) — history editing is complex enough to warrant full-screen per D-08. |
 
 ---
 
@@ -562,10 +562,10 @@ All Phase 1 and Phase 2 components remain available unchanged. Phase 3 adds the 
 | Property | Value |
 |----------|-------|
 | **Path** | `src/components/AIGenerationSheet/index.tsx` |
-| **Composition** | Bottom sheet modal + heading + 3 input fields (goal, current lifts, duration/weeks) + "Generate" primary Button + loading state (Spinner + streaming copy) |
+| **Composition** | Bottom sheet modal + heading + 3 input fields (goal, current lifts, duration/weeks) + "Generate program" primary Button + loading state (Spinner + streaming copy) |
 | **Variants** | `program` |
 | **States** | idle, loading (Edge Function call in progress), error |
-| **Notes** | Bottom sheet: `bg-elevated` background, `shadow-modal`, radius `lg` top corners. Heading: "Generate your program" (Body emphasis 16px). Fields: "Your goal" (TextInput placeholder "Build strength, add muscle..."), "Benchmark lifts" (TextInput multiline placeholder "Bench: 185 lbs, Squat: 225 lbs..."), "Duration" (TextInput placeholder "8 weeks"). "Generate" button: primary variant, 48pt. Loading state: "Generate" button replaced by `Spinner` + body copy "Claude is building your program..." (fg-muted 12px). No streaming UI in Phase 3 (streaming is Phase 4 AI chat feature). Error state: HelperText (error variant) below Generate button — same inline error pattern as Phase 1. |
+| **Notes** | Bottom sheet: `bg-elevated` background, `shadow-modal`, radius `lg` top corners. Heading: "Generate your program" (Body emphasis 16px). Fields: "Your goal" (TextInput placeholder "Build strength, add muscle..."), "Benchmark lifts" (TextInput multiline placeholder "Bench: 185 lbs, Squat: 225 lbs..."), "Duration" (TextInput placeholder "8 weeks"). "Generate program" button: primary variant, 48pt. Loading state: "Generate program" button replaced by `Spinner` + body copy "Claude is building your program..." (fg-muted 12px). No streaming UI in Phase 3 (streaming is Phase 4 AI chat feature). Error state: HelperText (error variant) below Generate program button — same inline error pattern as Phase 1. |
 
 ---
 
@@ -577,7 +577,7 @@ All Phase 1 and Phase 2 components remain available unchanged. Phase 3 adds the 
 | **Composition** | Screen header (back + "AI Program" heading) + `ProgramWeekGrid` in `review` variant + sticky bottom action bar (3 buttons: Accept, Regenerate, Edit) |
 | **Variants** | — |
 | **States** | — |
-| **Notes** | Full-screen route. `ProgramWeekGrid` fills the scrollable area. Bottom action bar: `bg` background, 1px `border` top, 3 equal-width buttons stacked vertically (not 3 columns — each button is full-width for fat-finger safety). Button order top-to-bottom: (1) "Accept program" primary Button 48pt; (2) "Regenerate" secondary Button 48pt; (3) "Edit manually" ghost Button 44pt. "Accept program" → writes program to PowerSync, navigates back to Split tab, program becomes active. "Regenerate" → calls Edge Function again with same inputs (shows loading in `AIGenerationSheet` briefly, then returns to review). "Edit manually" → opens manual program builder pre-filled with the generated structure (full-screen route TBD). |
+| **Notes** | Full-screen route. `ProgramWeekGrid` fills the scrollable area. Bottom action bar: `bg` background, 1px `border` top, 3 equal-width buttons stacked vertically (not 3 columns — each button is full-width for fat-finger safety). Button order top-to-bottom: (1) "Accept program" primary Button 48pt; (2) "Regenerate program" secondary Button 48pt; (3) "Edit manually" ghost Button 44pt. "Accept program" → writes program to PowerSync, navigates back to Split tab, program becomes active. "Regenerate program" → calls Edge Function again with same inputs (shows loading in `AIGenerationSheet` briefly, then returns to review). "Edit manually" → opens manual program builder pre-filled with the generated structure (full-screen route TBD). |
 
 ---
 
@@ -685,7 +685,7 @@ All from `lucide-react-native` — no new icon library. Tree-shakable named impo
 ```
 ┌─────────────────────────────────────┐
 │  ↑ safe area top                    │
-│  ← [  Push Day          ] [Save]    │ Header: back + template name TextInput + Save Button
+│  ← [  Push Day          ] [Save template]  │ Header: back + template name TextInput + Save template Button
 │                                     │
 │  ┌──────────────────────────────┐   │ ExerciseSearchBar
 │  │  🔍 Search exercises...      │   │ bg-input, border
@@ -723,7 +723,7 @@ All from `lucide-react-native` — no new icon library. Tree-shakable named impo
 
 ```
 ┌─────────────────────────────────────┐
-│  ← [  Push Day          ] [Save]    │
+│  ← [  Push Day          ] [Save template]  │
 │                                     │
 │  ┌──────────────────────────────┐   │ ExerciseSearchBar (focused, border-strong)
 │  │  🔍 Bench_                [X]│   │ Clear button visible
@@ -975,7 +975,7 @@ All from `lucide-react-native` — no new icon library. Tree-shakable named impo
 │  ║     Accept program           ║   │ Primary Button 48pt
 │  ╚══════════════════════════════╝   │ 8pt gap
 │  ┌──────────────────────────────┐   │
-│  │     Regenerate               │   │ Secondary Button 48pt
+│  │     Regenerate program       │   │ Secondary Button 48pt
 │  └──────────────────────────────┘   │ 8pt gap
 │       Edit manually                 │ Ghost Button 44pt
 │  ↓ safe area bottom                 │
@@ -1031,8 +1031,8 @@ The template builder reuses Phase 2 `SetRow` and `ExpandedSetForm` with one adap
 2. Edit view shows the session as a Phase 2-style exercise list — all fields editable
 3. User edits a weight value: taps `WeightInput`, types new value, keyboard dismisses on blur
 4. User changes go/no-go: taps `SetResultButton` — toggles state immediately (no confirmation)
-5. User taps "Save" button in header → `writeTransaction()` commits all changes to PowerSync → PowerSync syncs to Supabase → charts re-query and reflect new data on return to Charts segment (HISTORY-03)
-6. No partial save: all edits commit together on "Save". Discard path: back button shows `Alert.alert` — "Discard changes? Your edits will be lost." / "Discard" (destructive) / "Keep editing" (cancel)
+5. User taps "Save session" button in header → `writeTransaction()` commits all changes to PowerSync → PowerSync syncs to Supabase → charts re-query and reflect new data on return to Charts segment (HISTORY-03)
+6. No partial save: all edits commit together on "Save session". Discard path: back button shows `Alert.alert` — "Discard changes? Your edits will be lost." / "Discard" (destructive) / "Keep editing" (cancel)
 7. Delete session: overflow menu → `Alert.alert` — "Delete this session? This can't be undone." / "Delete" (destructive) / "Cancel"
 
 ### Progress Photo Upload + Comparison Selection
@@ -1058,12 +1058,12 @@ The template builder reuses Phase 2 `SetRow` and `ExpandedSetForm` with one adap
 1. User taps "Generate with AI" in Split tab Programs section
 2. `AIGenerationSheet` bottom sheet slides up (Phase 1 `slow` 300ms)
 3. User fills 3 fields (goal, current lifts, duration). All are optional — Claude has defaults
-4. Taps "Generate" button → button replaced by `Spinner` + "Claude is building your program..." caption
+4. Taps "Generate program" button → button replaced by `Spinner` + "Claude is building your program..." caption
 5. Edge Function called (`/functions/v1/generate-program`); on response: `AIGenerationSheet` auto-dismisses, navigation pushes `AIProgramReviewScreen`
-6. On error: HelperText error in sheet "Program generation failed. Try again." — Retry is the Generate button re-tapping
+6. On error: HelperText error in sheet "Program generation failed. Try again." — Retry is the Generate program button re-tapping
 7. On `AIProgramReviewScreen`: user reviews `ProgramWeekGrid`
    - "Accept program" → `writeTransaction()` saves to PowerSync → program becomes active in Split tab → navigate back
-   - "Regenerate" → re-shows `AIGenerationSheet` pre-filled with previous inputs → same loading flow
+   - "Regenerate program" → re-shows `AIGenerationSheet` pre-filled with previous inputs → same loading flow
    - "Edit manually" → navigate to manual program builder screen pre-filled
 
 ### Badge Unlock Toast Timing
@@ -1127,7 +1127,7 @@ All copy below is the SHIPPED COPY. Executor does not paraphrase.
 | Screen heading (new) | `New template` |
 | Screen heading (edit) | `Edit template` |
 | Template name placeholder | `Template name` |
-| Save button | `Save` |
+| Save button | `Save template` |
 | Exercise search placeholder | `Search exercises...` |
 | Muscle group filter — all | `All` |
 | Muscle group filter — chest | `Chest` |
@@ -1281,7 +1281,7 @@ All copy below is the SHIPPED COPY. Executor does not paraphrase.
 | Lifts field placeholder | `Bench: 185 lbs, Squat: 225 lbs, Deadlift: 315 lbs...` |
 | Duration field label | `Duration` |
 | Duration field placeholder | `8 weeks` |
-| Generate button | `Generate` |
+| Generate button | `Generate program` |
 | Loading caption | `Claude is building your program...` |
 | Error copy | `Program generation failed. Try again.` |
 
@@ -1291,7 +1291,7 @@ All copy below is the SHIPPED COPY. Executor does not paraphrase.
 |---------|------|
 | Screen heading | `AI Program` |
 | Accept button | `Accept program` |
-| Regenerate button | `Regenerate` |
+| Regenerate button | `Regenerate program` |
 | Edit manually button | `Edit manually` |
 | Deload week inline label (in grid) | `Deload week` |
 | AI-generated program subtitle | `Generated based on your goal and history` |
@@ -1313,7 +1313,7 @@ All copy below is the SHIPPED COPY. Executor does not paraphrase.
 | Element | Copy |
 |---------|------|
 | Screen heading | `{Month D, YYYY}` (e.g. "May 22, 2026") |
-| Save button | `Save` |
+| Save button | `Save session` |
 | Discard confirmation title | `Discard changes?` |
 | Discard confirmation body | `Your edits will be lost.` |
 | Discard confirm | `Discard` |
@@ -1323,7 +1323,7 @@ All copy below is the SHIPPED COPY. Executor does not paraphrase.
 | Delete session confirmation body | `This can't be undone.` |
 | Delete confirm | `Delete` |
 | Delete cancel | `Cancel` |
-| Save success (brief, replace Save button) | (Save button shows `Spinner` for 300ms, then view dismisses — no separate success message) |
+| Save success (brief, replace Save session button) | (Save session button shows `Spinner` for 300ms, then view dismisses — no separate success message) |
 | Add exercise button | `Add exercise` |
 
 ### General Copy Rules (carry from Phase 1/2, restated)
@@ -1358,7 +1358,7 @@ All Phase 1 and Phase 2 minimums carry. Phase 3-specific:
 | ProgramWeekGrid row | 44pt height | Meets minimum |
 | DeloadBanner dismiss X | 44×44pt | Hit area via `hitSlop` |
 | AI Generation Sheet — Generate button | 48pt | Primary CTA standard |
-| HistoryEditView — Save button (header) | 36pt height × 72pt min-width | DECLARED EXCEPTION — header density, consistent with Phase 2 Complete button |
+| HistoryEditView — Save session button (header) | 36pt height × 72pt min-width | DECLARED EXCEPTION — header density, consistent with Phase 2 Complete button |
 | ExercisePicker dropdown row | 48pt | |
 | ProgressPhotoComparison dismiss | 44×44pt | |
 
@@ -1367,6 +1367,7 @@ All Phase 1 and Phase 2 minimums carry. Phase 3-specific:
 | Component | accessibilityRole | accessibilityLabel |
 |-----------|-------------------|--------------------|
 | TemplateCard | `button` | `{template name}, {N} exercises. {Today: "Today's workout."}` |
+| TemplateCard overflow button (`MoreVertical`) | `button` | `Template options` |
 | SegmentTab (each) | `tab` | `{tab name}` + `accessibilityState={{ selected }}` |
 | SegmentTabs (container) | `tablist` | `Progress sections` |
 | StatsRow — stat block | `none` (decorative container) | parent StatsRow: `accessibilityRole="summary"`, `accessibilityLabel="Stats: {N} workouts, {N} day streak, {N}% go rate, {N} personal records"` |
