@@ -67,7 +67,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  const resp = await fetch(`${SUPABASE_URL}/rest/v1/events?select=*&order=date`, {
+  const resp = await fetch(`${SUPABASE_URL}/rest/v1/v1_events?select=*&order=date`, {
     headers: {
       apikey: SUPABASE_KEY,
       Authorization: `Bearer ${SUPABASE_KEY}`,

@@ -62,13 +62,13 @@ export function AppProvider({ children }) {
     if (!isConfigured || !user) return;
     const channel = supabase
       .channel('family-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'chores' },           () => db.loadChores().then(setChores))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' },           () => db.loadEvents().then(setEvents))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'custody' },          () => db.loadCustody().then(setCustody))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'meal_plan' },        () => db.loadMealPlan().then(setMealPlan))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'meal_recommendations' }, () => db.loadMealRecs().then(setMealRecs))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'groceries' },        () => db.loadGroceries().then(setGroceries))
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'grocery_requests' }, () => db.loadGroceryRequests().then(setGroceryRequests))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'v1_chores' },           () => db.loadChores().then(setChores))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'v1_events' },           () => db.loadEvents().then(setEvents))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'v1_custody' },          () => db.loadCustody().then(setCustody))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'v1_meal_plan' },        () => db.loadMealPlan().then(setMealPlan))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'v1_meal_recommendations' }, () => db.loadMealRecs().then(setMealRecs))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'v1_groceries' },        () => db.loadGroceries().then(setGroceries))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'v1_grocery_requests' }, () => db.loadGroceryRequests().then(setGroceryRequests))
       .subscribe();
     return () => supabase.removeChannel(channel);
   }, [user]);

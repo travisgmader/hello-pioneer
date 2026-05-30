@@ -82,26 +82,26 @@ const mealPlanFromRows = (rows) =>
 
 // ── Per-table loaders (used by real-time subscriptions) ─
 
-export const loadChores   = () => supabase.from('chores').select('*').order('created_at').then(r => (r.data ?? []).map(choreFromRow));
-export const loadEvents   = () => supabase.from('events').select('*').order('date').then(r => (r.data ?? []).map(eventFromRow));
-export const loadCustody  = () => supabase.from('custody').select('*').then(r => custodyFromRows(r.data ?? []));
-export const loadMealPlan = () => supabase.from('meal_plan').select('*').then(r => mealPlanFromRows(r.data ?? []));
-export const loadMealRecs = () => supabase.from('meal_recommendations').select('*').order('created_at').then(r => (r.data ?? []).map(recFromRow));
-export const loadGroceries      = () => supabase.from('groceries').select('*').order('created_at').then(r => (r.data ?? []).map(groceryFromRow));
-export const loadGroceryRequests = () => supabase.from('grocery_requests').select('*').order('created_at').then(r => (r.data ?? []).map(reqFromRow));
+export const loadChores   = () => supabase.from('v1_chores').select('*').order('created_at').then(r => (r.data ?? []).map(choreFromRow));
+export const loadEvents   = () => supabase.from('v1_events').select('*').order('date').then(r => (r.data ?? []).map(eventFromRow));
+export const loadCustody  = () => supabase.from('v1_custody').select('*').then(r => custodyFromRows(r.data ?? []));
+export const loadMealPlan = () => supabase.from('v1_meal_plan').select('*').then(r => mealPlanFromRows(r.data ?? []));
+export const loadMealRecs = () => supabase.from('v1_meal_recommendations').select('*').order('created_at').then(r => (r.data ?? []).map(recFromRow));
+export const loadGroceries      = () => supabase.from('v1_groceries').select('*').order('created_at').then(r => (r.data ?? []).map(groceryFromRow));
+export const loadGroceryRequests = () => supabase.from('v1_grocery_requests').select('*').order('created_at').then(r => (r.data ?? []).map(reqFromRow));
 
 // ── Load all ───────────────────────────────────────────
 
 export async function loadAll() {
   const [choresRes, eventsRes, custodyRes, mealPlanRes, mealRecsRes, groceriesRes, reqsRes] =
     await Promise.all([
-      supabase.from('chores').select('*').order('created_at'),
-      supabase.from('events').select('*').order('date'),
-      supabase.from('custody').select('*'),
-      supabase.from('meal_plan').select('*'),
-      supabase.from('meal_recommendations').select('*').order('created_at'),
-      supabase.from('groceries').select('*').order('created_at'),
-      supabase.from('grocery_requests').select('*').order('created_at'),
+      supabase.from('v1_chores').select('*').order('created_at'),
+      supabase.from('v1_events').select('*').order('date'),
+      supabase.from('v1_custody').select('*'),
+      supabase.from('v1_meal_plan').select('*'),
+      supabase.from('v1_meal_recommendations').select('*').order('created_at'),
+      supabase.from('v1_groceries').select('*').order('created_at'),
+      supabase.from('v1_grocery_requests').select('*').order('created_at'),
     ]);
 
   return {
@@ -117,51 +117,51 @@ export async function loadAll() {
 
 // ── Chores ─────────────────────────────────────────────
 
-export const dbAddChore    = (c) => checked(supabase.from('chores').insert(choreToRow(c)));
+export const dbAddChore    = (c) => checked(supabase.from('v1_chores').insert(choreToRow(c)));
 export const dbUpdateChore = (id, u) => {
   const { id: _id, ...fields } = choreToRow({ id: '', ...u });
-  return checked(supabase.from('chores').update(fields).eq('id', id));
+  return checked(supabase.from('v1_chores').update(fields).eq('id', id));
 };
-export const dbDeleteChore = (id) => checked(supabase.from('chores').delete().eq('id', id));
+export const dbDeleteChore = (id) => checked(supabase.from('v1_chores').delete().eq('id', id));
 
 // ── Events ─────────────────────────────────────────────
 
-export const dbAddEvent    = (e) => checked(supabase.from('events').insert(eventToRow(e)));
+export const dbAddEvent    = (e) => checked(supabase.from('v1_events').insert(eventToRow(e)));
 export const dbUpdateEvent = (id, u) => {
   const { id: _id, ...fields } = eventToRow({ id: '', ...u });
-  return checked(supabase.from('events').update(fields).eq('id', id));
+  return checked(supabase.from('v1_events').update(fields).eq('id', id));
 };
-export const dbDeleteEvent = (id) => checked(supabase.from('events').delete().eq('id', id));
+export const dbDeleteEvent = (id) => checked(supabase.from('v1_events').delete().eq('id', id));
 
 // ── Custody ────────────────────────────────────────────
 
 export const dbSetCustody = (date, parent) =>
   parent
-    ? checked(supabase.from('custody').upsert({ date, parent }))
-    : checked(supabase.from('custody').delete().eq('date', date));
+    ? checked(supabase.from('v1_custody').upsert({ date, parent }))
+    : checked(supabase.from('v1_custody').delete().eq('date', date));
 
 // ── Meal plan ──────────────────────────────────────────
 
 export const dbSetMeal = (date, slot, meal) =>
   meal
-    ? checked(supabase.from('meal_plan').upsert({ date, slot, meal }))
-    : checked(supabase.from('meal_plan').delete().eq('date', date).eq('slot', slot));
+    ? checked(supabase.from('v1_meal_plan').upsert({ date, slot, meal }))
+    : checked(supabase.from('v1_meal_plan').delete().eq('date', date).eq('slot', slot));
 
 // ── Meal recommendations ───────────────────────────────
 
-export const dbAddMealRec    = (r) => checked(supabase.from('meal_recommendations').insert(recToRow(r)));
-export const dbDeleteMealRec = (id) => checked(supabase.from('meal_recommendations').delete().eq('id', id));
+export const dbAddMealRec    = (r) => checked(supabase.from('v1_meal_recommendations').insert(recToRow(r)));
+export const dbDeleteMealRec = (id) => checked(supabase.from('v1_meal_recommendations').delete().eq('id', id));
 export const dbVoteMealRec   = (id, votes) =>
-  checked(supabase.from('meal_recommendations').update({ votes }).eq('id', id));
+  checked(supabase.from('v1_meal_recommendations').update({ votes }).eq('id', id));
 
 // ── Groceries ──────────────────────────────────────────
 
-export const dbAddGrocery    = (g) => checked(supabase.from('groceries').insert(groceryToRow(g)));
-export const dbToggleGrocery = (id, chk) => checked(supabase.from('groceries').update({ checked: chk }).eq('id', id));
-export const dbDeleteGrocery = (id) => checked(supabase.from('groceries').delete().eq('id', id));
+export const dbAddGrocery    = (g) => checked(supabase.from('v1_groceries').insert(groceryToRow(g)));
+export const dbToggleGrocery = (id, chk) => checked(supabase.from('v1_groceries').update({ checked: chk }).eq('id', id));
+export const dbDeleteGrocery = (id) => checked(supabase.from('v1_groceries').delete().eq('id', id));
 
 // ── Grocery requests ───────────────────────────────────
 
-export const dbAddGroceryReq    = (r) => checked(supabase.from('grocery_requests').insert(reqToRow(r)));
-export const dbUpdateGroceryReq = (id, u) => checked(supabase.from('grocery_requests').update(reqToRow({ id, ...u })).eq('id', id));
-export const dbDeleteGroceryReq = (id) => checked(supabase.from('grocery_requests').delete().eq('id', id));
+export const dbAddGroceryReq    = (r) => checked(supabase.from('v1_grocery_requests').insert(reqToRow(r)));
+export const dbUpdateGroceryReq = (id, u) => checked(supabase.from('v1_grocery_requests').update(reqToRow({ id, ...u })).eq('id', id));
+export const dbDeleteGroceryReq = (id) => checked(supabase.from('v1_grocery_requests').delete().eq('id', id));
