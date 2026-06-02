@@ -60,7 +60,11 @@ export default function Dashboard({ setPage }) {
 
   const todayChores = chores
     .filter(c => !c.completed || c.dueDate === todayStr)
-    .sort((a, b) => (a.completed ? 1 : 0) - (b.completed ? 1 : 0));
+    .sort((a, b) => {
+      const aBottom = a.completed && a.frequency === 'once' ? 1 : 0;
+      const bBottom = b.completed && b.frequency === 'once' ? 1 : 0;
+      return aBottom - bBottom;
+    });
   const todayMeals = MEAL_SLOTS.map(slot => ({ slot, meal: mealPlan[todayStr]?.[slot] || '' }));
   const pendingGroceries = groceries.filter(g => !g.checked).slice(0, 8);
   const upcomingEvents = events

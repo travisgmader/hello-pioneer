@@ -24,7 +24,11 @@ export default function MemberPage({ memberId }) {
   const col = COLOR_VARS[member.color];
   const memberChores = chores
     .filter(c => c.assignedTo === memberId)
-    .sort((a, b) => (a.completed ? 1 : 0) - (b.completed ? 1 : 0));
+    .sort((a, b) => {
+      const aBottom = a.completed && a.frequency === 'once' ? 1 : 0;
+      const bBottom = b.completed && b.frequency === 'once' ? 1 : 0;
+      return aBottom - bBottom;
+    });
   const memberEvents = events.filter(e => e.memberId === memberId);
   const done = memberChores.filter(c => c.completed).length;
   const pct = memberChores.length ? Math.round((done / memberChores.length) * 100) : 0;
