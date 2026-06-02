@@ -59,7 +59,7 @@ export default function Dashboard({ setPage }) {
   const handleDelete = (id) => { deleteEvent(id); closeModal(); };
 
   const todayChores = chores
-    .filter(c => !c.completed || c.dueDate === todayStr)
+    .filter(c => c.dueDate <= todayStr && (!c.completed || c.dueDate === todayStr))
     .sort((a, b) => {
       const aBottom = a.completed && a.frequency === 'once' ? 1 : 0;
       const bBottom = b.completed && b.frequency === 'once' ? 1 : 0;
