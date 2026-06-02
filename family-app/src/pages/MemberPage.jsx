@@ -22,7 +22,9 @@ export default function MemberPage({ memberId }) {
   if (!member) return <div>Member not found</div>;
 
   const col = COLOR_VARS[member.color];
-  const memberChores = chores.filter(c => c.assignedTo === memberId);
+  const memberChores = chores
+    .filter(c => c.assignedTo === memberId)
+    .sort((a, b) => (a.completed ? 1 : 0) - (b.completed ? 1 : 0));
   const memberEvents = events.filter(e => e.memberId === memberId);
   const done = memberChores.filter(c => c.completed).length;
   const pct = memberChores.length ? Math.round((done / memberChores.length) * 100) : 0;

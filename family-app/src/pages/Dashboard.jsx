@@ -58,7 +58,9 @@ export default function Dashboard({ setPage }) {
 
   const handleDelete = (id) => { deleteEvent(id); closeModal(); };
 
-  const todayChores = chores.filter(c => !c.completed || c.dueDate === todayStr);
+  const todayChores = chores
+    .filter(c => !c.completed || c.dueDate === todayStr)
+    .sort((a, b) => (a.completed ? 1 : 0) - (b.completed ? 1 : 0));
   const todayMeals = MEAL_SLOTS.map(slot => ({ slot, meal: mealPlan[todayStr]?.[slot] || '' }));
   const pendingGroceries = groceries.filter(g => !g.checked).slice(0, 8);
   const upcomingEvents = events

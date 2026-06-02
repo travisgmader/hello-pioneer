@@ -33,7 +33,7 @@ export default function Chores() {
     if (filter === 'pending') return !c.completed;
     if (filter === 'done') return c.completed;
     return c.assignedTo === filter;
-  });
+  }).sort((a, b) => (a.completed ? 1 : 0) - (b.completed ? 1 : 0));
 
   const handleAdd = (e) => {
     e.preventDefault();
