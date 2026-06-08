@@ -170,7 +170,7 @@ Every user-facing string in Phase 2 is listed here. Executor copies verbatim. Vo
 | Sections label | What can this member see? |
 | Sections helper | Leave all checked to show every section. |
 | Save CTA (primary) | **Save member** |
-| Cancel | Cancel |
+| Secondary action (discard) | **Discard changes** |
 | Validation error (empty name) | Add a name to continue. |
 
 ### COPPA consent sheet
@@ -192,7 +192,7 @@ Every user-facing string in Phase 2 is listed here. Executor copies verbatim. Vo
 | Code section heading | Share this family code |
 | Code helper | This code works once and expires in 7 days. |
 | Copy button | **Copy code** (success state: **Copied**) |
-| Share button | **Share** |
+| Share button | **Share code** |
 | Divider label | or |
 | Email section heading | Invite by email |
 | Email placeholder | name@email.com |
@@ -238,7 +238,7 @@ Every user-facing string in Phase 2 is listed here. Executor copies verbatim. Vo
 
 | Action | Confirmation approach |
 |--------|----------------------|
-| Remove member | **Confirm required.** Tapping the remove icon opens an inline confirm (not a full sheet): heading "Remove {name}?", body "This removes {name} and anything attributed only to them. This can't be undone.", buttons **Remove** (destructive, `--pink-dark`) / Cancel. Optimistic delete with rollback on error. |
+| Remove member | **Confirm required.** Tapping the remove icon opens an inline confirm (not a full sheet): heading "Remove {name}?", body "This removes {name} and anything attributed only to them. This can't be undone.", buttons **Remove** (destructive, `--pink-dark`) / **Keep {name}** (secondary, dismisses the confirm and leaves the member untouched). Optimistic delete with rollback on error. |
 | Claim invite code | None — the explicit "Yes, join" confirm step on `/join` already gates it; joining is reversible by a parent removing the member. |
 | Generate new invite code | None — non-destructive; supersedes prior unused codes only on the server side. |
 
@@ -261,7 +261,7 @@ These are required for the executor and ui-checker to validate behaviour.
 | Color swatch picker | 10 round swatches (`src/lib/memberColors.ts`), 32px visual in 44px tap target, 8px gap, wrap. Each swatch fill = its member color; selected swatch gets a 2px `--lavender` ring + checkmark. |
 | Role toggle | Two-segment control (Parent / Child); selected segment `--lavender` fill, white text; unselected `--card-bg` + `--text`. |
 | `visible_sections` checkboxes | One checkbox per app section. All-checked persists as `[]` ("see all" default) — NOT the full enumerated array (RESEARCH Pattern 7 pitfall). |
-| InviteSheet | Top: code section — 28px Display code, tracked, with **Copy code** (clipboard, label swaps to "Copied" 2s) and **Share** (`navigator.share()` with clipboard fallback). Below a "or" divider: email input + **Send invite**. Both flows in one sheet (D-11). On free-tier this sheet is never reached — PremiumGateSheet opens instead. |
+| InviteSheet | Top: code section — 28px Display code, tracked, with **Copy code** (clipboard, label swaps to "Copied" 2s) and **Share code** (`navigator.share()` with clipboard fallback). Below a "or" divider: email input + **Send invite**. Both flows in one sheet (D-11). On free-tier this sheet is never reached — PremiumGateSheet opens instead. |
 | PremiumGateSheet | Opened when a free-tier parent taps a locked Invite action (D-17). Title, body, **Upgrade** CTA → toast (no navigation, route doesn't exist yet — RESEARCH Open Q4). |
 | `/join` route | Outside `RootLayout` (sibling of `create-family`). 6-digit numeric input, **Join family** → confirm step showing family name → **Yes, join**. Loading + expired-code error states. After claim, `current-family` query refetches and routes to `/dashboard`. |
 | create-family link | A muted "Already invited? Join with a code" link routing to `/join` (RESEARCH Open Q1 — gives invited users a path in). |
@@ -317,3 +317,5 @@ These are required for the executor and ui-checker to validate behaviour.
 | `src/routes/onboarding/create-family.module.css` | Reused emoji-chip, input, `.primary`, `.error` patterns |
 
 User input requested in this session: **none** — all design contract questions were answered by upstream artifacts (Phase 1 UI-SPEC inheritance + Phase 2 CONTEXT.md D-01–D-18 + RESEARCH.md discretion resolutions). shadcn gate auto-resolves to `Tool: none` per the project's locked styling decision.
+
+Revision note (2026-06-07): fixed three checker copywriting findings — Add/Edit member secondary action "Cancel" → "Discard changes"; remove-member confirm secondary "Cancel" → "Keep {name}"; InviteSheet "Share" → "Share code".
