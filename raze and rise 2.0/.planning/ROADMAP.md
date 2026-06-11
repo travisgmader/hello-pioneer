@@ -130,7 +130,35 @@ Plans:
 4. Progress page shows per-exercise weight progression chart, volume bar chart, and measurement history chart — all filterable by date range; editing a completed session's weights or results is reflected in charts immediately
 5. User can upload a progress photo, view them in chronological order, and select any two dates for side-by-side comparison; achievement badges unlock for real milestones (first workout, 100 workouts, 30-day streak)
 
-**Plans:** TBD
+**Plans:** 8 plans (4 waves)
+Plans:
+**Wave 0** *(BLOCKING — schema push + native rebuild gate)*
+
+- [ ] 03-01-PLAN.md — Phase 3 migration (new tables + columns + RLS + storage buckets) + PowerSync schema mirror + chart tokens/chartStyles + TTF font + native deps install + `supabase db push` + dev-client rebuild + RED test scaffolds
+
+**Wave 1** *(parallel)*
+
+- [ ] 03-02-PLAN.md — Templates slice: Workouts tab restructure (TodayCard + template list), full-screen template builder with inline exercise search, set/rep/rest/type/superset config, custom exercises, edit/delete (TEMPLATE-01/02/03/05/06/07)
+- [ ] 03-03-PLAN.md — Progress host (4-segment tabs) + Overview (stats + recent sessions + streak) + full-screen history editing (PROGRESS-01/05, HISTORY-01/02/03, GAMIFY-03)
+
+**Wave 2** *(parallel — plug into Progress segments)*
+
+- [ ] 03-04-PLAN.md — Charts segment: Victory Native XL weight progression + volume + measurement charts, picker + date range (PROGRESS-02/03/04); fixes measured_at latent bug
+- [ ] 03-05-PLAN.md — Photos segment: capture/pick + compress + Storage upload, chronological grid, two-date comparison (PHOTO-01/02/03)
+- [ ] 03-06-PLAN.md — Gamification: milestone badge detection in completeSession, Achievements segment, post-Anubis unlock toast (GAMIFY-01/03)
+
+**Wave 3** *(parallel)*
+
+- [ ] 03-07-PLAN.md — Programs + deload: ungated Claude generate-program Edge Function, Split-tab Programs section, AI review (Accept/Regenerate/Edit), manual builder, week auto-advance, deload detection + override + 65% (PROGRAM-01..07)
+- [ ] 03-08-PLAN.md — Exercise demo media: cache-first ExerciseDB seed script + Storage resolver + ExerciseVideoPlayer wired into search rows (TEMPLATE-04)
+
+**Cross-cutting constraints:**
+- Schema-push gate: 03-01 MUST `supabase db push` and rebuild the native dev client before any Wave 1+ plan runs (Skia/expo-video/expo-image-picker are native — no OTA)
+- Latent bugs fixed: `measured_at` (not logged_at) in 03-01/03-04; `muscle_group` (not primary_muscle) in 03-01/03-02; TTF font for Victory useFont in 03-01/03-04
+- FlashList mandatory for template list, exercise results, recent sessions, photo grid (STATE.md)
+- progress.tsx owned solely by 03-03; Charts/Photos/Achievements segments plug in via stable placeholder component paths (03-04/05/06) — no progress.tsx edits in Wave 2
+- Deferred (NOT planned): TEMPLATE-08, TEMPLATE-09 (Phase 6), GAMIFY-02 challenges (Phase 6)
+
 **UI hint**: yes
 
 ---
