@@ -48,7 +48,7 @@ created: 2026-06-10
 | 03-03-T2 | 03-03 | 1 | HISTORY-01/02/03 | — | History edit writeTransaction is atomic | integration | `vitest run tests/integration/historyEdit.test.ts` | ❌ W0 | ⬜ pending |
 | 03-03-T3 | 03-03 | 1 | GAMIFY-03 | — | Streak counter increments + breaks on missed week | unit | `vitest run src/lib/__tests__/streak.test.ts` | ❌ W0 | ⬜ pending |
 | 03-04-T1 | 03-04 | 2 | PROGRESS-02/03/04 | — | Charts render with empty + populated data; volume buckets match test | unit | `vitest run src/lib/__tests__/volumeBucket.test.ts` | ❌ W0 | ⬜ pending |
-| 03-05-T1 | 03-05 | 2 | PHOTO-01/02/03 | — | Photo uploads to correct Storage path; metadata row created | integration | `vitest run tests/integration/photoUpload.test.ts` | ❌ W0 | ⬜ pending |
+| 03-05-T1 | 03-05 | 2 | PHOTO-01/02/03 | — | Photo uploads to correct Storage path; metadata row created | manual | Device camera/gallery + Supabase Storage dashboard (see Manual-Only Verifications) | n/a — manual | ⬜ pending |
 | 03-06-T1 | 03-06 | 2 | GAMIFY-01/03 | — | Badge milestones fire once on exact threshold | unit | `vitest run src/lib/__tests__/badgeRules.test.ts` | ❌ W0 | ⬜ pending |
 | 03-07-T1 | 03-07 | 3 | PROGRAM-02 | T-03-P2 | Edge Function validates JWT before calling Claude; never leaks API key | integration | Deno test for `generate-program` Edge Function | ❌ W0 | ⬜ pending |
 | 03-07-T2 | 03-07 | 3 | PROGRAM-01/03/04/05/06/07 | — | Program week-advance and deload weight reduction correct | unit | `npm run test:unit` | ✅ | ⬜ pending |
