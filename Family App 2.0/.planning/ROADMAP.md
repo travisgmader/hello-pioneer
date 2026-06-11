@@ -74,7 +74,22 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A parent can invite a member by email link or share a 6-digit family code; when an invited user signs in with Google, the `handle_new_user()` Postgres trigger auto-links them to the pre-seeded member row by lowercase email
   4. A parent can create an account on behalf of a child under 13 through a COPPA-compliant parental-consent flow before any child data is recorded
   5. Every new family automatically enters a 7-day premium trial tracked in Stripe; premium-only features are gated by a `useTier()` hook driven by the Stripe subscription state
-**Plans:** TBD
+**Plans:** 5 plans
+
+**Wave 1** *(no dependencies — schema foundation + test scaffold)*
+- [ ] 02-01-PLAN.md — Phase 2 migration (family_invites, coppa_consented_at, handle_new_user trigger, invite RPCs, RLS, subscription_status lock) + [BLOCKING] db push + types regen + realtime bridge + vaul gate + Wave 0 RED stubs
+
+**Wave 2** *(blocked on Wave 1)*
+- [ ] 02-02-PLAN.md — Data/state layer: useMembers, useTier, useUpsert/useDeleteMember, useFamilyInvites, ActingAsProvider/useActingAs, own-member helpers, member color/emoji palettes
+
+**Wave 3** *(blocked on Wave 2)*
+- [ ] 02-03-PLAN.md — Members vertical slice: /members route, MemberCard, AddEditMemberSheet, AvatarChipRow, ActingAsBanner, 7th nav tab + RootLayout/router wiring
+
+**Wave 4** *(blocked on Wave 3)*
+- [ ] 02-04-PLAN.md — Invite vertical slice: invite-member Edge Function, InviteSheet (code + email + Web Share), /join route + create-family join link
+
+**Wave 5** *(blocked on Wave 4)*
+- [ ] 02-05-PLAN.md — Compliance + gating slice: CoppaConsentSheet (consent before child write), PremiumGateSheet (free-tier invite gate via useTier)
 
 ### Phase 3: Chores
 **Goal:** Parents assign recurring chores; members one-tap complete them with optimistic update; streaks track consecutive completions DST-safely and survive a single miss via auto-replenishing freezes.
