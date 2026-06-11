@@ -563,20 +563,24 @@ import { startOfISOWeek, differenceInCalendarISOWeeks } from 'date-fns';
 | A7 | Progress photo Storage path `progress-photos/{userId}/{iso-date}.jpg` and private bucket | Pattern 7 | UI-SPEC specifies this exactly; low risk |
 | A8 | ExerciseDB data licensing permits bundling into Supabase Storage | Pattern 5 | STATE.md flags this as an open todo — confirm before seeding (legal, not technical) |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Per-template exercise type override** — Does TEMPLATE-05's exercise-type toggle set the type on the template instance (`template_exercises.exercise_type`, new column) or mutate the shared library exercise (`exercises.type`, with cross-template side effects)?
    - What we know: UI-SPEC shows a Standard/Bodyweight/Run toggle in the template builder; `useSessionData` currently reads type from the library JOIN.
    - Recommendation: Add `template_exercises.exercise_type` (instance-level override, falling back to library type when null). Confirm with user in discuss-phase.
+   - **RESOLVED:** 03-01 adds `template_exercises.exercise_type` column (instance-level override); 03-02 writes it in the template builder. Matches recommendation.
 
 2. **Anthropic in Edge Function: SDK vs raw fetch** — The repo uses `esm.sh` imports; the Anthropic SDK is cleanest via `npm:`. Mixed import styles in one function are fine in Deno but worth a deliberate choice.
    - Recommendation: Use raw `fetch` to `https://api.anthropic.com/v1/messages` with prompt-enforced JSON + zod validation as the robust baseline (no npm-in-Deno surprises), and treat the SDK + structured outputs as an enhancement if it imports cleanly. Verify in Wave 0.
+   - **RESOLVED:** 03-07 uses raw `fetch` baseline with zod-validated JSON response. Matches recommendation.
 
 3. **ExerciseDB video vs GIF** — RapidAPI ExerciseDB classically returns animated **GIF** URLs (`gifUrl`), not MP4. The UI-SPEC's `ExerciseVideoPlayer` uses `expo-video` (MP4) with a GIF/`Image` fallback.
    - Recommendation: Plan for GIF rendering via `Image` as the primary path (seed `.gif` to Storage); keep `expo-video` for any true-video source. Confirm the exact ExerciseDB media format during the seed-script spike.
+   - **RESOLVED:** 03-08 plans GIF-via-`Image` as primary path, seeded to Supabase Storage; `expo-video` retained for any true-video source. Matches recommendation.
 
 4. **Lifetime aggregate storage for badges** — Where do running totals (lifetime volume) live to avoid full scans? A `user_stats` table, columns on `split_settings`, or recompute-on-read?
    - Recommendation: Add a lightweight `user_stats` row (or reuse `profiles`) with `total_sessions`, `lifetime_volume_kg`, incremented in `completeSession`. Decide in Wave 0 schema.
+   - **RESOLVED:** 03-01 adds `user_stats` table with `total_sessions`, `lifetime_volume_kg` columns; 03-06 increments them inside `completeSession` writeTransaction. Matches recommendation.
 
 ## Environment Availability
 
