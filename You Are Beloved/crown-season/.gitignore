@@ -1,0 +1,17 @@
+node_modules
+dist
+dev-dist
+.DS_Store
+*.local
+.vercel
+
+# generated leader seed (sensitive — regenerate locally)
+scripts/seed-leader.sql
+.env*
+
+# Supabase CLI DB connection string (secret — never commit)
+.supabase.env
+
+# TS build cache & tooling artifacts
+*.tsbuildinfo
+.playwright-cli
