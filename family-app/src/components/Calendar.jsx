@@ -299,6 +299,26 @@ export default function Calendar({
               <input className={styles.evtInput} placeholder="Event title..." value={newEvent.title} onChange={e => setNewEvent(f => ({ ...f, title: e.target.value }))} required />
               <div className={styles.timeRow}>
                 <label className={styles.timeLabel}>
+                  Start time
+                  <input
+                    type="time"
+                    className={styles.evtInput}
+                    value={newEvent.time}
+                    onChange={e => setNewEvent(f => ({ ...f, time: e.target.value }))}
+                  />
+                </label>
+                <label className={styles.timeLabel}>
+                  End time
+                  <input
+                    type="time"
+                    className={styles.evtInput}
+                    value={newEvent.endTime}
+                    onChange={e => setNewEvent(f => ({ ...f, endTime: e.target.value }))}
+                  />
+                </label>
+              </div>
+              <div className={styles.timeRow}>
+                <label className={styles.timeLabel}>
                   Start
                   <input
                     type="date"
