@@ -44,6 +44,12 @@ const eventToRow = (e) => ({
   time: e.time, end_time: e.endTime,
   color: e.color, dropoff_parent: e.dropoffParent ?? null, pickup_parent: e.pickupParent ?? null,
 });
+// camelCase app field → v1_events column, for partial updates
+const EVENT_COLS = {
+  title: 'title', memberId: 'member_id', date: 'date', endDate: 'end_date',
+  time: 'time', endTime: 'end_time', color: 'color',
+  dropoffParent: 'dropoff_parent', pickupParent: 'pickup_parent',
+};
 
 const recFromRow = (r) => ({
   id: r.id, title: r.title, category: r.category,
@@ -128,7 +134,12 @@ export const dbDeleteChore = (id) => checked(supabase.from('v1_chores').delete()
 
 export const dbAddEvent    = (e) => checked(supabase.from('v1_events').insert(eventToRow(e)));
 export const dbUpdateEvent = (id, u) => {
-  const { id: _id, ...fields } = eventToRow({ id: '', ...u });
+  // Only write columns explicitly present in the update — never null out
+  // untouched fields (dropoff/pickup/end_date). '' → null (end_date is a date column).
+  const fields = {};
+  for (const [k, v] of Object.entries(u)) {
+    if (k in EVENT_COLS) fields[EVENT_COLS[k]] = v === '' ? null : v;
+  }
   return checked(supabase.from('v1_events').update(fields).eq('id', id));
 };
 export const dbDeleteEvent = (id) => checked(supabase.from('v1_events').delete().eq('id', id));
