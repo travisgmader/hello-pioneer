@@ -6,6 +6,14 @@ import * as db from '../lib/db';
 
 const AppContext = createContext(null);
 
+// Monotonic unique id. Date.now() alone collides when several rows are
+// created in one synchronous loop (e.g. a recurring event fans out to many
+// occurrences in the same millisecond), producing duplicate primary keys and
+// 409 conflicts on all but the first insert. The counter guarantees each id
+// is unique within a session; Date.now() keeps them unique across sessions.
+let _idSeq = 0;
+const uid = (prefix) => `${prefix}${Date.now()}-${_idSeq++}`;
+
 // ── localStorage fallback helpers ─────────────────────
 const lsLoad = (key, fallback) => {
   try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
@@ -86,7 +94,7 @@ export function AppProvider({ children }) {
 
   // ── Chores ────────────────────────────────────────────
   const addChore = (chore) => {
-    const c = { ...chore, id: 'c' + Date.now(), completed: false };
+    const c = { ...chore, id: uid('c'), completed: false };
     setChores(prev => [...prev, c]);
     if (isConfigured) db.dbAddChore(c).catch(dbErr);
   };
@@ -113,7 +121,7 @@ export function AppProvider({ children }) {
 
   // ── Events ────────────────────────────────────────────
   const addEvent = (event) => {
-    const e = { ...event, id: 'e' + Date.now() };
+    const e = { ...event, id: uid('e') };
     setEvents(prev => [...prev, e]);
     if (isConfigured) db.dbAddEvent(e).catch(dbErr);
   };
@@ -139,7 +147,7 @@ export function AppProvider({ children }) {
     if (isConfigured) db.dbSetMeal(dateStr, slot, value).catch(dbErr);
   };
   const addMealRec = (rec) => {
-    const r = { ...rec, id: 'mr' + Date.now(), votes: [] };
+    const r = { ...rec, id: uid('mr'), votes: [] };
     setMealRecs(prev => [...prev, r]);
     if (isConfigured) db.dbAddMealRec(r).catch(dbErr);
   };
@@ -160,7 +168,7 @@ export function AppProvider({ children }) {
 
   // ── Groceries ─────────────────────────────────────────
   const addGrocery = (item) => {
-    const g = { ...item, id: 'g' + Date.now(), checked: false };
+    const g = { ...item, id: uid('g'), checked: false };
     setGroceries(prev => [...prev, g]);
     if (isConfigured) db.dbAddGrocery(g).catch(dbErr);
   };
@@ -177,7 +185,7 @@ export function AppProvider({ children }) {
 
   // ── Grocery requests ──────────────────────────────────
   const addGroceryRequest = (req) => {
-    const r = { ...req, id: 'gr' + Date.now(), status: 'pending' };
+    const r = { ...req, id: uid('gr'), status: 'pending' };
     setGroceryRequests(prev => [...prev, r]);
     if (isConfigured) db.dbAddGroceryReq(r).catch(dbErr);
   };
