@@ -39,7 +39,7 @@ export default function Calendar({
   const [month, setMonth] = useState(now.getMonth());
   const [selected, setSelected] = useState(null);
   const [showEventForm, setShowEventForm] = useState(false);
-  const [newEvent, setNewEvent] = useState({ title: '', memberId: '', time: '', endTime: '', startDate: '', endDate: '', color: 'peach', repeat: 'none', repeatUntil: '' });
+  const [newEvent, setNewEvent] = useState({ title: '', memberId: '', time: '', endTime: '', startDate: '', endDate: '', color: 'peach', repeat: 'none', repeatUntil: '', repeatDays: [] });
   const [editingId, setEditingId] = useState(null);
   const [editFields, setEditFields] = useState({});
   const [editingMealSlot, setEditingMealSlot] = useState(null);
@@ -91,8 +91,21 @@ export default function Calendar({
   const selectedDateStr = selected ? fmt(year, month, selected) : null;
   const selectedEvents = selected ? eventsForDate(selectedDateStr) : [];
 
-  const generateRepeatDates = (startDate, repeat, until) => {
+  const generateRepeatDates = (startDate, repeat, until, repeatDays = []) => {
     if (repeat === 'none') return [startDate];
+    // Custom: repeat on the selected weekdays only, day-by-day until the end date.
+    if (repeat === 'custom') {
+      if (!repeatDays.length) return [startDate];
+      const dates = [];
+      const end = new Date(until + 'T00:00:00');
+      let cur = new Date(startDate + 'T00:00:00');
+      let guard = 500;
+      while (cur <= end && guard-- > 0) {
+        if (repeatDays.includes(cur.getDay())) dates.push(localDateStr(cur));
+        cur.setDate(cur.getDate() + 1);
+      }
+      return dates;
+    }
     const dates = [];
     const end = new Date(until + 'T00:00:00');
     let cur = new Date(startDate + 'T00:00:00');
@@ -113,11 +126,11 @@ export default function Calendar({
     e.preventDefault();
     if (!newEvent.title.trim() || !selected) return;
     const startDate = newEvent.startDate || fmt(year, month, selected);
-    const { repeat, repeatUntil, startDate: _sd, endDate, ...eventBase } = newEvent;
+    const { repeat, repeatUntil, repeatDays, startDate: _sd, endDate, ...eventBase } = newEvent;
     const until = repeat !== 'none' && repeatUntil ? repeatUntil : startDate;
     const resolvedEndDate = endDate && endDate > startDate ? endDate : null;
-    generateRepeatDates(startDate, repeat, until).forEach(date => onAddEvent?.({ ...eventBase, date, endDate: resolvedEndDate }));
-    setNewEvent({ title: '', memberId: '', time: '', endTime: '', startDate: '', endDate: '', color: 'peach', repeat: 'none', repeatUntil: '' });
+    generateRepeatDates(startDate, repeat, until, repeatDays).forEach(date => onAddEvent?.({ ...eventBase, date, endDate: resolvedEndDate }));
+    setNewEvent({ title: '', memberId: '', time: '', endTime: '', startDate: '', endDate: '', color: 'peach', repeat: 'none', repeatUntil: '', repeatDays: [] });
     setShowEventForm(false);
   };
 
@@ -363,8 +376,10 @@ export default function Calendar({
                     const repeat = e.target.value;
                     const base = newEvent.startDate || fmt(year, month, selected);
                     const d = new Date(base + 'T00:00:00');
-                    d.setDate(d.getDate() + (repeat === 'daily' || repeat === 'weekdays' ? 14 : repeat === 'weekly' ? 28 : 90));
-                    setNewEvent(f => ({ ...f, repeat, repeatUntil: repeat !== 'none' ? localDateStr(d) : '' }));
+                    d.setDate(d.getDate() + (repeat === 'daily' || repeat === 'weekdays' ? 14 : repeat === 'weekly' ? 28 : repeat === 'custom' ? 28 : 90));
+                    // Seed custom picker with the start date's weekday so it's never empty.
+                    const repeatDays = repeat === 'custom' ? [new Date(base + 'T00:00:00').getDay()] : [];
+                    setNewEvent(f => ({ ...f, repeat, repeatUntil: repeat !== 'none' ? localDateStr(d) : '', repeatDays }));
                   }}
                 >
                   <option value="none">Never</option>
@@ -372,6 +387,7 @@ export default function Calendar({
                   <option value="weekdays">Weekdays</option>
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
+                  <option value="custom">Custom days…</option>
                 </select>
                 {newEvent.repeat !== 'none' && (
                   <>
@@ -386,6 +402,28 @@ export default function Calendar({
                       required
                     />
                   </>
+                )}
+                {newEvent.repeat === 'custom' && (
+                  <div className={styles.weekdayPicker}>
+                    {DAYS.map((label, dow) => {
+                      const active = newEvent.repeatDays.includes(dow);
+                      return (
+                        <button
+                          key={dow}
+                          type="button"
+                          className={`${styles.weekdayBtn} ${active ? styles.weekdayActive : ''}`}
+                          onClick={() => setNewEvent(f => ({
+                            ...f,
+                            repeatDays: f.repeatDays.includes(dow)
+                              ? f.repeatDays.filter(x => x !== dow)
+                              : [...f.repeatDays, dow].sort((a, b) => a - b),
+                          }))}
+                        >
+                          {label[0]}
+                        </button>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
               <button type="submit" className={styles.evtSubmit}>Add</button>
