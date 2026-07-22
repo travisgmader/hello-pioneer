@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_CHORES, INITIAL_EVENTS, INITIAL_MEAL_PLAN, INITIAL_MEAL_RECOMMENDATIONS, INITIAL_GROCERIES, INITIAL_GROCERY_REQUESTS } from '../data/initialData';
-import { isConfigured, supabase } from '../lib/supabase';
+import { isConfigured, supabase, supabaseRealtime } from '../lib/supabase';
 import { nextDueDate } from '../lib/utils';
 import * as db from '../lib/db';
 
@@ -68,7 +68,7 @@ export function AppProvider({ children }) {
   // ── Real-time subscriptions ───────────────────────────
   useEffect(() => {
     if (!isConfigured || !user) return;
-    const channel = supabase
+    const channel = supabaseRealtime
       .channel('family-realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'v1_chores' },           () => db.loadChores().then(setChores))
       .on('postgres_changes', { event: '*', schema: 'public', table: 'v1_events' },           () => db.loadEvents().then(setEvents))
@@ -78,7 +78,7 @@ export function AppProvider({ children }) {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'v1_groceries' },        () => db.loadGroceries().then(setGroceries))
       .on('postgres_changes', { event: '*', schema: 'public', table: 'v1_grocery_requests' }, () => db.loadGroceryRequests().then(setGroceryRequests))
       .subscribe();
-    return () => supabase.removeChannel(channel);
+    return () => supabaseRealtime.removeChannel(channel);
   }, [user]);
 
   // ── localStorage sync (only when Supabase is NOT configured) ──
