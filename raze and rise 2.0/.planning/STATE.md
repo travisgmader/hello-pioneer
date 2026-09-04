@@ -2,10 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Phase 3 context gathered
-last_updated: "2026-06-11T02:39:01.008Z"
-last_activity: 2026-06-11 -- Phase 3 planning complete
+status: planned
+last_updated: "2026-09-04T00:00:00.000Z"
+last_activity: 2026-09-04 -- STATE.md reconciled; Phase 03 ready to execute
 progress:
   total_phases: 6
   completed_phases: 2
@@ -21,41 +20,41 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-18)
 
 **Core value:** A workout session — from opening the app to tapping Complete — must be frictionless, accurate, and smart enough that you never need to reach for your phone clock, a separate notes app, or a calculator.
-**Current focus:** Phase 2 — Core Session Loop
+**Current focus:** Phase 03 — templates-programs-progress
 
 ## Current Position
 
-Phase: 2 of 6 (Core Session Loop)
-Plan: 0 of 9 in current phase (planning complete — ready to execute)
-Status: Ready to execute
-Last activity: 2026-06-11 -- Phase 3 planning complete
+Phase: 03 (templates-programs-progress) — PLANNED, ready to execute
+Plan: 0 of 8 executed
+Status: Phase 03 planned (8 plans, 4 waves) — awaiting execution
+Last activity: 2026-09-04 -- STATE.md reconciled with git history; Phase 03 execution starting
 
-Progress: [█░░░░░░░░░] 17%
+Progress: [███░░░░░░░] 33% (2 of 6 phases complete)
 
 ```
-Phase 1: Foundation          [x] Complete (9/9 plans)
-Phase 2: Core Session Loop   [>] Planned (9 plans, 8 waves — ready to execute)
-Phase 3: Templates, Programs & Progress  [ ] Not started
-Phase 4: Premium & AI        [ ] Not started
-Phase 5: Wearables & Notifications      [ ] Not started
-Phase 6: Polish & Platform   [ ] Not started
+Phase 1: Foundation                      [x] Complete (9/9 plans)
+Phase 2: Core Session Loop               [x] Complete (9/9 plans, 238 tests passing)
+Phase 3: Templates, Programs & Progress  [>] Planned (8 plans, 4 waves — ready to execute)
+Phase 4: Premium & AI                    [ ] Not started
+Phase 5: Wearables & Notifications       [ ] Not started
+Phase 6: Polish & Platform               [ ] Not started
 ```
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 8
-- Average duration: 13 min
-- Total execution time: ~1.4 hours
+- Total plans completed: 18
+- Average duration: ~13 min
+- Total execution time: ~4 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 — Foundation | 9/9 | ~120 min | 13 min |
-| 2 — Core Session Loop | 0/? | — | — |
-| 3 — Templates, Programs & Progress | 0/? | — | — |
+| 2 — Core Session Loop | 9/9 | ~150 min | ~17 min |
+| 3 — Templates, Programs & Progress | 0/8 | — | — |
 | 4 — Premium & AI | 0/? | — | — |
 | 5 — Wearables & Notifications | 0/? | — | — |
 | 6 — Polish & Platform | 0/? | — | — |
@@ -158,5 +157,5 @@ Items carried forward from pre-v2 planning and explicitly deferred:
 
 ## Session Continuity
 
-Last session: 2026-05-27
-Stopped at: Phase 3 context gathered
+Last session: 2026-09-04
+Stopped at: Phase 3 fully planned (03-01..03-08); starting execution at Wave 0 (03-01 schema push + native rebuild gate)
