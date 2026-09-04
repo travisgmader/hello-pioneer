@@ -41,6 +41,16 @@ module.exports = {
         'set-warmup': '#5C564B',
         'timer-zero-bg': '#F2CA50',
         'timer-zero-fg': '#0A0A0B',
+        // Phase 3 — chart + badge semantic tokens (03-UI-SPEC "New Color Tokens").
+        // Chart components must import the JS equivalents from src/lib/tokens.ts:
+        // Victory Native XL renders on a Skia canvas and cannot take class names.
+        'chart-line': '#F2CA50', // alias of accent
+        'chart-bar': 'rgba(212, 175, 55, 0.35)',
+        'chart-measurement': '#60A5FA',
+        'chart-grid': 'rgba(92, 86, 75, 0.30)',
+        'badge-unlocked': '#F2CA50', // alias of accent
+        'badge-locked': 'rgba(92, 86, 75, 0.40)',
+        'badge-locked-border': 'rgba(92, 86, 75, 0.25)',
       },
       spacing: {
         xs: '4px',
