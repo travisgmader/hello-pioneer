@@ -126,8 +126,8 @@ Key decisions relevant to Phase 1 (pre-existing):
 
 ### Pending Todos
 
-- Apply for Garmin developer program access during Phase 3 (2–4 week approval lead time; needed before Phase 5 Terra API work)
-- Apply for Whoop developer API access during Phase 3 (same lead time constraint)
+- ~~Apply for Garmin developer program access~~ — NOT NEEDED if going through Terra. Terra states it "manages the Garmin API credentials, so there is nothing to register" (tryterra.co/integrations/garmin, verified 2026-09-04). Direct Garmin Connect Developer Program is enterprise-only, currently partner-gated, and reportedly not accepting new signups. Confirm with Terra sales before Phase 5; fall back to the existing v1 `.fit` file export if Terra's Garmin coverage changes.
+- **Apply for Whoop developer credentials during Phase 3** — REQUIRED even when using Terra: "You supply your own WHOOP app credentials" (tryterra.co/integrations/whoop). Self-serve at external-developer-portal.whoop.com; needs a Whoop membership/device to register. Unapproved apps are capped at **10 connected Whoop members**, so register now and submit for app approval before Phase 5 launch. Approval needs: accepted API Terms of Use, tested with ≥1 real Whoop user, accurate app name/contact email/privacy policy URL, and compliance with Whoop design + brand guidelines.
 - Verify `react-native-health` New Architecture compatibility before integrating in Phase 5 (SDK 55 mandates New Architecture)
 - Confirm Terra API per-user pricing before committing to it as the wearables abstraction in Phase 5
 - Confirm ExerciseDB data licensing terms before bundling exercise data into Supabase Storage
@@ -136,7 +136,7 @@ Key decisions relevant to Phase 1 (pre-existing):
 
 ### Blockers / Concerns
 
-- Garmin and Whoop API access require developer program applications with 2–4 week approval windows. Must be initiated in Phase 3 to avoid blocking Phase 5.
+- Whoop app approval gates Phase 5 launch (not development): unapproved Whoop apps are limited to 10 connected members. Register the app in Phase 3, build against it, submit for approval before launch. Garmin is no longer a blocker via Terra (Terra owns those credentials) — but Terra's entry pricing is ~$399–499/mo, which is the real Phase 5 gating decision.
 - `expo-widgets` (iOS home screen widgets) is alpha as of May 2026. Pin the version; test on each SDK upgrade.
 - FlashList (`@shopify/flash-list`) must be used for workout history and exercise library screens from Phase 2/3 onward. FlatList causes JS thread spikes on dense set-row lists.
 - RLS + Supabase Realtime: every table with a Realtime subscription must have an explicit SELECT policy or events are silently dropped (GitHub issue supabase/supabase#35282). Always add RLS and policies in the same migration.
