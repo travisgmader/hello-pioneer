@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planned
-last_updated: "2026-09-04T00:00:00.000Z"
-last_activity: 2026-09-04 -- STATE.md reconciled; Phase 03 ready to execute
+status: executing
+last_updated: "2026-09-04T16:06:01.027Z"
+last_activity: 2026-09-04 -- Phase 03 execution started
 progress:
   total_phases: 6
   completed_phases: 2
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-18)
 
 ## Current Position
 
-Phase: 03 (templates-programs-progress) — PLANNED, ready to execute
-Plan: 0 of 8 executed
-Status: Phase 03 planned (8 plans, 4 waves) — awaiting execution
-Last activity: 2026-09-04 -- STATE.md reconciled with git history; Phase 03 execution starting
+Phase: 03 (templates-programs-progress) — EXECUTING
+Plan: 1 of 8
+Status: Executing Phase 03
+Last activity: 2026-09-04 -- Phase 03 execution started
 
 Progress: [███░░░░░░░] 33% (2 of 6 phases complete)
 
@@ -77,6 +77,17 @@ Key decisions relevant to Phase 1 (01a additions):
 - **react-native version:** 0.82.1 (not 0.81.5 from template) — required by react-native-screens@4.25.1 in expo-router@55
 - **TypeScript version:** 6.x installed; ignoreDeprecations: '6.0' added to tsconfig for baseUrl compatibility
 - **Install flags:** --legacy-peer-deps required for all installs due to React 19/ecosystem peer dep gaps
+
+Key decisions relevant to Phase 3 (03-01 Wave 0 foundation additions):
+
+- **measurements extra columns already existed:** hips_cm / arms_cm / thighs_cm / notes were created in the initial schema; the real gap was the PowerSync mirror. Phase 3 migration uses `ADD COLUMN IF NOT EXISTS` so it is a no-op rather than an abort of the whole migration.
+- **Correct column names (do not carry the latent bugs forward):** `measurements.measured_at` (never `logged_at`) and `exercises.muscle_group` (never `primary_muscle`). Both bugs still live in useSessionData.ts:184 and ExerciseSwapModal:98 — logged in the phase deferred-items.md, owned by 03-03 / 03-02.
+- **template_exercises.exercise_type:** nullable with a CHECK matching exercises.type; NULL means "inherit from the library JOIN", so every existing row keeps current behaviour.
+- **user_stats table:** running aggregates (total_sessions, lifetime_volume_kg, first_pr_at) so badge detection never scans session history — resolves RESEARCH Open Question 4.
+- **JS token layer (src/lib/tokens.ts):** required because Victory Native XL renders on a Skia canvas that NativeWind className cannot reach. Chart components import tokens/chartStyles; raw hex in chart code stays forbidden.
+- **Chart axis font:** assets/fonts/Manrope-Medium.ttf — the Manrope 500 *static* instance (OFL 1.1), not the variable TTF, because Skia `useFont` wants a single concrete weight.
+- **vitest include extended to `src/**/__tests__`:** without it the co-located lib suites are silently never collected and a RED scaffold reports green.
+- **Expo module installs must use `npx expo install`:** bare `npm install expo-video` pulls the SDK 56 line and breaks the SDK 55 native build.
 
 Key decisions relevant to Phase 1 (01-03 auth additions):
 
