@@ -8,13 +8,20 @@ import Progress from './pages/Progress.jsx'
 import Onboarding from './components/Onboarding/Onboarding.jsx'
 import LoadingScreen from './components/LoadingScreen/LoadingScreen.jsx'
 import AuthPage from './pages/AuthPage.jsx'
+import ResetPassword from './pages/ResetPassword.jsx'
 import { defaultState } from './lib/storage.js'
 import { supabase } from './lib/supabase.js'
+import { initialAuthType } from './lib/urlHash.js'
 
 const ADMIN_EMAIL = 'travis.g.mader@gmail.com'
 
 export default function App() {
   const [authReady, setAuthReady] = useState(false)
+  // A recovery link signs the user in, so it must be gated on separately or the
+  // app would render normally and never offer to set a new password. The hash is
+  // the reliable signal: supabase-js may fire PASSWORD_RECOVERY while parsing the
+  // URL, before the listener below is subscribed.
+  const [recovering, setRecovering] = useState(initialAuthType === 'recovery')
   const [user, setUser]           = useState(null)
   const [loading, setLoading]     = useState(true)
   const [stateReady, setStateReady] = useState(false)
@@ -29,10 +36,12 @@ export default function App() {
       setAuthReady(true)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       const next = session?.user ?? null
+      if (event === 'PASSWORD_RECOVERY') setRecovering(true)
       setUser(next)
       if (!next) {
+        setRecovering(false)
         stateLoaded.current = false
         setStateReady(false)
         setState(defaultState())
@@ -71,8 +80,9 @@ export default function App() {
 
   const isAdmin = user?.email === ADMIN_EMAIL
 
-  if (!authReady) return null
-  if (!user)      return <AuthPage />
+  if (!authReady)         return null
+  if (!user)              return <AuthPage />
+  if (recovering)         return <ResetPassword onDone={() => setRecovering(false)} />
 
   let content
   if (page === 'workouts') {
